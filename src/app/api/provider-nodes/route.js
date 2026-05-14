@@ -42,6 +42,20 @@ export async function POST(request) {
       return NextResponse.json({ error: "Prefix is required" }, { status: 400 });
     }
 
+    // Check prefix uniqueness against static provider aliases + existing custom nodes
+    const { AI_PROVIDERS } = await import("@/shared/constants/providers");
+    const staticAliases = new Set(
+      Object.values(AI_PROVIDERS).map(p => p.alias).filter(Boolean)
+    );
+    if (staticAliases.has(prefix.trim())) {
+      return NextResponse.json({ error: `Prefix "${prefix.trim()}" is already used by a built-in provider` }, { status: 409 });
+    }
+    const existingNodes = await getProviderNodes();
+    const takenByNode = existingNodes.find(n => n.prefix === prefix.trim());
+    if (takenByNode) {
+      return NextResponse.json({ error: `Prefix "${prefix.trim()}" is already used by "${takenByNode.name}"` }, { status: 409 });
+    }
+
     // Determine type
     const nodeType = type || "openai-compatible";
 

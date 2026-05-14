@@ -237,7 +237,7 @@ export async function proxyAwareFetch(url, options = {}, proxyOptions = null) {
       const realIP = await resolveRealIP(parsedUrl.hostname);
       if (realIP) return await createBypassRequest(parsedUrl, realIP, options);
     } catch (error) {
-      console.warn(`[ProxyFetch] MITM bypass failed: ${error.message}`);
+      // Suppress MITM bypass ECONNREFUSED noise — expected when no local proxy is running
     }
   }
 

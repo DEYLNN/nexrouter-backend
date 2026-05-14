@@ -14,10 +14,8 @@ export class DefaultExecutor extends BaseExecutor {
   transformRequest(model, body) {
     let transformed = injectReasoningContent({ provider: this.provider, model, body });
     if (this.provider === "xiaomi-mimo-plan-sgp") {
-      const messages = Array.isArray(transformed.messages)
-        ? transformed.messages.map(({ reasoning_content, reasoning, thinking, ...message }) => message)
-        : transformed.messages;
-      transformed = { ...transformed, messages };
+      // Xiaomi MiMo SGP requires reasoning_content to be passed back in thinking mode.
+      // Do NOT strip reasoning_content from messages — only strip top-level thinking flags.
       delete transformed.reasoning;
       delete transformed.thinking;
       delete transformed.include_reasoning;

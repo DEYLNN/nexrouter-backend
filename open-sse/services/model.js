@@ -16,12 +16,14 @@ const ALIAS_TO_PROVIDER_ID = {
   ocg: "opencode-go",
   // TTS providers
   el: "elevenlabs",
-  // API Key providers
+  // LLM API Key providers
   openai: "openai",
   anthropic: "anthropic",
   gemini: "gemini",
+  or: "openrouter",
   openrouter: "openrouter",
   glm: "glm",
+  "glm-cn": "glm-cn",
   kimi: "kimi",
   minimax: "minimax",
   "minimax-cn": "minimax-cn",
@@ -43,6 +45,10 @@ const ALIAS_TO_PROVIDER_ID = {
   siliconflow: "siliconflow",
   hyp: "hyperbolic",
   hyperbolic: "hyperbolic",
+  nous: "nous-portal",
+  morph: "morph",
+  routeway: "routeway",
+  "mimo-sgp": "xiaomi-mimo-plan-sgp",
   dg: "deepgram",
   deepgram: "deepgram",
   aai: "assemblyai",

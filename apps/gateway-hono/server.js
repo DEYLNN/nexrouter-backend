@@ -32,6 +32,8 @@ import { POST as providerValidatePost } from "../../src/app/api/providers/valida
 import { GET as providerModelsGet } from "../../src/app/api/providers/[id]/models/route.js";
 import { POST as providerTestPost } from "../../src/app/api/providers/[id]/test/route.js";
 import { POST as providerTestModelsPost } from "../../src/app/api/providers/[id]/test-models/route.js";
+import { GET as mimoUsageGet } from "../../src/app/api/providers/mimo-usage/route.js";
+import { GET as availableModelsGet } from "../../src/app/api/keys/available-models/route.js";
 import { POST as providerNodesPost } from "../../src/app/api/provider-nodes/route.js";
 import { PUT as providerNodePut, DELETE as providerNodeDelete } from "../../src/app/api/provider-nodes/[id]/route.js";
 import { POST as providerNodeValidatePost } from "../../src/app/api/provider-nodes/validate/route.js";
@@ -380,6 +382,7 @@ app.get("/api/usage/:connectionId", (c) => nextRouteHandler(c, usageConnectionGe
 // P1 dashboard config CRUD migrated through Hono (reusing existing route handlers)
 app.get("/api/keys", (c) => nextRouteHandler(c, keysGet));
 app.post("/api/keys", (c) => nextRouteHandler(c, keysPost));
+app.get("/api/keys/available-models", (c) => nextRouteHandler(c, availableModelsGet));
 app.get("/api/keys/:id", (c) => nextRouteHandler(c, keyGet, { id: c.req.param("id") }));
 app.put("/api/keys/:id", (c) => nextRouteHandler(c, keyPut, { id: c.req.param("id") }));
 app.delete("/api/keys/:id", (c) => nextRouteHandler(c, keyDelete, { id: c.req.param("id") }));
@@ -389,6 +392,7 @@ app.get("/api/settings/database", (c) => nextRouteHandler(c, settingsDatabaseGet
 app.post("/api/settings/database", (c) => nextRouteHandler(c, settingsDatabasePost));
 
 app.post("/api/providers", (c) => nextRouteHandler(c, providersPost));
+app.get("/api/providers/mimo-usage", (c) => nextRouteHandler(c, mimoUsageGet));
 app.get("/api/providers/:id", (c) => nextRouteHandler(c, providerGet, { id: c.req.param("id") }));
 app.put("/api/providers/:id", (c) => nextRouteHandler(c, providerPut, { id: c.req.param("id") }));
 app.delete("/api/providers/:id", (c) => nextRouteHandler(c, providerDelete, { id: c.req.param("id") }));

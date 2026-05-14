@@ -6,6 +6,7 @@ import {
   clearAccountError,
   extractApiKey,
   isValidApiKey,
+  isModelAllowedForKey,
 } from "../services/auth.js";
 import { cacheClaudeHeaders } from "open-sse/utils/claudeHeaderCache.js";
 import { getSettings } from "@/lib/localDb";
@@ -87,10 +88,16 @@ export async function handleChat(request, clientRawRequest = null) {
       log.warn("AUTH", "Missing API key (requireApiKey=true)");
       return errorResponse(HTTP_STATUS.UNAUTHORIZED, "Missing API key");
     }
-    const valid = await isValidApiKey(apiKey);
-    if (!valid) {
+    const validKey = await isValidApiKey(apiKey);
+    if (!validKey) {
       log.warn("AUTH", "Invalid API key (requireApiKey=true)");
       return errorResponse(HTTP_STATUS.UNAUTHORIZED, "Invalid API key");
+    }
+
+    // Check model access restriction
+    if (modelStr && !isModelAllowedForKey(validKey, modelStr)) {
+      log.warn("AUTH", `API key not allowed for model: ${modelStr}`);
+      return errorResponse(HTTP_STATUS.FORBIDDEN, `Access denied: your API key does not have access to model "${modelStr}"`);
     }
   }
 

@@ -4,6 +4,7 @@ import {
   clearAccountError,
   extractApiKey,
   isValidApiKey,
+  isModelAllowedForKey,
 } from "../services/auth.js";
 import { getSettings } from "@/lib/localDb";
 import { getModelInfo, getComboModels } from "../services/model.js";
@@ -39,8 +40,11 @@ export async function handleImageGeneration(request) {
   const settings = await getSettings();
   if (settings.requireApiKey) {
     if (!apiKey) return errorResponse(HTTP_STATUS.UNAUTHORIZED, "Missing API key");
-    const valid = await isValidApiKey(apiKey);
-    if (!valid) return errorResponse(HTTP_STATUS.UNAUTHORIZED, "Invalid API key");
+    const validKey = await isValidApiKey(apiKey);
+    if (!validKey) return errorResponse(HTTP_STATUS.UNAUTHORIZED, "Invalid API key");
+    if (model && !isModelAllowedForKey(validKey, model)) {
+      return errorResponse(HTTP_STATUS.FORBIDDEN, `Access denied: your API key does not have access to model "${model}"`);
+    }
   }
 
   if (!modelStr) return errorResponse(HTTP_STATUS.BAD_REQUEST, "Missing model");

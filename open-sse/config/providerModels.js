@@ -29,9 +29,9 @@ function withCodexReviewModels(models) {
 export const PROVIDER_MODELS = {
   // OAuth Providers (using alias)
   cc: [  // Claude Code
-    { id: "claude-opus-4-7", name: "Claude Opus 4.7" },
+    { id: "claude-opus-4.7", name: "Claude Opus 4.7" },
     { id: "claude-opus-4-6", name: "Claude Opus 4.6" },
-    { id: "claude-sonnet-4-6", name: "Claude Sonnet 4.6" },
+    { id: "claude-sonnet-4.6", name: "Claude Sonnet 4.6" },
     { id: "claude-opus-4-5-20251101", name: "Claude 4.5 Opus" },
     { id: "claude-sonnet-4-5-20250929", name: "Claude 4.5 Sonnet" },
     { id: "claude-haiku-4-5-20251001", name: "Claude 4.5 Haiku" },
@@ -90,7 +90,7 @@ export const PROVIDER_MODELS = {
     { id: "gemini-3.1-pro-high", name: "Gemini 3 Pro High" },
     { id: "gemini-3.1-pro-low", name: "Gemini 3 Pro Low" },
     { id: "gemini-3-flash", name: "Gemini 3 Flash", thinking: false }, // AG strips thinking for this model
-    { id: "claude-sonnet-4-6", name: "Claude Sonnet 4.6" },
+    { id: "claude-sonnet-4.6", name: "Claude Sonnet 4.6" },
     { id: "claude-opus-4-6-thinking", name: "Claude Opus 4.6 Thinking" },
     { id: "gpt-oss-120b-medium", name: "GPT OSS 120B Medium" },
   ],
@@ -133,7 +133,9 @@ export const PROVIDER_MODELS = {
     { id: "deepseek-3.2", name: "DeepSeek 3.2", strip: ["image", "audio"] },
     { id: "qwen3-coder-next", name: "Qwen3 Coder Next", strip: ["image", "audio"] },
     { id: "glm-5", name: "GLM 5" },
-    { id: "MiniMax-M2.5", name: "MiniMax M2.5" },
+    { id: "minimax-m2.5", name: "MiniMax M2.5" },
+    { id: "claude-sonnet-4.6", name: "Claude Sonnet 4.6" },
+    { id: "claude-opus-4.7", name: "Claude Opus 4.7" },
   ],
   cu: [  // Cursor IDE
     { id: "default", name: "Auto (Server Picks)" },
@@ -339,6 +341,11 @@ export const PROVIDER_MODELS = {
     { id: "openai/gpt-image-1", name: "GPT Image 1 (via OpenRouter)", type: "image", params: ["n", "size", "quality", "response_format"] },
     { id: "google/imagen-3.0-generate-002", name: "Imagen 3 (via OpenRouter)", type: "image", params: ["n", "size"] },
     { id: "black-forest-labs/FLUX.1-schnell", name: "FLUX.1 Schnell (via OpenRouter)", type: "image", params: ["n", "size"] },
+    // Free LLM models
+    { id: "poolside/laguna-m.1:free", name: "Poolside Laguna M.1 (Free)" },
+    { id: "openai/gpt-oss-120b:free", name: "GPT OSS 120B (Free)" },
+    { id: "nvidia/nemotron-3-super-120b-a12b:free", name: "NVIDIA Nemotron Super 120B (Free)" },
+    { id: "minimax/minimax-m2.5:free", name: "MiniMax M2.5 (Free)" },
   ],
   glm: [
     { id: "glm-5.1", name: "GLM 5.1" },

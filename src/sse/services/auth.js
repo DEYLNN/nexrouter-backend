@@ -9,6 +9,21 @@ import { isCodexConnectionQuotaAvailable } from "@/lib/codexQuotaCache.js";
 // Mutex to prevent race conditions during account selection
 let selectionMutex = Promise.resolve();
 
+function normalizeModelForBlockList(value) {
+  return String(value || "")
+    .toLowerCase()
+    .replace(/claude-(sonnet|opus)-4[.-]([0-9])/g, "claude-$1-4-$2");
+}
+
+function isConnectionModelBlockedForModel(connection, model) {
+  if (!model) return false;
+  const blockedModels = connection?.providerSpecificData?.blockedModels;
+  if (!Array.isArray(blockedModels) || blockedModels.length === 0) return false;
+  const requestedModel = normalizeModelForBlockList(model);
+  const blockedSet = new Set(blockedModels.map(normalizeModelForBlockList));
+  return blockedSet.has(requestedModel);
+}
+
 /**
  * Get provider credentials from localDb
  * Filters out unavailable accounts and returns the selected account based on strategy
@@ -53,11 +68,14 @@ export async function getProviderCredentials(provider, excludeConnectionIds = nu
       return null;
     }
 
-    // Filter out model-locked and excluded connections
+    // Filter out unavailable connections before first hit.
+    // Mirrors Codex planIneligible handling: per-account blocked models are skipped
+    // at auth-selection time, not after provider 400/invalid-model errors.
     const prefilteredConnections = connections.filter(c => {
       if (excludeSet.has(c.id)) return false;
       if (isModelLockActive(c, model)) return false;
       if (!isCodexConnectionEligibleForModel(c, model)) return false;
+      if (isConnectionModelBlockedForModel(c, model)) return false;
       return true;
     });
 
@@ -79,11 +97,12 @@ export async function getProviderCredentials(provider, excludeConnectionIds = nu
       const excluded = excludeSet.has(c.id);
       const locked = isModelLockActive(c, model);
       const planIneligible = !isCodexConnectionEligibleForModel(c, model);
+      const modelBlocked = isConnectionModelBlockedForModel(c, model);
       const quotaUnavailable = quotaUnavailableIds.has(c.id);
-      if (excluded || locked || planIneligible || quotaUnavailable) {
+      if (excluded || locked || planIneligible || modelBlocked || quotaUnavailable) {
         const lockUntil = getEarliestModelLockUntil(c);
         const plan = normalizeCodexPlan(c.providerSpecificData?.codexPlan || c.providerSpecificData?.chatgptPlanType);
-        log.debug("AUTH", `  → ${c.id?.slice(0, 8)} | ${excluded ? "excluded" : ""} ${locked ? `modelLocked(${model}) until ${lockUntil}` : ""} ${planIneligible ? `planIneligible(${plan})` : ""} ${quotaUnavailable ? "quotaReached" : ""}`);
+        log.debug("AUTH", `  → ${c.id?.slice(0, 8)} | ${excluded ? "excluded" : ""} ${locked ? `modelLocked(${model}) until ${lockUntil}` : ""} ${planIneligible ? `planIneligible(${plan})` : ""} ${modelBlocked ? `modelBlocked(${model})` : ""} ${quotaUnavailable ? "quotaReached" : ""}`);
       }
     });
 
@@ -107,6 +126,11 @@ export async function getProviderCredentials(provider, excludeConnectionIds = nu
       if (providerId === "codex" && model && planEligibleCount === 0) {
         log.warn("AUTH", `${provider} | no plan-eligible Codex accounts for ${model}`);
         return { noEligiblePlan: true, provider: providerId, model, message: `No eligible Codex account for ${model}` };
+      }
+      const modelAllowedCount = connections.filter(c => !isConnectionModelBlockedForModel(c, model)).length;
+      if (model && modelAllowedCount === 0) {
+        log.warn("AUTH", `${provider} | no model-allowed accounts for ${model}`);
+        return { noModelAllowed: true, provider: providerId, model, message: `No account allows ${model}` };
       }
       log.warn("AUTH", `${provider} | all ${connections.length} accounts unavailable`);
       return null;
@@ -316,6 +340,16 @@ export function extractApiKey(request) {
  * Validate API key (optional - for local use can skip)
  */
 export async function isValidApiKey(apiKey) {
-  if (!apiKey) return false;
-  return await validateApiKey(apiKey);
+  if (!apiKey) return null;
+  return await validateApiKey(apiKey); // returns key object or null
+}
+
+/**
+ * Check if a model is allowed for a given API key object.
+ * Returns true if key has no allowedModels (full access) or model is in the list.
+ */
+export function isModelAllowedForKey(keyObj, model) {
+  if (!keyObj) return false;
+  if (!Array.isArray(keyObj.allowedModels) || keyObj.allowedModels.length === 0) return true;
+  return keyObj.allowedModels.includes(model);
 }

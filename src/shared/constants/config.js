@@ -64,6 +64,8 @@ export const CLIENT_STORE_TTL_MS = 60000;
 // Provider API endpoints (for display only)
 export const PROVIDER_ENDPOINTS = {
   openrouter: "https://openrouter.ai/api/v1/chat/completions",
+  "freemodel-dev": "https://api.freemodel.dev/v1/chat/completions",
+  fmd: "https://api.freemodel.dev/v1/chat/completions",
   bai: "https://api.b.ai/v1/chat/completions",
   qiniu: "https://api.qnaigc.com/v1/chat/completions",
   morph: "https://api.morphllm.com/v1/chat/completions",

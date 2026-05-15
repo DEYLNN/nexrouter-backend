@@ -350,6 +350,8 @@ export async function POST(request) {
         }
 
         case "deepseek":
+        case "freemodel-dev":
+        case "fmd":
         case "bai":
         case "qiniu":
         case "groq":
@@ -390,6 +392,26 @@ export async function POST(request) {
             routeway: {
               url: "https://api.routeway.ai/v1/models",
               method: "GET",
+            },
+            "freemodel-dev": {
+              url: "https://api.freemodel.dev/v1/chat/completions",
+              method: "POST",
+              body: {
+                model: "gpt-5.5",
+                messages: [{ role: "user", content: "test" }],
+                max_tokens: 1,
+                stream: false,
+              },
+            },
+            fmd: {
+              url: "https://api.freemodel.dev/v1/chat/completions",
+              method: "POST",
+              body: {
+                model: "gpt-5.5",
+                messages: [{ role: "user", content: "test" }],
+                max_tokens: 1,
+                stream: false,
+              },
             },
             morph: {
               url: "https://api.morphllm.com/v1/chat/completions",

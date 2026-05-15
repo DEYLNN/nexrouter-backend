@@ -136,6 +136,10 @@ export const PROVIDERS = {
       "X-Title": "Endpoint Proxy"
     }
   },
+  fmd: {
+    baseUrl: "https://api.freemodel.dev/v1/chat/completions",
+    format: "openai"
+  },
   "freemodel-dev": {
     baseUrl: "https://api.freemodel.dev/v1/chat/completions",
     format: "openai"

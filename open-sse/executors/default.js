@@ -183,6 +183,7 @@ export class DefaultExecutor extends BaseExecutor {
       claude: () => this.refreshWithJSON(OAUTH_ENDPOINTS.anthropic.token, { grant_type: "refresh_token", refresh_token: credentials.refreshToken, client_id: PROVIDERS.claude.clientId }, proxyOptions),
       codex: () => this.refreshWithForm(OAUTH_ENDPOINTS.openai.token, { grant_type: "refresh_token", refresh_token: credentials.refreshToken, client_id: PROVIDERS.codex.clientId, scope: "openid profile email offline_access" }, proxyOptions),
       qwen: () => this.refreshWithForm(OAUTH_ENDPOINTS.qwen.token, { grant_type: "refresh_token", refresh_token: credentials.refreshToken, client_id: PROVIDERS.qwen.clientId }, proxyOptions),
+      "nous-portal": () => this.refreshWithForm(PROVIDERS["nous-portal"].tokenUrl, { grant_type: "refresh_token", refresh_token: credentials.refreshToken, client_id: PROVIDERS["nous-portal"].clientId }, proxyOptions),
       iflow: () => this.refreshIflow(credentials.refreshToken, proxyOptions),
       gemini: () => this.refreshGoogle(credentials.refreshToken, proxyOptions),
       kiro: () => this.refreshKiro(credentials.refreshToken, proxyOptions),

@@ -67,6 +67,8 @@ import { GET as modelsGet, PUT as modelsPut } from "../../src/app/api/models/rou
 import { GET as modelAvailabilityGet, POST as modelAvailabilityPost } from "../../src/app/api/models/availability/route.js";
 import { GET as initGet } from "../../src/app/api/init/route.js";
 import { GET as oauthGet, POST as oauthPost } from "../../src/app/api/oauth/[provider]/[action]/route.js";
+import { POST as kiroImportPost } from "../../src/app/api/oauth/kiro/import/route.js";
+import { GET as kiroAutoImportGet } from "../../src/app/api/oauth/kiro/auto-import/route.js";
 import { GET as consoleLogsGet, DELETE as consoleLogsDelete } from "../../src/app/api/translator/console-logs/route.js";
 import { GET as consoleLogsStreamGet } from "../../src/app/api/translator/console-logs/stream/route.js";
 
@@ -359,6 +361,9 @@ app.post("/api/models/availability", (c) => nextRouteHandler(c, modelAvailabilit
 app.get("/api/init", (c) => nextRouteHandler(c, initGet));
 
 // OAuth endpoints (needed when Next/Vercel UI proxies dashboard API calls to Hono)
+// Specific Kiro import routes must be mounted before the dynamic provider/action route.
+app.get("/api/oauth/kiro/auto-import", (c) => nextRouteHandler(c, kiroAutoImportGet));
+app.post("/api/oauth/kiro/import", (c) => nextRouteHandler(c, kiroImportPost));
 app.get("/api/oauth/:provider/:action", (c) => nextRouteHandler(c, oauthGet, {
   provider: c.req.param("provider"),
   action: c.req.param("action"),

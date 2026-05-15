@@ -617,6 +617,8 @@ export async function refreshTokenByProvider(provider, credentials, log) {
       return refreshCodexToken(credentials.refreshToken, log);
     case "qwen":
       return refreshQwenToken(credentials.refreshToken, log);
+    case "nous-portal":
+      return getAccessToken(provider, credentials, log);
     case "iflow":
       return refreshIflowToken(credentials.refreshToken, log);
     case "github":

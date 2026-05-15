@@ -152,6 +152,7 @@ export const REFRESH_LEAD_MS = {
   claude:       4 * 60 * 60 * 1000,     // 4 hours
   iflow:       24 * 60 * 60 * 1000,     // 24 hours
   qwen:        20 * 60 * 1000,          // 20 minutes
+  "nous-portal": 2 * 60 * 1000,         // 2 minutes (Nous access JWT is short-lived, usually ~15 min)
   "kimi-coding": 5 * 60 * 1000,         // 5 minutes
   antigravity:  5 * 60 * 1000,          // 5 minutes
 };

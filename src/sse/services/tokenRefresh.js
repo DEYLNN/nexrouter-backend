@@ -240,10 +240,41 @@ export async function checkAndRefreshToken(provider, credentials) {
     const agentKeyExpiresAt = Number(specific.agentKeyObtainedAt || 0) + Number(specific.agentKeyExpiresIn || 0) * 1000;
     if (!specific.agentKey || Date.now() > agentKeyExpiresAt - 60_000) {
       log.info("TOKEN_REFRESH", "Minting Nous Portal agent key");
-      const agent = await mintNousAgentKey(creds.accessToken);
-      const updatedSpecific = { ...specific, ...agent };
-      await updateProviderCredentials(creds.connectionId, { providerSpecificData: updatedSpecific });
-      creds.providerSpecificData = updatedSpecific;
+      try {
+        const agent = await mintNousAgentKey(creds.accessToken);
+        const updatedSpecific = { ...specific, ...agent };
+        await updateProviderCredentials(creds.connectionId, { providerSpecificData: updatedSpecific });
+        creds.providerSpecificData = updatedSpecific;
+      } catch (error) {
+        // Nous access JWTs are short-lived (~15 min). If agent-key mint fails because
+        // the access token expired between checks, refresh once and retry immediately.
+        if (!creds.refreshToken) throw error;
+        log.warn("TOKEN_REFRESH", "Nous agent-key mint failed; refreshing access token and retrying", {
+          error: error.message,
+        });
+        const newCreds = await getAccessToken(provider, creds);
+        if (!newCreds?.accessToken) throw error;
+
+        const mergedCreds = {
+          ...newCreds,
+          existingProviderSpecificData: creds.providerSpecificData,
+        };
+        await updateProviderCredentials(creds.connectionId, mergedCreds);
+        creds = {
+          ...creds,
+          accessToken: newCreds.accessToken,
+          refreshToken: newCreds.refreshToken ?? creds.refreshToken,
+          providerSpecificData: newCreds.providerSpecificData
+            ? { ...creds.providerSpecificData, ...newCreds.providerSpecificData }
+            : creds.providerSpecificData,
+          expiresAt: newCreds.expiresIn ? toExpiresAt(newCreds.expiresIn) : creds.expiresAt,
+        };
+
+        const agent = await mintNousAgentKey(creds.accessToken);
+        const updatedSpecific = { ...(creds.providerSpecificData || {}), ...agent };
+        await updateProviderCredentials(creds.connectionId, { providerSpecificData: updatedSpecific });
+        creds.providerSpecificData = updatedSpecific;
+      }
     }
   }
 

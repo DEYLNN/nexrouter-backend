@@ -60,7 +60,10 @@ export const PROVIDER_MODELS = {
   ],
   nous: [  // Nous Portal
     { id: "stepfun/step-3.5-flash", name: "StepFun Step 3.5 Flash" },
-    { id: "qwen/qwen3.6-plus", name: "Qwen 3.6 Plus" },
+    { id: "deepseek/deepseek-v4-flash", name: "DeepSeek V4 Flash" },
+    { id: "google/lyria-3-clip-preview", name: "Google Lyria 3 Clip Preview" },
+    { id: "google/lyria-3-pro-preview", name: "Google Lyria 3 Pro Preview" },
+    { id: "openrouter/owl-alpha", name: "OpenRouter Owl Alpha" },
   ],
   qw: [  // Qwen Code
     // { id: "qwen3-coder-next", name: "Qwen3 Coder Next" },
@@ -212,6 +215,9 @@ export const PROVIDER_MODELS = {
   ],
 
   // API Key Providers (alias = id)
+  "freemodel-dev": [
+    { id: "gpt-5.5", name: "GPT-5.5" },
+  ],
   bai: [
     { id: "glm-5.1", name: "GLM 5.1" },
     { id: "minimax-m2.7", name: "MiniMax M2.7" },
@@ -561,10 +567,21 @@ export const PROVIDER_MODELS = {
     { id: "zai/glm-5.1", name: "GLM 5.1" },
   ],
   routeway: [
-    { id: "deepseek/deepseek-v4-flash:free", name: "DeepSeek V4 Flash Free" },
-    { id: "moonshotai/kimi-k2.6:free", name: "Kimi K2.6 Free" },
-    { id: "qwen/qwen3-coder:free", name: "Qwen3 Coder Free" },
-    { id: "openai/gpt-oss-120b:free", name: "GPT OSS 120B Free" },
+    { id: "ling-2.6-flash:free", name: "Ling 2.6 Flash Free" },
+    { id: "gemma-4-31b-it:free", name: "Gemma 4 31B IT Free" },
+    { id: "step-3.5-flash:free", name: "Step 3.5 Flash Free" },
+    { id: "nemotron-3-nano-30b-a3b:free", name: "Nemotron 3 Nano 30B A3B Free" },
+    { id: "minimax-m2:free", name: "MiniMax M2 Free" },
+    { id: "laguna-xs.2:free", name: "Laguna XS.2 Free" },
+    { id: "laguna-m.1:free", name: "Laguna M.1 Free" },
+    { id: "nemotron-nano-9b-v2:free", name: "Nemotron Nano 9B V2 Free" },
+    { id: "gpt-oss-120b:free", name: "GPT OSS 120B Free" },
+    { id: "glm-4.5-air:free", name: "GLM 4.5 Air Free" },
+    { id: "llama-3.2-3b-instruct:free", name: "Llama 3.2 3B Instruct Free" },
+    { id: "llama-3.2-1b-instruct:free", name: "Llama 3.2 1B Instruct Free" },
+    { id: "llama-3.1-8b-instruct:free", name: "Llama 3.1 8B Instruct Free" },
+    { id: "llama-3.3-70b-instruct:free", name: "Llama 3.3 70B Instruct Free" },
+    { id: "mistral-nemo-instruct:free", name: "Mistral Nemo Instruct Free" },
   ],
   sr: [
     { id: "gpt-5.5", name: "GPT 5.5" },

@@ -394,18 +394,6 @@ export const PROVIDERS = {
     headers: { "x-opencode-client": "desktop" },
     noAuth: true
   },
-  glb: {
-    baseUrl: "https://opengateway.gitlawb.com/v1/xiaomi-mimo/chat/completions",
-    format: "openai",
-    headers: { "Accept-Encoding": "identity" },
-    noAuth: true
-  },
-  gitlawb: {
-    baseUrl: "https://opengateway.gitlawb.com/v1/xiaomi-mimo/chat/completions",
-    format: "openai",
-    headers: { "Accept-Encoding": "identity" },
-    noAuth: true
-  },
   "opencode-go": {
     baseUrl: "https://opencode.ai/zen/go/v1/chat/completions",
     format: "openai",

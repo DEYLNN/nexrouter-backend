@@ -215,20 +215,6 @@ export const PROVIDER_MODELS = {
   ],
 
   // API Key Providers (alias = id)
-  glb: [
-    { id: "mimo-v2.5-pro", name: "MiMo V2.5 Pro" },
-    { id: "mimo-v2.5", name: "MiMo V2.5" },
-    { id: "mimo-v2-pro", name: "MiMo V2 Pro" },
-    { id: "mimo-v2-flash", name: "MiMo V2 Flash" },
-    { id: "mimo-v2-omni", name: "MiMo V2 Omni" },
-  ],
-  gitlawb: [
-    { id: "mimo-v2.5-pro", name: "MiMo V2.5 Pro" },
-    { id: "mimo-v2.5", name: "MiMo V2.5" },
-    { id: "mimo-v2-pro", name: "MiMo V2 Pro" },
-    { id: "mimo-v2-flash", name: "MiMo V2 Flash" },
-    { id: "mimo-v2-omni", name: "MiMo V2 Omni" },
-  ],
   fmd: [
     { id: "gpt-5.5", name: "GPT-5.5" },
   ],
@@ -817,7 +803,6 @@ const OAUTH_ALIASES = {
   kilocode: "kc",
   cline: "cl",
   opencode: "oc",
-  gitlawb: "glb",
   vertex: "vertex",
   "vertex-partner": "vertex-partner",
   canopywave: "cwv",

@@ -11,6 +11,9 @@ const AGENT_ID = process.env.FREEBUFF_AGENT_ID || "base2-free";
 const COST_MODE = process.env.FREEBUFF_COST_MODE || "free";
 const FREEBUFF_WAIT_TIMEOUT_MS = Number(process.env.FREEBUFF_WAIT_TIMEOUT_MS || 25000);
 const FREEBUFF_WAIT_POLL_MS = Number(process.env.FREEBUFF_WAIT_POLL_MS || 2000);
+const FREEBUFF_MAX_MESSAGES = Number(process.env.FREEBUFF_MAX_MESSAGES || 14);
+const FREEBUFF_MAX_MESSAGE_CHARS = Number(process.env.FREEBUFF_MAX_MESSAGE_CHARS || 6000);
+const FREEBUFF_MAX_TOOL_CHARS = Number(process.env.FREEBUFF_MAX_TOOL_CHARS || 2500);
 
 const MODEL_MAP = {
   "deepseek-v4-flash": "deepseek/deepseek-v4-flash",
@@ -262,6 +265,12 @@ async function ensureFreeSession(token, session) {
 }
 
 
+function truncateText(text, maxChars) {
+  const value = String(text || "");
+  if (value.length <= maxChars) return value;
+  return `${value.slice(0, maxChars)}\n...[truncated ${value.length - maxChars} chars]`;
+}
+
 function normalizeMessageContent(content) {
   if (typeof content === "string") return content;
   if (Array.isArray(content)) {
@@ -270,6 +279,7 @@ function normalizeMessageContent(content) {
         if (typeof part === "string") return part;
         if (part?.type === "text") return part.text || "";
         if (part?.text) return part.text;
+        if (part?.type === "image_url") return "[image omitted]";
         return "";
       })
       .filter(Boolean)
@@ -279,17 +289,50 @@ function normalizeMessageContent(content) {
   return String(content);
 }
 
-function sanitizeMessages(messages = []) {
-  return messages
-    .filter((message) => message && message.role !== "tool")
-    .map((message) => {
-      const clean = { role: message.role || "user", content: normalizeMessageContent(message.content) };
-      // Assistant messages that only contained tool calls become empty after stripping;
-      // keep prior text messages only to avoid upstream schema errors.
-      if (clean.role === "assistant" && !clean.content.trim()) return null;
-      return clean;
+function toolResultToText(message) {
+  const name = message.name || message.tool_call_id || "tool";
+  const content = truncateText(normalizeMessageContent(message.content), FREEBUFF_MAX_TOOL_CHARS);
+  return `[tool result: ${name}]\n${content}`;
+}
+
+function toolCallsToText(toolCalls = []) {
+  if (!Array.isArray(toolCalls) || toolCalls.length === 0) return "";
+  return toolCalls
+    .map((call) => {
+      const name = call?.function?.name || call?.name || call?.id || "tool_call";
+      const args = call?.function?.arguments || call?.arguments || "";
+      return `[assistant requested tool: ${name}] ${truncateText(args, 800)}`;
     })
-    .filter(Boolean);
+    .join("\n");
+}
+
+function sanitizeMessages(messages = []) {
+  const systemLike = [];
+  const conversational = [];
+
+  for (const message of messages) {
+    if (!message) continue;
+    const role = message.role || "user";
+    let clean = null;
+
+    if (role === "tool") {
+      clean = { role: "user", content: toolResultToText(message) };
+    } else {
+      const content = normalizeMessageContent(message.content);
+      const toolText = role === "assistant" ? toolCallsToText(message.tool_calls) : "";
+      const merged = [content, toolText].filter(Boolean).join("\n").trim();
+      if (!merged) continue;
+      clean = { role: role === "developer" ? "system" : role, content: truncateText(merged, FREEBUFF_MAX_MESSAGE_CHARS) };
+    }
+
+    if (clean.role === "system") systemLike.push(clean);
+    else conversational.push(clean);
+  }
+
+  const keptConversation = conversational.slice(-FREEBUFF_MAX_MESSAGES);
+  const trimmed = [...systemLike.slice(0, 2), ...keptConversation];
+  if (trimmed.length === 0) return [{ role: "user", content: "Continue." }];
+  return trimmed;
 }
 
 function isInvalidRun(response) {
@@ -355,15 +398,15 @@ export class FreeBuffExecutor extends BaseExecutor {
     };
     if (wantsStream) {
       upstreamBody.stream_options = body.stream_options || { include_usage: true };
-      if (Array.isArray(body.tools)) upstreamBody.tools = body.tools;
-      if (body.tool_choice) upstreamBody.tool_choice = body.tool_choice;
     } else {
-      // Non-stream fallback is chat-only; strip agentic extras that upstream rejects.
-      delete upstreamBody.tools;
-      delete upstreamBody.tool_choice;
-      delete upstreamBody.parallel_tool_calls;
       delete upstreamBody.stream_options;
     }
+    // FreeBuff free tier is optimized as chat/planning backend, not a full tool-calling
+    // engine. Strip tool schemas to avoid 20k+ repeated prompt overhead; preserve
+    // tool results/tool-call intent inside sanitized messages above.
+    delete upstreamBody.tools;
+    delete upstreamBody.tool_choice;
+    delete upstreamBody.parallel_tool_calls;
     delete upstreamBody.response_format;
     delete upstreamBody.reasoning_effort;
     delete upstreamBody.reasoning;

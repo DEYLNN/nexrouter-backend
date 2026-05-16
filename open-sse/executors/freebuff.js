@@ -11,9 +11,9 @@ const AGENT_ID = process.env.FREEBUFF_AGENT_ID || "base2-free";
 const COST_MODE = process.env.FREEBUFF_COST_MODE || "free";
 const FREEBUFF_WAIT_TIMEOUT_MS = Number(process.env.FREEBUFF_WAIT_TIMEOUT_MS || 25000);
 const FREEBUFF_WAIT_POLL_MS = Number(process.env.FREEBUFF_WAIT_POLL_MS || 2000);
-const FREEBUFF_MAX_MESSAGES = Number(process.env.FREEBUFF_MAX_MESSAGES || 14);
-const FREEBUFF_MAX_MESSAGE_CHARS = Number(process.env.FREEBUFF_MAX_MESSAGE_CHARS || 6000);
-const FREEBUFF_MAX_TOOL_CHARS = Number(process.env.FREEBUFF_MAX_TOOL_CHARS || 2500);
+const FREEBUFF_MAX_MESSAGES = Number(process.env.FREEBUFF_MAX_MESSAGES || 32);
+const FREEBUFF_MAX_MESSAGE_CHARS = Number(process.env.FREEBUFF_MAX_MESSAGE_CHARS || 16000);
+const FREEBUFF_MAX_TOOL_CHARS = Number(process.env.FREEBUFF_MAX_TOOL_CHARS || 8000);
 
 const MODEL_MAP = {
   "deepseek-v4-flash": "deepseek/deepseek-v4-flash",
@@ -295,19 +295,30 @@ function toolResultToText(message) {
   return `[tool result: ${name}]\n${content}`;
 }
 
-function toolCallsToText(toolCalls = []) {
-  // FreeBuff is exposed as a chat/planning backend in AI Gateway. Do not preserve
-  // previous assistant tool-call intents as text; models tend to copy them back
-  // instead of answering, which breaks clients like Hermes. Tool *results* are kept
-  // separately via toolResultToText().
-  return "";
+function sanitizeToolCalls(toolCalls) {
+  if (!Array.isArray(toolCalls)) return undefined;
+  const cleaned = toolCalls
+    .map((call) => {
+      if (!call) return null;
+      const id = call.id || `call_${Math.random().toString(36).slice(2, 10)}`;
+      const fnName = call.function?.name || call.name;
+      if (!fnName) return null;
+      const args = call.function?.arguments ?? call.arguments ?? "";
+      return {
+        id,
+        type: "function",
+        function: {
+          name: String(fnName).slice(0, 96),
+          arguments: typeof args === "string" ? truncateText(args, 6000) : truncateText(JSON.stringify(args ?? {}), 6000),
+        },
+      };
+    })
+    .filter(Boolean);
+  return cleaned.length ? cleaned : undefined;
 }
 
 function sanitizeMessages(messages = []) {
-  const systemLike = [{
-    role: "system",
-    content: "You are behind AI Gateway's FreeBuff chat adapter. Tool execution is not available for this provider. Do not output tool-call placeholders, JSON tool requests, or lines like '[assistant requested tool: ...]'. Answer directly from the provided context. If a task requires live web/tool access, say that this model cannot execute tools and give a concise best-effort answer."
-  }];
+  const systemLike = [];
   const conversational = [];
 
   for (const message of messages) {
@@ -316,13 +327,29 @@ function sanitizeMessages(messages = []) {
     let clean = null;
 
     if (role === "tool") {
-      clean = { role: "user", content: toolResultToText(message) };
+      const content = truncateText(normalizeMessageContent(message.content), FREEBUFF_MAX_TOOL_CHARS);
+      clean = {
+        role: "tool",
+        content,
+        tool_call_id: message.tool_call_id || message.id || undefined,
+        name: message.name,
+      };
+    } else if (role === "assistant") {
+      const content = normalizeMessageContent(message.content);
+      const toolCalls = sanitizeToolCalls(message.tool_calls);
+      if (!content && !toolCalls) continue;
+      clean = {
+        role: "assistant",
+        content: content ? truncateText(content, FREEBUFF_MAX_MESSAGE_CHARS) : undefined,
+      };
+      if (toolCalls) clean.tool_calls = toolCalls;
     } else {
       const content = normalizeMessageContent(message.content);
-      const toolText = role === "assistant" ? toolCallsToText(message.tool_calls) : "";
-      const merged = [content, toolText].filter(Boolean).join("\n").trim();
-      if (!merged) continue;
-      clean = { role: role === "developer" ? "system" : role, content: truncateText(merged, FREEBUFF_MAX_MESSAGE_CHARS) };
+      if (!content) continue;
+      clean = {
+        role: role === "developer" ? "system" : role,
+        content: truncateText(content, FREEBUFF_MAX_MESSAGE_CHARS),
+      };
     }
 
     if (clean.role === "system") systemLike.push(clean);
@@ -330,7 +357,7 @@ function sanitizeMessages(messages = []) {
   }
 
   const keptConversation = conversational.slice(-FREEBUFF_MAX_MESSAGES);
-  const trimmed = [...systemLike.slice(0, 2), ...keptConversation];
+  const trimmed = [...systemLike.slice(0, 3), ...keptConversation];
   if (trimmed.length === 0) return [{ role: "user", content: "Continue." }];
   return trimmed;
 }
@@ -401,12 +428,16 @@ export class FreeBuffExecutor extends BaseExecutor {
     } else {
       delete upstreamBody.stream_options;
     }
-    // FreeBuff free tier is optimized as chat/planning backend, not a full tool-calling
-    // engine. Strip tool schemas to avoid 20k+ repeated prompt overhead; preserve
-    // tool results/tool-call intent inside sanitized messages above.
-    delete upstreamBody.tools;
-    delete upstreamBody.tool_choice;
-    delete upstreamBody.parallel_tool_calls;
+    // Keep tools so agentic clients (Hermes/Codex-style) can drive real tool-call loops.
+    if (Array.isArray(body.tools)) {
+      upstreamBody.tools = body.tools;
+      if (body.tool_choice) upstreamBody.tool_choice = body.tool_choice;
+      if (body.parallel_tool_calls !== undefined) upstreamBody.parallel_tool_calls = body.parallel_tool_calls;
+    } else {
+      delete upstreamBody.tools;
+      delete upstreamBody.tool_choice;
+      delete upstreamBody.parallel_tool_calls;
+    }
     delete upstreamBody.response_format;
     delete upstreamBody.reasoning_effort;
     delete upstreamBody.reasoning;

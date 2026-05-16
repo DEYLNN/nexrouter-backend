@@ -239,6 +239,7 @@ export class FreeBuffExecutor extends BaseExecutor {
     delete upstreamBody.tools;
     delete upstreamBody.tool_choice;
     delete upstreamBody.parallel_tool_calls;
+    delete upstreamBody.stream_options;
     delete upstreamBody.response_format;
     delete upstreamBody.reasoning_effort;
     delete upstreamBody.reasoning;

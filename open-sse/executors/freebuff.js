@@ -360,7 +360,52 @@ function sanitizeMessages(messages = []) {
   }
 
   const keptConversation = conversational.slice(-FREEBUFF_MAX_MESSAGES);
-  const trimmed = [...systemLike.slice(0, 3), ...keptConversation];
+
+  // FreeBuff/Codebuff DeepSeek validates that any tool message follows an
+  // assistant turn with matching tool_calls. After context trimming, orphan tool
+  // messages can break the request (HTTP 400). Repair pairs and drop dangling
+  // assistant.tool_calls that lack their tool result.
+  const repaired = [];
+  const knownToolCallIds = new Set();
+  for (let i = 0; i < keptConversation.length; i++) {
+    const message = keptConversation[i];
+    if (message.role === "tool") {
+      if (message.tool_call_id && knownToolCallIds.has(message.tool_call_id)) {
+        repaired.push(message);
+      } else if (message.content) {
+        // Convert orphan tool result into a plain user note so context survives.
+        repaired.push({ role: "user", content: `[tool result: ${message.name || message.tool_call_id || "tool"}]\n${message.content}` });
+      }
+      continue;
+    }
+    if (message.role === "assistant" && Array.isArray(message.tool_calls)) {
+      const toolIds = message.tool_calls.map((c) => c.id);
+      const followers = [];
+      let j = i + 1;
+      while (j < keptConversation.length && keptConversation[j].role === "tool") {
+        if (keptConversation[j].tool_call_id && toolIds.includes(keptConversation[j].tool_call_id)) {
+          followers.push(keptConversation[j]);
+        }
+        j += 1;
+      }
+      if (followers.length === 0) {
+        // No matching tool result in window; drop tool_calls so DeepSeek does not
+        // demand a paired tool response. Preserve textual content if any.
+        if (message.content) repaired.push({ role: "assistant", content: message.content });
+        continue;
+      }
+      const allowedIds = new Set(followers.map((tool) => tool.tool_call_id));
+      const filteredCalls = message.tool_calls.filter((c) => allowedIds.has(c.id));
+      const safeMessage = { role: "assistant", tool_calls: filteredCalls };
+      if (message.content) safeMessage.content = message.content;
+      repaired.push(safeMessage);
+      filteredCalls.forEach((c) => knownToolCallIds.add(c.id));
+      continue;
+    }
+    repaired.push(message);
+  }
+
+  const trimmed = [...systemLike.slice(0, 3), ...repaired];
   if (trimmed.length === 0) return [{ role: "user", content: "Continue." }];
   return trimmed;
 }

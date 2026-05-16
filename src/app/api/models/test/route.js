@@ -69,8 +69,15 @@ export async function POST(request) {
 
     if (!res.ok) {
       const detail = parsed?.error?.message || parsed?.msg || parsed?.message || parsed?.error || rawText;
-      const error = `HTTP ${res.status}${detail ? `: ${String(detail).slice(0, 240)}` : ""}`;
-      return NextResponse.json({ ok: false, latencyMs, error, status: res.status });
+      const detailText = String(detail || "");
+      const lowerDetail = detailText.toLowerCase();
+      const isSkippedByBlockedModelFilter =
+        (res.status === 400 || res.status === 401 || res.status === 403) &&
+        (lowerDetail.includes("missing bearer token") || lowerDetail.includes("no credentials for provider"));
+      const error = isSkippedByBlockedModelFilter
+        ? "No active key available for this model. It may be blocked on all configured accounts."
+        : `HTTP ${res.status}${detail ? `: ${detailText.slice(0, 240)}` : ""}`;
+      return NextResponse.json({ ok: false, latencyMs, error, status: res.status, reason: isSkippedByBlockedModelFilter ? "blocked_or_no_credentials" : undefined });
     }
 
     // Some providers may return HTTP 200 but not a real completion for invalid models.

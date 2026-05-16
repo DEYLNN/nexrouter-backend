@@ -352,6 +352,8 @@ export async function POST(request) {
         case "deepseek":
         case "freemodel-dev":
         case "fmd":
+        case "aim":
+        case "aimurah":
         case "bai":
         case "qiniu":
         case "groq":
@@ -390,8 +392,14 @@ export async function POST(request) {
               method: "GET",
             },
             routeway: {
-              url: "https://api.routeway.ai/v1/models",
-              method: "GET",
+              url: "https://api.routeway.ai/v1/chat/completions",
+              method: "POST",
+              body: {
+                model: "step-3.5-flash:free",
+                messages: [{ role: "user", content: "test" }],
+                max_tokens: 1,
+                stream: false,
+              },
             },
             "freemodel-dev": {
               url: "https://api.freemodel.dev/v1/chat/completions",
@@ -413,11 +421,41 @@ export async function POST(request) {
                 stream: false,
               },
             },
+            aim: {
+              url: "https://aimurah.my.id/api/v1/chat/completions",
+              method: "POST",
+              body: {
+                model: "deepseek-v4-flash",
+                messages: [{ role: "user", content: "test" }],
+                max_tokens: 1,
+                stream: false,
+              },
+            },
+            aimurah: {
+              url: "https://aimurah.my.id/api/v1/chat/completions",
+              method: "POST",
+              body: {
+                model: "deepseek-v4-flash",
+                messages: [{ role: "user", content: "test" }],
+                max_tokens: 1,
+                stream: false,
+              },
+            },
+            bai: {
+              url: "https://api.b.ai/v1/chat/completions",
+              method: "POST",
+              body: {
+                model: "deepseek-v3.2",
+                messages: [{ role: "user", content: "test" }],
+                max_tokens: 1,
+                stream: false,
+              },
+            },
             morph: {
               url: "https://api.morphllm.com/v1/chat/completions",
               method: "POST",
               body: {
-                model: "morph-v3-fast",
+                model: "morph-minimax27-230b",
                 messages: [{ role: "user", content: "test" }],
                 max_tokens: 1,
               },

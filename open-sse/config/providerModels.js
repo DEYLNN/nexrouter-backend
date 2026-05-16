@@ -221,6 +221,8 @@ export const PROVIDER_MODELS = {
     { id: "mimo-v2-pro", name: "MiMo V2 Pro" },
     { id: "mimo-v2-flash", name: "MiMo V2 Flash" },
     { id: "mimo-v2-omni", name: "MiMo V2 Omni" },
+    { id: "google/gemini-3.1-flash-lite-preview", name: "Gemini 3.1 Flash Lite Preview" },
+    { id: "zai-org/GLM-5.1-FP8", name: "GLM 5.1 FP8" },
   ],
   gitlawb: [
     { id: "mimo-v2.5-pro", name: "MiMo V2.5 Pro" },
@@ -228,6 +230,8 @@ export const PROVIDER_MODELS = {
     { id: "mimo-v2-pro", name: "MiMo V2 Pro" },
     { id: "mimo-v2-flash", name: "MiMo V2 Flash" },
     { id: "mimo-v2-omni", name: "MiMo V2 Omni" },
+    { id: "google/gemini-3.1-flash-lite-preview", name: "Gemini 3.1 Flash Lite Preview" },
+    { id: "zai-org/GLM-5.1-FP8", name: "GLM 5.1 FP8" },
   ],
   fmd: [
     { id: "gpt-5.5", name: "GPT-5.5" },
@@ -582,6 +586,20 @@ export const PROVIDER_MODELS = {
     { id: "deepseek/deepseek-v4-flash", name: "DeepSeek V4 Flash" },
     { id: "minimax/minimax-m2.5", name: "MiniMax M2.5" },
     { id: "zai/glm-5.1", name: "GLM 5.1" },
+  ],
+  aim: [
+    { id: "claude-haiku-4.5", name: "Claude Haiku 4.5" },
+    { id: "claude-sonnet-4.5", name: "Claude Sonnet 4.5" },
+    { id: "claude-sonnet-4.5-1m", name: "Claude Sonnet 4.5 1M" },
+    { id: "deepseek-v4-flash", name: "DeepSeek V4 Flash" },
+    { id: "minimax-m2.5", name: "MiniMax M2.5" },
+  ],
+  aimurah: [
+    { id: "claude-haiku-4.5", name: "Claude Haiku 4.5" },
+    { id: "claude-sonnet-4.5", name: "Claude Sonnet 4.5" },
+    { id: "claude-sonnet-4.5-1m", name: "Claude Sonnet 4.5 1M" },
+    { id: "deepseek-v4-flash", name: "DeepSeek V4 Flash" },
+    { id: "minimax-m2.5", name: "MiniMax M2.5" },
   ],
   routeway: [
     { id: "ling-2.6-flash:free", name: "Ling 2.6 Flash Free" },

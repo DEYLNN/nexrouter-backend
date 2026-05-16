@@ -472,6 +472,25 @@ async function testApiKeyConnection(connection, effectiveProxy = null) {
         const valid = res.status !== 401 && res.status !== 403;
         return { valid, error: valid ? null : "Invalid API key" };
       }
+      case "aim":
+      case "aimurah": {
+        const res = await fetchWithConnectionProxy("https://aimurah.my.id/api/v1/chat/completions", {
+          method: "POST",
+          headers: { Authorization: `Bearer ${connection.apiKey}`, "content-type": "application/json" },
+          body: JSON.stringify({ model: "deepseek-v4-flash", messages: [{ role: "user", content: "test" }], max_tokens: 1, stream: false }),
+        }, effectiveProxy);
+        const valid = res.status !== 401 && res.status !== 403;
+        return { valid, error: valid ? null : "Invalid API key" };
+      }
+      case "bai": {
+        const res = await fetchWithConnectionProxy("https://api.b.ai/v1/chat/completions", {
+          method: "POST",
+          headers: { Authorization: `Bearer ${connection.apiKey}`, "content-type": "application/json" },
+          body: JSON.stringify({ model: "deepseek-v3.2", messages: [{ role: "user", content: "test" }], max_tokens: 1, stream: false }),
+        }, effectiveProxy);
+        const valid = res.status !== 401 && res.status !== 403;
+        return { valid, error: valid ? null : "Invalid API key" };
+      }
       case "freemodel-dev":
       case "fmd": {
         const res = await fetchWithConnectionProxy("https://api.freemodel.dev/v1/chat/completions", {
@@ -563,6 +582,34 @@ async function testApiKeyConnection(connection, effectiveProxy = null) {
       case "chutes": {
         const res = await fetchWithConnectionProxy("https://llm.chutes.ai/v1/models", { headers: { Authorization: `Bearer ${connection.apiKey}` } }, effectiveProxy);
         return { valid: res.ok, error: res.ok ? null : "Invalid API key" };
+      }
+      case "routeway": {
+        const res = await fetchWithConnectionProxy("https://api.routeway.ai/v1/chat/completions", {
+          method: "POST",
+          headers: { Authorization: `Bearer ${connection.apiKey}`, "Content-Type": "application/json" },
+          body: JSON.stringify({
+            model: "step-3.5-flash:free",
+            messages: [{ role: "user", content: "test" }],
+            max_tokens: 1,
+            stream: false,
+          }),
+        }, effectiveProxy);
+        const valid = res.status !== 401 && res.status !== 403;
+        return { valid, error: valid ? null : "Invalid API key" };
+      }
+      case "morph": {
+        const res = await fetchWithConnectionProxy("https://api.morphllm.com/v1/chat/completions", {
+          method: "POST",
+          headers: { Authorization: `Bearer ${connection.apiKey}`, "Content-Type": "application/json" },
+          body: JSON.stringify({
+            model: "morph-minimax27-230b",
+            messages: [{ role: "user", content: "test" }],
+            max_tokens: 1,
+            stream: false,
+          }),
+        }, effectiveProxy);
+        const valid = res.status !== 401 && res.status !== 403;
+        return { valid, error: valid ? null : "Invalid API key" };
       }
       case "grok-web": {
         const token = connection.apiKey.startsWith("sso=") ? connection.apiKey.slice(4) : connection.apiKey;

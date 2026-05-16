@@ -8,6 +8,8 @@ const PLACEHOLDER = " ";
 const PROVIDER_RULES = {
   deepseek: { scope: "all" },
   "xiaomi-mimo-plan-sgp": { scope: "all" },
+  glb: { scope: "all" },
+  gitlawb: { scope: "all" },
 };
 
 // Model-level rules: matched by predicate against model id

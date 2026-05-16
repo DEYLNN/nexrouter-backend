@@ -169,6 +169,19 @@ export async function buildModelsList(kindFilter, options = {}) {
     }
   }
 
+  // Include no-auth free providers (for example Gitlawb/OpenCode) in model inventory
+  // even when they have no providerConnections row.
+  for (const [providerId, providerInfo] of Object.entries(AI_PROVIDERS)) {
+    if (providerInfo?.noAuth && providerMatchesKinds(providerId, kindFilter) && !activeConnectionByProvider.has(providerId)) {
+      activeConnectionByProvider.set(providerId, {
+        id: `${providerId}-noauth`,
+        provider: providerId,
+        isActive: true,
+        providerSpecificData: {},
+      });
+    }
+  }
+
   const models = [];
 
   // Combos first (filtered by kind). Web combos expose `kind` so AI knows search vs fetch.

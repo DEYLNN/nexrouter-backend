@@ -38,7 +38,13 @@ async function pingModel(modelId, baseUrl, apiKey) {
     let error = null;
     if (!ok) {
       const text = await res.text().catch(() => "");
-      error = `HTTP ${res.status}${text ? `: ${text.slice(0, 120)}` : ""}`;
+      const lowerText = text.toLowerCase();
+      const isSkippedByBlockedModelFilter =
+        (res.status === 400 || res.status === 401 || res.status === 403) &&
+        (lowerText.includes("missing bearer token") || lowerText.includes("no credentials for provider"));
+      error = isSkippedByBlockedModelFilter
+        ? "No active key available for this model. It may be blocked on all configured accounts."
+        : `HTTP ${res.status}${text ? `: ${text.slice(0, 120)}` : ""}`;
     }
     return { ok, latencyMs, error };
   } catch (err) {

@@ -7,10 +7,52 @@ import { saveRequestDetail } from "@/lib/usageDb.js";
 
 const SSE_HEADERS = {
   "Content-Type": "text/event-stream",
-  "Cache-Control": "no-cache",
+  "Cache-Control": "no-cache, no-transform",
   "Connection": "keep-alive",
+  "X-Accel-Buffering": "no",
   "Access-Control-Allow-Origin": "*"
 };
+
+const SSE_KEEPALIVE_MS = Number(process.env.SSE_KEEPALIVE_MS || 10000);
+
+function withSSEKeepAlive(readable, intervalMs = SSE_KEEPALIVE_MS) {
+  if (!intervalMs || intervalMs <= 0) return readable;
+  const encoder = new TextEncoder();
+  const reader = readable.getReader();
+  let timer = null;
+  let closed = false;
+
+  return new ReadableStream({
+    start(controller) {
+      timer = setInterval(() => {
+        if (!closed) {
+          try { controller.enqueue(encoder.encode(`: keepalive ${Date.now()}\n\n`)); } catch { }
+        }
+      }, intervalMs);
+    },
+    async pull(controller) {
+      try {
+        const { done, value } = await reader.read();
+        if (done) {
+          closed = true;
+          if (timer) clearInterval(timer);
+          controller.close();
+          return;
+        }
+        controller.enqueue(value);
+      } catch (err) {
+        closed = true;
+        if (timer) clearInterval(timer);
+        controller.error(err);
+      }
+    },
+    cancel(reason) {
+      closed = true;
+      if (timer) clearInterval(timer);
+      return reader.cancel(reason);
+    }
+  });
+}
 
 /**
  * Determine which SSE transform stream to use based on provider/format.
@@ -43,7 +85,7 @@ export function handleStreamingResponse({ providerResponse, provider, model, sou
   if (onRequestSuccess) onRequestSuccess();
 
   const transformStream = buildTransformStream({ provider, sourceFormat, targetFormat, userAgent, reqLogger, toolNameMap, model, connectionId, body, onStreamComplete, apiKey });
-  const transformedBody = pipeWithDisconnect(providerResponse, transformStream, streamController);
+  const transformedBody = withSSEKeepAlive(pipeWithDisconnect(providerResponse, transformStream, streamController));
 
   const streamDetailId = `${Date.now()}-${Math.random().toString(36).slice(2, 11)}`;
   saveRequestDetail(buildRequestDetail({

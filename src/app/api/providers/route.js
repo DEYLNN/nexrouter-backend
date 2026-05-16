@@ -26,15 +26,12 @@ export async function GET() {
       }
     } catch { }
 
-    // Hide sensitive fields, enrich name for compatible providers
+    // Hide sensitive fields. Keep per-key connection names intact; provider/node labels live in providerSpecificData.
     const safeConnections = connections.map(c => {
-      const isCompatible = isOpenAICompatibleProvider(c.provider) || isAnthropicCompatibleProvider(c.provider);
-      const name = isCompatible
-        ? (nodeNameMap[c.provider] || c.providerSpecificData?.nodeName || c.provider)
-        : c.name;
       return {
         ...c,
-        name,
+        name: c.name,
+        nodeName: nodeNameMap[c.provider] || c.providerSpecificData?.nodeName || null,
         apiKey: undefined,
         accessToken: undefined,
         refreshToken: undefined,
@@ -86,7 +83,7 @@ export async function POST(request) {
         prefix: node.prefix,
         apiType: node.apiType,
         baseUrl: node.baseUrl,
-        nodeName: node.name,
+        nodeName: connectionName,
       };
     } else if (isAnthropicCompatibleProvider(provider)) {
       const node = await getProviderNodeById(provider);
@@ -96,7 +93,7 @@ export async function POST(request) {
       providerSpecificData = {
         prefix: node.prefix,
         baseUrl: node.baseUrl,
-        nodeName: node.name,
+        nodeName: connectionName,
       };
     } else if (isCustomEmbeddingProvider(provider)) {
       const node = await getProviderNodeById(provider);

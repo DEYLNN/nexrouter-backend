@@ -124,6 +124,14 @@ export const PROVIDERS = {
     baseUrl: "https://api.swiftrouter.com/v1/chat/completions",
     format: "openai"
   },
+  aim: {
+    baseUrl: "https://aimurah.my.id/api/v1/chat/completions",
+    format: "openai"
+  },
+  aimurah: {
+    baseUrl: "https://aimurah.my.id/api/v1/chat/completions",
+    format: "openai"
+  },
   routeway: {
     baseUrl: "https://api.routeway.ai/v1/chat/completions",
     format: "openai"
@@ -395,13 +403,13 @@ export const PROVIDERS = {
     noAuth: true
   },
   glb: {
-    baseUrl: "https://opengateway.gitlawb.com/v1/xiaomi-mimo/chat/completions",
+    baseUrl: "https://opengateway.gitlawb.com/v1/chat/completions",
     format: "openai",
     headers: { "Accept-Encoding": "identity" },
     noAuth: true
   },
   gitlawb: {
-    baseUrl: "https://opengateway.gitlawb.com/v1/xiaomi-mimo/chat/completions",
+    baseUrl: "https://opengateway.gitlawb.com/v1/chat/completions",
     format: "openai",
     headers: { "Accept-Encoding": "identity" },
     noAuth: true

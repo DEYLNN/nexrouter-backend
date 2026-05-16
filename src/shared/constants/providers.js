@@ -10,6 +10,7 @@ export const FREE_PROVIDERS = {
   iflow: { id: "iflow", alias: "if", name: "iFlow AI", icon: "water_drop", color: "#6366F1", website: "https://iflow.cn", notice: { signupUrl: "https://iflow.cn" } },
   opencode: { id: "opencode", alias: "oc", name: "OpenCode Free", icon: "terminal", color: "#E87040", textIcon: "OC", noAuth: true, passthroughModels: true, modelsFetcher: { url: "https://opencode.ai/zen/v1/models", type: "opencode-free" } },
   gitlawb: { id: "gitlawb", alias: "glb", name: "Gitlawb", icon: "/provider-icons/gitlawb.png", color: "#111827", textIcon: "GLB", noAuth: true, passthroughModels: true, modelsFetcher: { url: "https://opengateway.gitlawb.com/v1/xiaomi-mimo/models", type: "openai" }, website: "https://gitlawb.com", notice: { text: "Gitlawb Opengateway free hosted Xiaomi MiMo endpoint. No API key required." } },
+  freebuff: { id: "freebuff", alias: "fb", name: "FreeBuff", icon: "/providers/default-icon.png", color: "#4F7CFF", textIcon: "FB", noAuth: true, website: "https://freebuff.com", notice: { text: "Native FreeBuff/Codebuff no-key provider. Uses local ~/.config/manicode/credentials.json credential; currently exposes DeepSeek V4 Flash." }, serviceKinds: ["llm"] },
 };
 
 // Free Tier Providers (has free access but may require account/API key)
@@ -59,7 +60,6 @@ export const OAUTH_PROVIDERS = {
 
 export const APIKEY_PROVIDERS = {
   "freemodel-dev": { id: "freemodel-dev", alias: "fmd", name: "Free Model Dev", icon: "/provider-icons/freemodel-dev.png", color: "#10B981", textIcon: "FM", website: "https://api.freemodel.dev", notice: { apiKeyUrl: "https://api.freemodel.dev" }, serviceKinds: ["llm"] },
-  freebuff: { id: "freebuff", alias: "fb", name: "FreeBuff", icon: "bolt", color: "#4F7CFF", textIcon: "FB", noAuth: true, website: "https://freebuff.com", notice: { text: "Native FreeBuff/Codebuff free bridge. Uses local ~/.config/manicode/credentials.json credential; currently exposes DeepSeek V4 Flash." }, serviceKinds: ["llm"] },
   bai: { id: "bai", alias: "bai", name: "B.AI", icon: "smart_toy", color: "#000000", textIcon: "B", website: "https://b.ai", notice: { apiKeyUrl: "https://b.ai" }, serviceKinds: ["llm"] },
   morph: { id: "morph", alias: "morph", name: "Morph LLM", icon: "speed", color: "#6B4FBB", textIcon: "MP", website: "https://morphllm.com", notice: { apiKeyUrl: "https://morphllm.com/dashboard/api-keys" }, serviceKinds: ["llm", "embedding"], embeddingConfig: { baseUrl: "https://api.morphllm.com/v1/embeddings", authType: "apikey", authHeader: "bearer", models: [{ id: "morph-embedding-v4", name: "Morph Embedding V4", dimensions: 1536 }] } },
   qiniu: { id: "qiniu", alias: "qiniu", name: "Qiniu", icon: "cloud", color: "#3B82F6", textIcon: "QN", notice: { apiKeyUrl: "https://portal.qiniu.com" }, serviceKinds: ["llm"] },

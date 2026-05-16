@@ -10,7 +10,6 @@ export const FREE_PROVIDERS = {
   iflow: { id: "iflow", alias: "if", name: "iFlow AI", icon: "water_drop", color: "#6366F1", website: "https://iflow.cn", notice: { signupUrl: "https://iflow.cn" } },
   opencode: { id: "opencode", alias: "oc", name: "OpenCode Free", icon: "terminal", color: "#E87040", textIcon: "OC", noAuth: true, passthroughModels: true, modelsFetcher: { url: "https://opencode.ai/zen/v1/models", type: "opencode-free" } },
   gitlawb: { id: "gitlawb", alias: "glb", name: "Gitlawb", icon: "/provider-icons/gitlawb.png", color: "#111827", textIcon: "GLB", noAuth: true, passthroughModels: true, modelsFetcher: { url: "https://opengateway.gitlawb.com/v1/xiaomi-mimo/models", type: "openai" }, website: "https://gitlawb.com", notice: { text: "Gitlawb Opengateway free hosted Xiaomi MiMo endpoint. No API key required." } },
-  freebuff: { id: "freebuff", alias: "fb", name: "FreeBuff", icon: "/providers/default-icon.png", color: "#4F7CFF", textIcon: "FB", noAuth: true, website: "https://freebuff.com", notice: { text: "Native FreeBuff/Codebuff no-key provider. Uses local ~/.config/manicode/credentials.json credential; currently exposes DeepSeek V4 Flash." }, serviceKinds: ["llm"] },
 };
 
 // Free Tier Providers (has free access but may require account/API key)
@@ -45,6 +44,7 @@ export const THINKING_CONFIG = {
 
 // OAuth Providers
 export const OAUTH_PROVIDERS = {
+  freebuff: { id: "freebuff", alias: "fb", name: "FreeBuff", icon: "/providers/default-icon.png", color: "#4F7CFF", textIcon: "FB", website: "https://freebuff.com", authType: "oauth", notice: { signupUrl: "https://freebuff.com", text: "Sign in with your FreeBuff/Codebuff account to add a managed connection. Free tier currently uses DeepSeek V4 Flash." }, serviceKinds: ["llm"] },
   claude: { id: "claude", alias: "cc", name: "Claude Code", icon: "smart_toy", color: "#D97757", website: "https://claude.ai", notice: { signupUrl: "https://claude.ai" } },
   antigravity: { id: "antigravity", alias: "ag", name: "Antigravity", icon: "rocket_launch", color: "#F59E0B", deprecated: true, deprecationNotice: "AG is designed exclusively for Antigravity IDE. Using it with other tools (OpenClaw, Claude, Codex...) may result in account restrictions or bans.", website: "https://antigravity.google", notice: { signupUrl: "https://antigravity.google" } },
   codex: { id: "codex", alias: "cx", name: "OpenAI Codex", icon: "code", color: "#3B82F6", thinkingConfig: THINKING_CONFIG.effort, serviceKinds: ["llm", "image"], kindNotice: { image: "Requires a ChatGPT Plus (or higher) account. Free accounts are not supported for image generation." }, website: "https://chatgpt.com/codex", notice: { signupUrl: "https://chatgpt.com/codex" } },

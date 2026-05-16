@@ -179,9 +179,12 @@ export async function POST(request, { params }) {
 
       // Providers that don't use PKCE for device code
       const noPkceProviders = ["github", "kimi-coding", "kilocode", "codebuddy"];
+      const noPkceWithExtraDataProviders = ["freebuff"];
       let result;
       if (noPkceProviders.includes(provider)) {
         result = await pollForToken(provider, deviceCode);
+      } else if (noPkceWithExtraDataProviders.includes(provider)) {
+        result = await pollForToken(provider, deviceCode, null, extraData);
       } else if (provider === "kiro") {
         // Kiro needs extraData (clientId, clientSecret) from device code response
         result = await pollForToken(provider, deviceCode, null, extraData);

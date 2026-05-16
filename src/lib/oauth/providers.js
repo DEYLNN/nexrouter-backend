@@ -26,6 +26,8 @@ import {
   CODEBUDDY_CONFIG,
 } from "./constants/oauth";
 import { requestNousDeviceCode, pollNousToken, mintNousAgentKey } from "./nous.js";
+import { FREEBUFF_CONFIG } from "./constants/oauth.js";
+import { randomUUID } from "crypto";
 
 const BASE64_BLOCK_SIZE = 4;
 
@@ -953,6 +955,85 @@ const PROVIDERS = {
       accessToken: tokens.access_token,
       refreshToken: tokens.refresh_token,
       expiresIn: tokens.expires_in,
+    }),
+  },
+
+  freebuff: {
+    config: FREEBUFF_CONFIG,
+    flowType: "device_code",
+    requestDeviceCode: async (config) => {
+      const fingerprintId = randomUUID();
+      const response = await fetch(config.cliCodeUrl, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Accept: "application/json" },
+        body: JSON.stringify({ fingerprintId }),
+      });
+      if (!response.ok) {
+        const error = await response.text();
+        throw new Error(`FreeBuff login init failed: ${error}`);
+      }
+      const data = await response.json();
+      if (!data?.loginUrl) {
+        throw new Error("FreeBuff login init missing loginUrl");
+      }
+      return {
+        device_code: fingerprintId,
+        user_code: "",
+        verification_uri: data.loginUrl,
+        verification_uri_complete: data.loginUrl,
+        expires_in: 600,
+        interval: Math.max(1, Math.floor((config.pollInterval || 4000) / 1000)),
+        _fingerprintHash: typeof data.fingerprintHash === "string" ? data.fingerprintHash : null,
+        _expiresAt: data.expiresAt ?? null,
+        _loginUrl: data.loginUrl,
+      };
+    },
+    pollToken: async (config, deviceCode, _codeVerifier, extraData) => {
+      if (!extraData?._fingerprintHash || !extraData?._expiresAt) {
+        return { ok: false, data: { error: "authorization_pending" } };
+      }
+      const url = new URL(config.cliStatusUrl);
+      url.searchParams.set("fingerprintId", deviceCode);
+      url.searchParams.set("fingerprintHash", extraData._fingerprintHash);
+      url.searchParams.set("expiresAt", String(extraData._expiresAt));
+      const response = await fetch(url.toString(), {
+        headers: { Accept: "application/json" },
+      });
+      if (response.status === 401) {
+        return { ok: false, data: { error: "authorization_pending" } };
+      }
+      if (!response.ok) {
+        const text = await response.text();
+        return { ok: false, data: { error: "poll_failed", error_description: text || `Poll failed: ${response.status}` } };
+      }
+      const data = await response.json();
+      const user = data?.user;
+      if (!user || typeof user !== "object" || typeof user.authToken !== "string" || !user.authToken) {
+        return { ok: false, data: { error: "authorization_pending" } };
+      }
+      return {
+        ok: true,
+        data: {
+          access_token: user.authToken,
+          _email: user.email || null,
+          _userId: user.id || user.userId || null,
+          _fingerprintId: deviceCode,
+          _fingerprintHash: extraData._fingerprintHash,
+          _accountId: user.accountId || null,
+        },
+      };
+    },
+    mapTokens: (tokens) => ({
+      accessToken: tokens.access_token,
+      refreshToken: null,
+      expiresIn: null,
+      email: tokens._email,
+      providerSpecificData: {
+        accountId: tokens._accountId,
+        userId: tokens._userId,
+        fingerprintId: tokens._fingerprintId,
+        fingerprintHash: tokens._fingerprintHash,
+      },
     }),
   },
 

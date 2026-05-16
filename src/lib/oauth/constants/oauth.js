@@ -284,3 +284,11 @@ export const PROVIDERS = {
   GITLAB: "gitlab",
   CODEBUDDY: "codebuddy",
 };
+
+// FreeBuff (Codebuff) CLI Auth Configuration (custom device-code-style flow)
+export const FREEBUFF_CONFIG = {
+  loginBaseUrl: process.env.FREEBUFF_AUTH_BASE_URL || "https://www.codebuff.com",
+  cliCodeUrl: process.env.FREEBUFF_CLI_CODE_URL || "https://www.codebuff.com/api/auth/cli/code",
+  cliStatusUrl: process.env.FREEBUFF_CLI_STATUS_URL || "https://www.codebuff.com/api/auth/cli/status",
+  pollInterval: 4000,
+};

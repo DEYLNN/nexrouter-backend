@@ -1,5 +1,6 @@
 import { randomUUID } from "crypto";
 import { readFileSync } from "fs";
+import { getProviderConnections } from "@/lib/localDb";
 import { homedir } from "os";
 import { join } from "path";
 import { BaseExecutor } from "./base.js";
@@ -125,12 +126,35 @@ function backendModelFor(model) {
   return MODEL_MAP[model] || MODEL_MAP[`fb/${model}`] || null;
 }
 
-function loadCredentials() {
+function loadCredentialsFromFile() {
   const raw = readFileSync(CREDENTIALS_PATH, "utf8");
   const parsed = JSON.parse(raw);
   const account = parsed.default || parsed.accounts?.find((item) => item?.authToken);
   if (!account?.authToken) throw new Error("FreeBuff credentials missing authToken");
-  return account;
+  return { authToken: account.authToken, accountId: account.accountId || null, email: account.email || null, source: "file" };
+}
+
+async function loadCredentialsFromConnections() {
+  try {
+    const connections = await getProviderConnections({ provider: "freebuff", isActive: true });
+    const usable = connections.find((c) => c?.authType === "oauth" && c?.accessToken);
+    if (!usable) return null;
+    return {
+      authToken: usable.accessToken,
+      accountId: usable.providerSpecificData?.accountId || usable.id,
+      email: usable.email || null,
+      source: "db",
+      connectionId: usable.id,
+    };
+  } catch {
+    return null;
+  }
+}
+
+async function loadCredentials() {
+  const fromDb = await loadCredentialsFromConnections();
+  if (fromDb) return fromDb;
+  return loadCredentialsFromFile();
 }
 
 async function fetchRaw(pathname, token, body, extraHeaders = {}) {
@@ -452,7 +476,7 @@ export class FreeBuffExecutor extends BaseExecutor {
 
     let account;
     try {
-      account = loadCredentials();
+      account = await loadCredentials();
     } catch (error) {
       return { response: openAIError(error.message, 401, "missing_credentials") };
     }

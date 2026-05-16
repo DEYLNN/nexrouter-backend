@@ -25,6 +25,56 @@ function jsonResponse(payload, status = 200) {
   });
 }
 
+function openAISseResponseFromUpstream(upstream, requestedModel) {
+  const encoder = new TextEncoder();
+  const decoder = new TextDecoder();
+  const stream = new ReadableStream({
+    async start(controller) {
+      const reader = upstream.body.getReader();
+      let buf = "";
+      try {
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          buf += decoder.decode(value, { stream: true });
+          const lines = buf.split("\n");
+          buf = lines.pop() || "";
+          for (const line of lines) {
+            if (!line.startsWith("data:")) continue;
+            const data = line.slice(5).trim();
+            if (!data) continue;
+            if (data === "[DONE]") {
+              controller.enqueue(encoder.encode("data: [DONE]\n\n"));
+              continue;
+            }
+            try {
+              const chunk = JSON.parse(data);
+              chunk.model = requestedModel;
+              controller.enqueue(encoder.encode(`data: ${JSON.stringify(chunk)}\n\n`));
+            } catch {
+              controller.enqueue(encoder.encode(`data: ${data}\n\n`));
+            }
+          }
+        }
+        if (buf.includes("[DONE]")) controller.enqueue(encoder.encode("data: [DONE]\n\n"));
+      } catch (error) {
+        controller.error(error);
+      } finally {
+        try { await reader.cancel(); } catch {}
+        controller.close();
+      }
+    },
+  });
+  return new Response(stream, {
+    headers: {
+      "Content-Type": "text/event-stream",
+      "Cache-Control": "no-cache, no-transform",
+      "X-Accel-Buffering": "no",
+      "Access-Control-Allow-Origin": "*",
+    },
+  });
+}
+
 function sseResponseFromOpenAI(payload) {
   const choice = payload?.choices?.[0] || {};
   const content = choice?.message?.content || "";
@@ -66,6 +116,26 @@ function loadCredentials() {
   const account = parsed.default || parsed.accounts?.find((item) => item?.authToken);
   if (!account?.authToken) throw new Error("FreeBuff credentials missing authToken");
   return account;
+}
+
+async function fetchRaw(pathname, token, body, extraHeaders = {}) {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+  try {
+    return await fetch(`${API_BASE_URL}${pathname}`, {
+      method: body === undefined ? "GET" : "POST",
+      headers: {
+        "content-type": "application/json",
+        Authorization: `Bearer ${token}`,
+        "x-codebuff-api-key": token,
+        ...extraHeaders,
+      },
+      body: body === undefined ? undefined : JSON.stringify(body),
+      signal: controller.signal,
+    });
+  } finally {
+    clearTimeout(timeout);
+  }
 }
 
 async function fetchJson(pathname, token, body, extraHeaders = {}) {
@@ -229,17 +299,22 @@ export class FreeBuffExecutor extends BaseExecutor {
     const wantsStream = body?.stream === true;
     const upstreamBody = {
       ...body,
-      stream: false,
+      stream: wantsStream,
       model: backendModel,
       messages: sanitizeMessages(body.messages || []),
       provider: { data_collection: "deny", ...(body.provider || {}) },
     };
-    // MVP FreeBuff route is chat-only. Tool schemas from agentic clients can trigger
-    // upstream 400s, so strip them until native tool bridge is implemented.
-    delete upstreamBody.tools;
-    delete upstreamBody.tool_choice;
-    delete upstreamBody.parallel_tool_calls;
-    delete upstreamBody.stream_options;
+    if (wantsStream) {
+      upstreamBody.stream_options = body.stream_options || { include_usage: true };
+      if (Array.isArray(body.tools)) upstreamBody.tools = body.tools;
+      if (body.tool_choice) upstreamBody.tool_choice = body.tool_choice;
+    } else {
+      // Non-stream fallback is chat-only; strip agentic extras that upstream rejects.
+      delete upstreamBody.tools;
+      delete upstreamBody.tool_choice;
+      delete upstreamBody.parallel_tool_calls;
+      delete upstreamBody.stream_options;
+    }
     delete upstreamBody.response_format;
     delete upstreamBody.reasoning_effort;
     delete upstreamBody.reasoning;
@@ -247,6 +322,39 @@ export class FreeBuffExecutor extends BaseExecutor {
     try {
       await ensureRun(account.authToken, session);
       await ensureFreeSession(account.authToken, session);
+
+      if (wantsStream) {
+        const makeBody = () => ({ ...upstreamBody, codebuff_metadata: metadata(session) });
+        let upstream = await fetchRaw("/api/v1/chat/completions", account.authToken, makeBody());
+        if (!upstream.ok) {
+          const text = await upstream.text();
+          let data = null;
+          try { data = text ? JSON.parse(text) : null; } catch { data = { text }; }
+          const errorResponse = { ok: false, status: upstream.status, data, text };
+          if (isInvalidRun(errorResponse)) {
+            session.runId = null;
+            await ensureRun(account.authToken, session);
+            upstream = await fetchRaw("/api/v1/chat/completions", account.authToken, makeBody());
+          } else if (isRecoverableFreeSession(errorResponse)) {
+            session.freebuffInstanceId = null;
+            await ensureFreeSession(account.authToken, session);
+            upstream = await fetchRaw("/api/v1/chat/completions", account.authToken, makeBody());
+          } else {
+            const rawDetail = data?.error || data?.message || data || text || "FreeBuff stream request failed";
+            const detail = typeof rawDetail === "string" ? rawDetail : JSON.stringify(rawDetail);
+            return { response: openAIError(detail, upstream.status || 502, data?.code || "freebuff_upstream_error") };
+          }
+        }
+        if (!upstream.ok) {
+          const text = await upstream.text();
+          let data = null;
+          try { data = text ? JSON.parse(text) : null; } catch { data = { text }; }
+          const rawDetail = data?.error || data?.message || data || text || "FreeBuff stream request failed";
+          const detail = typeof rawDetail === "string" ? rawDetail : JSON.stringify(rawDetail);
+          return { response: openAIError(detail, upstream.status || 502, data?.code || "freebuff_upstream_error") };
+        }
+        return { response: openAISseResponseFromUpstream(upstream, model) };
+      }
 
       let response = await fetchJson("/api/v1/chat/completions", account.authToken, {
         ...upstreamBody,

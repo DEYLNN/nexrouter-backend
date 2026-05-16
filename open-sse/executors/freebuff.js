@@ -9,6 +9,8 @@ const CREDENTIALS_PATH = process.env.FREEBUFF_CREDENTIALS_PATH || join(homedir()
 const REQUEST_TIMEOUT_MS = Number(process.env.FREEBUFF_TIMEOUT_MS || 120000);
 const AGENT_ID = process.env.FREEBUFF_AGENT_ID || "base2-free";
 const COST_MODE = process.env.FREEBUFF_COST_MODE || "free";
+const FREEBUFF_WAIT_TIMEOUT_MS = Number(process.env.FREEBUFF_WAIT_TIMEOUT_MS || 25000);
+const FREEBUFF_WAIT_POLL_MS = Number(process.env.FREEBUFF_WAIT_POLL_MS || 2000);
 
 const MODEL_MAP = {
   "deepseek-v4-flash": "deepseek/deepseek-v4-flash",
@@ -211,14 +213,52 @@ async function ensureRun(token, session) {
   session.runId = response.data.runId;
 }
 
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+async function getFreeSession(token, instanceId) {
+  const response = await fetchJson("/api/v1/freebuff/session", token, undefined, {
+    "x-freebuff-instance-id": instanceId,
+  });
+  if (!response.ok) throw Object.assign(new Error(response.data?.error || response.data?.message || "Failed to get FreeBuff session"), { statusCode: response.status, body: response.data });
+  return response.data;
+}
+
+async function waitForFreeSessionActive(token, session) {
+  const started = Date.now();
+  while (session.freebuffInstanceId && Date.now() - started < FREEBUFF_WAIT_TIMEOUT_MS) {
+    const state = await getFreeSession(token, session.freebuffInstanceId);
+    session.freebuffSessionState = state?.status || null;
+    session.freebuffSessionUpdatedAt = new Date().toISOString();
+    if (state?.status === "active") return;
+    if (["ended", "superseded", "none"].includes(state?.status)) {
+      session.freebuffInstanceId = null;
+      break;
+    }
+    await sleep(FREEBUFF_WAIT_POLL_MS);
+  }
+}
+
 async function ensureFreeSession(token, session) {
   if (session.costMode !== "free") return;
-  if (session.freebuffInstanceId) return;
-  const response = await fetchJson("/api/v1/freebuff/session", token, {});
-  if (!response.ok || !response.data?.instanceId) {
-    throw Object.assign(new Error(response.data?.error || response.data?.message || "Failed to create FreeBuff session"), { statusCode: response.status, body: response.data });
+  if (session.freebuffInstanceId) {
+    try {
+      await waitForFreeSessionActive(token, session);
+      if (session.freebuffSessionState === "active") return;
+    } catch {
+      session.freebuffInstanceId = null;
+    }
   }
-  session.freebuffInstanceId = response.data.instanceId;
+  if (!session.freebuffInstanceId) {
+    const response = await fetchJson("/api/v1/freebuff/session", token, {});
+    if (!response.ok || !response.data?.instanceId) {
+      throw Object.assign(new Error(response.data?.error || response.data?.message || "Failed to create FreeBuff session"), { statusCode: response.status, body: response.data });
+    }
+    session.freebuffInstanceId = response.data.instanceId;
+    session.freebuffSessionState = response.data.status || "queued";
+    session.freebuffSessionCreatedAt = new Date().toISOString();
+    session.freebuffSessionUpdatedAt = session.freebuffSessionCreatedAt;
+    await waitForFreeSessionActive(token, session);
+  }
 }
 
 
@@ -258,7 +298,7 @@ function isInvalidRun(response) {
 }
 
 function isRecoverableFreeSession(response) {
-  return [409, 410, 426].includes(response?.status);
+  return [409, 410, 426, 428, 429].includes(response?.status);
 }
 
 function normalizeOpenAIResponse(data, requestedModel) {

@@ -771,9 +771,6 @@ export const PROVIDER_MODELS = {
   ],
   fb: [
     { id: "deepseek-v4-flash", name: "DeepSeek V4 Flash" },
-    { id: "deepseek-v4-pro", name: "DeepSeek V4 Pro" },
-    { id: "kimi-k2.6", name: "Kimi K2.6" },
-    { id: "minimax-m2.7", name: "MiniMax M2.7" },
   ],
 };
 

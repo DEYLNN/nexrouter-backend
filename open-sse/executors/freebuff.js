@@ -296,18 +296,18 @@ function toolResultToText(message) {
 }
 
 function toolCallsToText(toolCalls = []) {
-  if (!Array.isArray(toolCalls) || toolCalls.length === 0) return "";
-  return toolCalls
-    .map((call) => {
-      const name = call?.function?.name || call?.name || call?.id || "tool_call";
-      const args = call?.function?.arguments || call?.arguments || "";
-      return `[assistant requested tool: ${name}] ${truncateText(args, 800)}`;
-    })
-    .join("\n");
+  // FreeBuff is exposed as a chat/planning backend in AI Gateway. Do not preserve
+  // previous assistant tool-call intents as text; models tend to copy them back
+  // instead of answering, which breaks clients like Hermes. Tool *results* are kept
+  // separately via toolResultToText().
+  return "";
 }
 
 function sanitizeMessages(messages = []) {
-  const systemLike = [];
+  const systemLike = [{
+    role: "system",
+    content: "You are behind AI Gateway's FreeBuff chat adapter. Tool execution is not available for this provider. Do not output tool-call placeholders, JSON tool requests, or lines like '[assistant requested tool: ...]'. Answer directly from the provided context. If a task requires live web/tool access, say that this model cannot execute tools and give a concise best-effort answer."
+  }];
   const conversational = [];
 
   for (const message of messages) {

@@ -25,6 +25,33 @@ function jsonResponse(payload, status = 200) {
   });
 }
 
+function sseResponseFromOpenAI(payload) {
+  const choice = payload?.choices?.[0] || {};
+  const content = choice?.message?.content || "";
+  const chunk = {
+    id: payload?.id || `chatcmpl-freebuff-${Date.now()}`,
+    object: "chat.completion.chunk",
+    created: payload?.created || Math.floor(Date.now() / 1000),
+    model: payload?.model || "freebuff",
+    choices: [{ index: 0, delta: { role: "assistant", content }, finish_reason: null }],
+  };
+  const done = {
+    id: chunk.id,
+    object: "chat.completion.chunk",
+    created: chunk.created,
+    model: chunk.model,
+    choices: [{ index: 0, delta: {}, finish_reason: choice.finish_reason || "stop" }],
+    usage: payload?.usage,
+  };
+  return new Response(`data: ${JSON.stringify(chunk)}\n\ndata: ${JSON.stringify(done)}\n\ndata: [DONE]\n\n`, {
+    headers: {
+      "Content-Type": "text/event-stream",
+      "Cache-Control": "no-cache, no-transform",
+      "Access-Control-Allow-Origin": "*",
+    },
+  });
+}
+
 function openAIError(message, status = 500, code = "freebuff_error") {
   return jsonResponse({ error: { message, type: "server_error", code } }, status);
 }
@@ -168,12 +195,18 @@ export class FreeBuffExecutor extends BaseExecutor {
       sessions.set(sessionKey, session);
     }
 
+    const wantsStream = body?.stream === true;
     const upstreamBody = {
       ...body,
       stream: false,
       model: backendModel,
       provider: { data_collection: "deny", ...(body.provider || {}) },
     };
+    // MVP FreeBuff route is chat-only. Tool schemas from agentic clients can trigger
+    // upstream 400s, so strip them until native tool bridge is implemented.
+    delete upstreamBody.tools;
+    delete upstreamBody.tool_choice;
+    delete upstreamBody.parallel_tool_calls;
 
     try {
       await ensureRun(account.authToken, session);
@@ -207,7 +240,8 @@ export class FreeBuffExecutor extends BaseExecutor {
         return { response: openAIError(String(detail), response.status || 502, response.data?.code || "freebuff_upstream_error") };
       }
 
-      return { response: jsonResponse(normalizeOpenAIResponse(response.data, model)) };
+      const normalized = normalizeOpenAIResponse(response.data, model);
+      return { response: wantsStream ? sseResponseFromOpenAI(normalized) : jsonResponse(normalized) };
     } catch (error) {
       return { response: openAIError(error.message || "FreeBuff request failed", error.statusCode || 502, "freebuff_exception") };
     }

@@ -338,14 +338,17 @@ function sanitizeMessages(messages = []) {
       const content = normalizeMessageContent(message.content);
       const toolCalls = sanitizeToolCalls(message.tool_calls);
       const reasoningRaw = message.reasoning_content || message.reasoning || null;
-      const reasoning = reasoningRaw ? truncateText(typeof reasoningRaw === "string" ? reasoningRaw : JSON.stringify(reasoningRaw), FREEBUFF_MAX_MESSAGE_CHARS) : null;
+      const reasoning = reasoningRaw ? truncateText(typeof reasoningRaw === "string" ? reasoningRaw : JSON.stringify(reasoningRaw), FREEBUFF_MAX_MESSAGE_CHARS) : "";
       if (!content && !toolCalls && !reasoning) continue;
       clean = {
         role: "assistant",
         content: content ? truncateText(content, FREEBUFF_MAX_MESSAGE_CHARS) : undefined,
       };
       if (toolCalls) clean.tool_calls = toolCalls;
-      if (reasoning) clean.reasoning_content = reasoning;
+      // DeepSeek thinking mode strictly requires reasoning_content on every prior
+      // assistant turn even when the agentic client did not echo it back. Always
+      // provide a string (possibly empty) to satisfy upstream validation.
+      clean.reasoning_content = reasoning;
     } else {
       const content = normalizeMessageContent(message.content);
       if (!content) continue;

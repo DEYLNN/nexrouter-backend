@@ -142,6 +142,37 @@ async function ensureFreeSession(token, session) {
   session.freebuffInstanceId = response.data.instanceId;
 }
 
+
+function normalizeMessageContent(content) {
+  if (typeof content === "string") return content;
+  if (Array.isArray(content)) {
+    return content
+      .map((part) => {
+        if (typeof part === "string") return part;
+        if (part?.type === "text") return part.text || "";
+        if (part?.text) return part.text;
+        return "";
+      })
+      .filter(Boolean)
+      .join("\n");
+  }
+  if (content == null) return "";
+  return String(content);
+}
+
+function sanitizeMessages(messages = []) {
+  return messages
+    .filter((message) => message && message.role !== "tool")
+    .map((message) => {
+      const clean = { role: message.role || "user", content: normalizeMessageContent(message.content) };
+      // Assistant messages that only contained tool calls become empty after stripping;
+      // keep prior text messages only to avoid upstream schema errors.
+      if (clean.role === "assistant" && !clean.content.trim()) return null;
+      return clean;
+    })
+    .filter(Boolean);
+}
+
 function isInvalidRun(response) {
   const msg = response?.data?.message || response?.data?.error || response?.text || "";
   return typeof msg === "string" && (msg.includes("runId Not Found") || msg.includes("runId Not Running"));
@@ -200,6 +231,7 @@ export class FreeBuffExecutor extends BaseExecutor {
       ...body,
       stream: false,
       model: backendModel,
+      messages: sanitizeMessages(body.messages || []),
       provider: { data_collection: "deny", ...(body.provider || {}) },
     };
     // MVP FreeBuff route is chat-only. Tool schemas from agentic clients can trigger
@@ -207,6 +239,9 @@ export class FreeBuffExecutor extends BaseExecutor {
     delete upstreamBody.tools;
     delete upstreamBody.tool_choice;
     delete upstreamBody.parallel_tool_calls;
+    delete upstreamBody.response_format;
+    delete upstreamBody.reasoning_effort;
+    delete upstreamBody.reasoning;
 
     try {
       await ensureRun(account.authToken, session);
@@ -236,8 +271,9 @@ export class FreeBuffExecutor extends BaseExecutor {
       }
 
       if (!response.ok) {
-        const detail = response.data?.error || response.data?.message || response.text || "FreeBuff request failed";
-        return { response: openAIError(String(detail), response.status || 502, response.data?.code || "freebuff_upstream_error") };
+        const rawDetail = response.data?.error || response.data?.message || response.data || response.text || "FreeBuff request failed";
+        const detail = typeof rawDetail === "string" ? rawDetail : JSON.stringify(rawDetail);
+        return { response: openAIError(detail, response.status || 502, response.data?.code || "freebuff_upstream_error") };
       }
 
       const normalized = normalizeOpenAIResponse(response.data, model);

@@ -3,6 +3,7 @@ import { readFileSync } from "fs";
 import { homedir } from "os";
 import { join } from "path";
 import { BaseExecutor } from "./base.js";
+import { injectReasoningContent } from "../utils/reasoningContentInjector.js";
 
 const API_BASE_URL = process.env.FREEBUFF_API_BASE_URL || "https://www.codebuff.com";
 const CREDENTIALS_PATH = process.env.FREEBUFF_CREDENTIALS_PATH || join(homedir(), ".config", "manicode", "credentials.json");
@@ -338,17 +339,14 @@ function sanitizeMessages(messages = []) {
       const content = normalizeMessageContent(message.content);
       const toolCalls = sanitizeToolCalls(message.tool_calls);
       const reasoningRaw = message.reasoning_content || message.reasoning || null;
-      const reasoning = reasoningRaw ? truncateText(typeof reasoningRaw === "string" ? reasoningRaw : JSON.stringify(reasoningRaw), FREEBUFF_MAX_MESSAGE_CHARS) : "";
+      const reasoning = reasoningRaw ? truncateText(typeof reasoningRaw === "string" ? reasoningRaw : JSON.stringify(reasoningRaw), FREEBUFF_MAX_MESSAGE_CHARS) : null;
       if (!content && !toolCalls && !reasoning) continue;
       clean = {
         role: "assistant",
         content: content ? truncateText(content, FREEBUFF_MAX_MESSAGE_CHARS) : undefined,
       };
       if (toolCalls) clean.tool_calls = toolCalls;
-      // DeepSeek thinking mode strictly requires reasoning_content on every prior
-      // assistant turn even when the agentic client did not echo it back. Always
-      // provide a string (possibly empty) to satisfy upstream validation.
-      clean.reasoning_content = reasoning;
+      if (reasoning) clean.reasoning_content = reasoning;
     } else {
       const content = normalizeMessageContent(message.content);
       if (!content) continue;
@@ -474,6 +472,8 @@ export class FreeBuffExecutor extends BaseExecutor {
       messages: sanitizeMessages(body.messages || []),
       provider: { data_collection: "deny", ...(body.provider || {}) },
     };
+    const reasoningInjected = injectReasoningContent({ provider: "freebuff", model, body: { messages: upstreamBody.messages } });
+    upstreamBody.messages = reasoningInjected.messages;
     if (wantsStream) {
       upstreamBody.stream_options = body.stream_options || { include_usage: true };
     } else {

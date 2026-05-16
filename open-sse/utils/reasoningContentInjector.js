@@ -10,6 +10,8 @@ const PROVIDER_RULES = {
   "xiaomi-mimo-plan-sgp": { scope: "all" },
   glb: { scope: "all" },
   gitlawb: { scope: "all" },
+  freebuff: { scope: "all" },
+  fb: { scope: "all" },
 };
 
 // Model-level rules: matched by predicate against model id

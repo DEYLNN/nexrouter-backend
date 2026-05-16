@@ -337,12 +337,15 @@ function sanitizeMessages(messages = []) {
     } else if (role === "assistant") {
       const content = normalizeMessageContent(message.content);
       const toolCalls = sanitizeToolCalls(message.tool_calls);
-      if (!content && !toolCalls) continue;
+      const reasoningRaw = message.reasoning_content || message.reasoning || null;
+      const reasoning = reasoningRaw ? truncateText(typeof reasoningRaw === "string" ? reasoningRaw : JSON.stringify(reasoningRaw), FREEBUFF_MAX_MESSAGE_CHARS) : null;
+      if (!content && !toolCalls && !reasoning) continue;
       clean = {
         role: "assistant",
         content: content ? truncateText(content, FREEBUFF_MAX_MESSAGE_CHARS) : undefined,
       };
       if (toolCalls) clean.tool_calls = toolCalls;
+      if (reasoning) clean.reasoning_content = reasoning;
     } else {
       const content = normalizeMessageContent(message.content);
       if (!content) continue;

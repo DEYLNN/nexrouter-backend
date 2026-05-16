@@ -14,6 +14,15 @@ const MODEL_MAP = {
   "deepseek-v4-flash": "deepseek/deepseek-v4-flash",
   "fb/deepseek-v4-flash": "deepseek/deepseek-v4-flash",
   "freebuff/deepseek-v4-flash": "deepseek/deepseek-v4-flash",
+  "deepseek-v4-pro": "deepseek/deepseek-v4-pro",
+  "fb/deepseek-v4-pro": "deepseek/deepseek-v4-pro",
+  "freebuff/deepseek-v4-pro": "deepseek/deepseek-v4-pro",
+  "kimi-k2.6": "moonshotai/kimi-k2.6",
+  "fb/kimi-k2.6": "moonshotai/kimi-k2.6",
+  "freebuff/kimi-k2.6": "moonshotai/kimi-k2.6",
+  "minimax-m2.7": "minimax/minimax-m2.7",
+  "fb/minimax-m2.7": "minimax/minimax-m2.7",
+  "freebuff/minimax-m2.7": "minimax/minimax-m2.7",
 };
 
 const sessions = new Map();

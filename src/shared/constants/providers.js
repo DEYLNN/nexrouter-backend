@@ -59,6 +59,7 @@ export const OAUTH_PROVIDERS = {
 
 export const APIKEY_PROVIDERS = {
   "freemodel-dev": { id: "freemodel-dev", alias: "fmd", name: "Free Model Dev", icon: "/provider-icons/freemodel-dev.png", color: "#10B981", textIcon: "FM", website: "https://api.freemodel.dev", notice: { apiKeyUrl: "https://api.freemodel.dev" }, serviceKinds: ["llm"] },
+  freebuff: { id: "freebuff", alias: "fb", name: "FreeBuff", icon: "bolt", color: "#4F7CFF", textIcon: "FB", noAuth: true, website: "https://freebuff.com", notice: { text: "Native FreeBuff/Codebuff free bridge. Uses local ~/.config/manicode/credentials.json credential; currently exposes DeepSeek V4 Flash." }, serviceKinds: ["llm"] },
   bai: { id: "bai", alias: "bai", name: "B.AI", icon: "smart_toy", color: "#000000", textIcon: "B", website: "https://b.ai", notice: { apiKeyUrl: "https://b.ai" }, serviceKinds: ["llm"] },
   morph: { id: "morph", alias: "morph", name: "Morph LLM", icon: "speed", color: "#6B4FBB", textIcon: "MP", website: "https://morphllm.com", notice: { apiKeyUrl: "https://morphllm.com/dashboard/api-keys" }, serviceKinds: ["llm", "embedding"], embeddingConfig: { baseUrl: "https://api.morphllm.com/v1/embeddings", authType: "apikey", authHeader: "bearer", models: [{ id: "morph-embedding-v4", name: "Morph Embedding V4", dimensions: 1536 }] } },
   qiniu: { id: "qiniu", alias: "qiniu", name: "Qiniu", icon: "cloud", color: "#3B82F6", textIcon: "QN", notice: { apiKeyUrl: "https://portal.qiniu.com" }, serviceKinds: ["llm"] },

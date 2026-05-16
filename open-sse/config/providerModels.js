@@ -769,6 +769,9 @@ export const PROVIDER_MODELS = {
     { id: "gen4_turbo", name: "Gen-4 Turbo", type: "video", params: [] },
     { id: "gen3a_turbo", name: "Gen-3 Alpha Turbo", type: "video", params: [] },
   ],
+  fb: [
+    { id: "deepseek-v4-flash", name: "DeepSeek V4 Flash" },
+  ],
 };
 
 // Helper functions
@@ -841,6 +844,7 @@ const OAUTH_ALIASES = {
   canopywave: "cwv",
   "xiaomi-mimo-plan-sgp": "mimo-sgp",
   swiftrouter: "sr",
+  freebuff: "fb",
 };
 
 // Derived from PROVIDERS — no need to maintain manually

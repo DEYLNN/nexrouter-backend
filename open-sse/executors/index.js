@@ -15,6 +15,7 @@ import { GrokWebExecutor } from "./grok-web.js";
 import { PerplexityWebExecutor } from "./perplexity-web.js";
 import { OllamaLocalExecutor } from "./ollama-local.js";
 import { CommandCodeExecutor } from "./commandcode.js";
+import { FreeBuffExecutor } from "./freebuff.js";
 import { DefaultExecutor } from "./default.js";
 
 const executors = {
@@ -37,6 +38,8 @@ const executors = {
   "perplexity-web": new PerplexityWebExecutor(),
   "ollama-local": new OllamaLocalExecutor(),
   commandcode: new CommandCodeExecutor(),
+  freebuff: new FreeBuffExecutor(),
+  fb: new FreeBuffExecutor(),
 };
 
 const defaultCache = new Map();
@@ -70,3 +73,4 @@ export { GrokWebExecutor } from "./grok-web.js";
 export { PerplexityWebExecutor } from "./perplexity-web.js";
 export { OllamaLocalExecutor } from "./ollama-local.js";
 export { CommandCodeExecutor } from "./commandcode.js";
+export { FreeBuffExecutor } from "./freebuff.js";

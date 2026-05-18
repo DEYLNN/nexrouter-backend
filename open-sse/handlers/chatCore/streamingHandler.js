@@ -41,9 +41,7 @@ function fakeOpenAIStreamFromCompletion(completion) {
         }
       }
       controller.enqueue(encoder.encode(chunk({}, "stop", true)));
-      controller.enqueue(encoder.encode("data: [DONE]
-
-"));
+      controller.enqueue(encoder.encode("data: [DONE]\n\n"));
       controller.close();
     }
   });

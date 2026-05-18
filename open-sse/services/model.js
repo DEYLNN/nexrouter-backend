@@ -47,6 +47,8 @@ const ALIAS_TO_PROVIDER_ID = {
   hyperbolic: "hyperbolic",
   nous: "nous-portal",
   morph: "morph",
+  gmi: "gmi-cloud",
+  "gmi-cloud": "gmi-cloud",
   routeway: "routeway",
   "mimo-sgp": "xiaomi-mimo-plan-sgp",
   dg: "deepgram",

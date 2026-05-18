@@ -672,7 +672,7 @@ export const PROVIDER_MODELS = {
   hyperbolic: [
     { id: "Qwen/QwQ-32B", name: "QwQ 32B" },
     { id: "deepseek-ai/DeepSeek-R1", name: "DeepSeek R1" },
-    { id: "deepseek-ai/DeepSeek-V3", upstreamModelId: "google/deepseek-ai/DeepSeek-V3", name: "DeepSeek V3" },
+    { id: "deepseek-ai/DeepSeek-V3", name: "DeepSeek V3" },
     { id: "meta-llama/Llama-3.3-70B-Instruct", name: "Llama 3.3 70B" },
     { id: "meta-llama/Llama-3.2-3B-Instruct", name: "Llama 3.2 3B" },
     { id: "Qwen/Qwen2.5-72B-Instruct", name: "Qwen 2.5 72B" },

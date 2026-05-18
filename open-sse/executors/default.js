@@ -6,6 +6,36 @@ import { getCachedClaudeHeaders } from "../utils/claudeHeaderCache.js";
 import { proxyAwareFetch } from "../utils/proxyFetch.js";
 import { injectReasoningContent } from "../utils/reasoningContentInjector.js";
 
+function sanitizeGmiToolPayload(body) {
+  const next = { ...body };
+  delete next.tools;
+  delete next.tool_choice;
+  delete next.parallel_tool_calls;
+
+  if (Array.isArray(next.messages)) {
+    next.messages = next.messages.map((message) => {
+      const clean = { ...message };
+      delete clean.tool_calls;
+      delete clean.function_call;
+      delete clean.tool_call_id;
+      delete clean.name;
+
+      if (message.role === "tool" || message.role === "function") {
+        const label = message.name || message.tool_call_id || "tool";
+        const content = typeof message.content === "string"
+          ? message.content
+          : JSON.stringify(message.content ?? "");
+        return { role: "user", content: `[${label} result]
+${content}` };
+      }
+
+      return clean;
+    });
+  }
+
+  return next;
+}
+
 export class DefaultExecutor extends BaseExecutor {
   constructor(provider) {
     super(provider, PROVIDERS[provider] || PROVIDERS.openai);
@@ -25,6 +55,9 @@ export class DefaultExecutor extends BaseExecutor {
       const extra = { ...(transformed.extra_body || {}) };
       if (!extra.tags) extra.tags = ["product=hermes-agent"];
       transformed.extra_body = extra;
+    }
+    if (this.provider === "gmi-cloud") {
+      transformed = sanitizeGmiToolPayload(transformed);
     }
     return transformed;
   }

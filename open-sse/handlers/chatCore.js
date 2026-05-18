@@ -14,7 +14,7 @@ import { getExecutor } from "../executors/index.js";
 import { buildRequestDetail, extractRequestConfig } from "./chatCore/requestDetail.js";
 import { handleForcedSSEToJson } from "./chatCore/sseToJsonHandler.js";
 import { handleNonStreamingResponse } from "./chatCore/nonStreamingHandler.js";
-import { handleStreamingResponse, buildOnStreamComplete } from "./chatCore/streamingHandler.js";
+import { handleStreamingResponse, buildOnStreamComplete, handleFakeStreamingFromJson } from "./chatCore/streamingHandler.js";
 import { detectClientTool, isNativePassthrough } from "../utils/clientDetector.js";
 import { injectCaveman } from "../rtk/caveman.js";
 import { compressMessages, formatRtkLog } from "../rtk/index.js";
@@ -58,7 +58,8 @@ export async function handleChatCore({ body, modelInfo, credentials, log, onCred
 
   const clientRequestedStreaming = body.stream === true || sourceFormat === FORMATS.ANTIGRAVITY || sourceFormat === FORMATS.GEMINI || sourceFormat === FORMATS.GEMINI_CLI;
   const providerRequiresStreaming = provider === "openai" || provider === "codex" || provider === "commandcode";
-  let stream = providerRequiresStreaming ? true : (body.stream !== false);
+  const fakeStreamProvider = provider === "gmi-cloud";
+  let stream = fakeStreamProvider ? false : (providerRequiresStreaming ? true : (body.stream !== false));
 
   // Check client Accept header preference for non-streaming requests
   // This fixes AI SDK compatibility where clients send Accept: application/json
@@ -241,6 +242,13 @@ export async function handleChatCore({ body, modelInfo, credentials, log, onCred
   if (!clientRequestedStreaming && providerRequiresStreaming) {
     const result = await handleForcedSSEToJson({ ...sharedCtx, providerResponse, sourceFormat, trackDone, appendLog });
     if (result) { streamController.handleComplete(); return result; }
+  }
+
+  // Fake-stream GMI Cloud: upstream non-stream JSON, client receives OpenAI SSE.
+  if (fakeStreamProvider && clientRequestedStreaming) {
+    const result = await handleFakeStreamingFromJson({ ...sharedCtx, providerResponse, trackDone, appendLog });
+    streamController.handleComplete();
+    return result;
   }
 
   // True non-streaming response

@@ -15,6 +15,68 @@ const SSE_HEADERS = {
 
 const SSE_KEEPALIVE_MS = Number(process.env.SSE_KEEPALIVE_MS || 10000);
 
+function fakeOpenAIStreamFromCompletion(completion) {
+  const encoder = new TextEncoder();
+  const id = completion?.id || `chatcmpl-${Date.now()}`;
+  const created = completion?.created || Math.floor(Date.now() / 1000);
+  const model = completion?.model || "unknown";
+  const content = completion?.choices?.[0]?.message?.content || "";
+  const usage = completion?.usage || null;
+
+  const chunk = (delta, finishReason = null, includeUsage = false) => {
+    const payload = { id, object: "chat.completion.chunk", created, model, choices: [{ index: 0, delta, finish_reason: finishReason }] };
+    if (includeUsage && usage) payload.usage = usage;
+    return `data: ${JSON.stringify(payload)}
+
+`;
+  };
+
+  return new ReadableStream({
+    start(controller) {
+      controller.enqueue(encoder.encode(chunk({ role: "assistant" })));
+      if (content) {
+        const size = Number(process.env.FAKE_STREAM_CHUNK_SIZE || 96);
+        for (let i = 0; i < content.length; i += size) {
+          controller.enqueue(encoder.encode(chunk({ content: content.slice(i, i + size) })));
+        }
+      }
+      controller.enqueue(encoder.encode(chunk({}, "stop", true)));
+      controller.enqueue(encoder.encode("data: [DONE]
+
+"));
+      controller.close();
+    }
+  });
+}
+
+export async function handleFakeStreamingFromJson({ providerResponse, provider, model, requestStartTime, connectionId, apiKey, clientRawRequest, body, translatedBody, finalBody, onRequestSuccess, trackDone, appendLog }) {
+  trackDone();
+  let responseBody;
+  try {
+    responseBody = await providerResponse.json();
+  } catch (err) {
+    appendLog({ status: `FAILED 502` });
+    return { success: false, response: new Response(JSON.stringify({ error: { message: `Invalid JSON response from ${provider}` } }), { status: 502, headers: { "Content-Type": "application/json" } }) };
+  }
+  if (onRequestSuccess) await onRequestSuccess();
+  const usage = responseBody?.usage || { prompt_tokens: 0, completion_tokens: 0 };
+  appendLog({ tokens: usage, status: "200 OK" });
+  saveUsageStats({ provider, model, tokens: usage, connectionId, apiKey, endpoint: clientRawRequest?.endpoint, label: "FAKE STREAM USAGE" });
+
+  saveRequestDetail(buildRequestDetail({
+    provider, model, connectionId,
+    latency: { ttft: Date.now() - requestStartTime, total: Date.now() - requestStartTime },
+    tokens: usage,
+    request: extractRequestConfig(body, true),
+    providerRequest: finalBody || translatedBody || null,
+    providerResponse: responseBody || null,
+    response: { content: responseBody?.choices?.[0]?.message?.content || null, thinking: null, type: "fake-streaming" },
+    status: "success"
+  }, { endpoint: clientRawRequest?.endpoint || null })).catch(() => {});
+
+  return { success: true, response: new Response(fakeOpenAIStreamFromCompletion(responseBody), { headers: SSE_HEADERS }) };
+}
+
 function withSSEKeepAlive(readable, intervalMs = SSE_KEEPALIVE_MS) {
   if (!intervalMs || intervalMs <= 0) return readable;
   const encoder = new TextEncoder();

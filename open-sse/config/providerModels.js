@@ -305,6 +305,12 @@ export const PROVIDER_MODELS = {
     { id: "claude-opus-4-20250514", name: "Claude Opus 4" },
     { id: "claude-3-5-sonnet-20241022", name: "Claude 3.5 Sonnet" },
   ],
+  gmi: [
+    { id: "gemini-3.1-flash-lite-preview", name: "Gemini 3.1 Flash Lite Preview" },
+  ],
+  "gmi-cloud": [
+    { id: "gemini-3.1-flash-lite-preview", name: "Gemini 3.1 Flash Lite Preview" },
+  ],
   gemini: [
     // Gemini 3.1 series
     { id: "gemini-3.1-pro-preview", name: "Gemini 3.1 Pro Preview" },

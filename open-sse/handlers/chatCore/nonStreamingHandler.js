@@ -26,10 +26,34 @@ export function translateNonStreamingResponse(responseBody, targetFormat, source
     let textContent = "", reasoningContent = "";
     const toolCalls = [];
 
+    const extractTextToolCall = (text) => {
+      if (!text || typeof text !== "string") return null;
+      const trimmed = text.trim().replace(/^```(?:json)?\s*/i, "").replace(/\s*```$/i, "");
+      try {
+        const parsed = JSON.parse(trimmed);
+        const call = parsed.tool_call || parsed.toolCall || parsed.function_call || parsed.functionCall;
+        const name = call?.name || call?.function?.name;
+        const args = call?.arguments ?? call?.args ?? call?.function?.arguments ?? {};
+        if (!name) return null;
+        return { name, arguments: typeof args === "string" ? args : JSON.stringify(args || {}) };
+      } catch { return null; }
+    };
+
     if (content?.parts) {
       for (const part of content.parts) {
         if (part.thought === true && part.text) reasoningContent += part.text;
-        else if (part.text !== undefined) textContent += part.text;
+        else if (part.text !== undefined) {
+          const textToolCall = extractTextToolCall(part.text);
+          if (textToolCall) {
+            toolCalls.push({
+              id: `call_${textToolCall.name}_${Date.now()}_${toolCalls.length}`,
+              type: "function",
+              function: { name: textToolCall.name, arguments: textToolCall.arguments }
+            });
+          } else {
+            textContent += part.text;
+          }
+        }
         if (part.functionCall) {
           toolCalls.push({
             id: `call_${part.functionCall.name}_${Date.now()}_${toolCalls.length}`,

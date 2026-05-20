@@ -1,6 +1,39 @@
 import { register } from "../index.js";
 import { FORMATS } from "../formats.js";
 
+function extractTextToolCall(text) {
+  if (!text || typeof text !== "string") return null;
+  const trimmed = text.trim().replace(/^```(?:json)?\s*/i, "").replace(/\s*```$/i, "");
+  try {
+    const parsed = JSON.parse(trimmed);
+    const call = parsed.tool_call || parsed.toolCall || parsed.function_call || parsed.functionCall;
+    const name = call?.name || call?.function?.name;
+    const args = call?.arguments ?? call?.args ?? call?.function?.arguments ?? {};
+    if (!name) return null;
+    return { name, arguments: typeof args === "string" ? args : JSON.stringify(args || {}) };
+  } catch {
+    return null;
+  }
+}
+
+function pushToolCallChunk(results, state, fcName, fcArgs) {
+  const toolCallIndex = state.functionIndex++;
+  const toolCall = {
+    id: `call_${fcName}_${Date.now()}_${toolCallIndex}`,
+    index: toolCallIndex,
+    type: "function",
+    function: { name: fcName, arguments: fcArgs }
+  };
+  state.toolCalls.set(toolCallIndex, toolCall);
+  results.push({
+    id: `chatcmpl-${state.messageId}`,
+    object: "chat.completion.chunk",
+    created: Math.floor(Date.now() / 1000),
+    model: state.model,
+    choices: [{ index: 0, delta: { tool_calls: [toolCall] }, finish_reason: null }]
+  });
+}
+
 // Convert Gemini response chunk to OpenAI format
 export function geminiToOpenAIResponse(chunk, state) {
   if (!chunk) return null;
@@ -94,17 +127,22 @@ export function geminiToOpenAIResponse(chunk, state) {
 
       // Text content (non-thinking)
       if (part.text !== undefined && part.text !== "") {
-        results.push({
-          id: `chatcmpl-${state.messageId}`,
-          object: "chat.completion.chunk",
-          created: Math.floor(Date.now() / 1000),
-          model: state.model,
-          choices: [{
-            index: 0,
-            delta: { content: part.text },
-            finish_reason: null
-          }]
-        });
+        const textToolCall = extractTextToolCall(part.text);
+        if (textToolCall) {
+          pushToolCallChunk(results, state, textToolCall.name, textToolCall.arguments);
+        } else {
+          results.push({
+            id: `chatcmpl-${state.messageId}`,
+            object: "chat.completion.chunk",
+            created: Math.floor(Date.now() / 1000),
+            model: state.model,
+            choices: [{
+              index: 0,
+              delta: { content: part.text },
+              finish_reason: null
+            }]
+          });
+        }
       }
 
       // Function call

@@ -358,8 +358,7 @@ export const PROVIDERS = {
   },
   llm7: {
     baseUrl: "https://api.llm7.io/v1/chat/completions",
-    format: "openai",
-    noAuth: true
+    format: "openai"
   },
   perplexity: {
     baseUrl: "https://api.perplexity.ai/chat/completions",

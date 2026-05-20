@@ -708,14 +708,6 @@ export const PROVIDER_MODELS = {
     { id: "Qwen/Qwen2.5-Coder-32B-Instruct", name: "Qwen 2.5 Coder 32B" },
     { id: "NousResearch/Hermes-3-Llama-3.1-70B", name: "Hermes 3 70B" },
   ],
-  "github-models": [
-    { id: "openai/gpt-5", name: "GPT-5 (GitHub Models)" },
-    { id: "openai/gpt-4.1", name: "GPT-4.1 (GitHub Models)" },
-    { id: "openai/gpt-4o", name: "GPT-4o (GitHub Models)" },
-  ],
-  kilo: [
-    { id: "nvidia/nemotron-3-super-120b-a12b:free", name: "Nemotron 3 Super 120B (Free)" },
-  ],
   pollinations: [
     { id: "openai-fast", name: "GPT-OSS 20B (Pollinations)" },
   ],

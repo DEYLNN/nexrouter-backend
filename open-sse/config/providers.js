@@ -343,14 +343,6 @@ export const PROVIDERS = {
     baseUrl: "https://api.mistral.ai/v1/chat/completions",
     format: "openai"
   },
-  "github-models": {
-    baseUrl: "https://models.github.ai/inference/chat/completions",
-    format: "openai"
-  },
-  kilo: {
-    baseUrl: "https://api.kilo.ai/api/gateway/v1/chat/completions",
-    format: "openai"
-  },
   pollinations: {
     baseUrl: "https://text.pollinations.ai/openai/v1/chat/completions",
     format: "openai",

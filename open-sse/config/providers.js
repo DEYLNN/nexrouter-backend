@@ -29,6 +29,9 @@ const CLAUDE_API_HEADERS = {
 // Shared baseUrls
 const KIMI_CODING_BASE_URL = "https://api.kimi.com/coding/v1/messages";
 
+const GOOGLE_OAUTH_CLIENT_ID = process.env.GOOGLE_OAUTH_CLIENT_ID || process.env.GOOGLE_CLIENT_ID || "GOOGLE_CLIENT_ID_REPLACE_WITH_ENV";
+const GOOGLE_OAUTH_CLIENT_SECRET = process.env.GOOGLE_OAUTH_CLIENT_SECRET || process.env.GOOGLE_CLIENT_SECRET || "GOCSPX_REPLACE_WITH_ENV_SECRET";
+
 export const PROVIDERS = {
   claude: {
     baseUrl: "https://api.anthropic.com/v1/messages",
@@ -55,14 +58,14 @@ export const PROVIDERS = {
   gemini: {
     baseUrl: "https://generativelanguage.googleapis.com/v1beta/models",
     format: "gemini",
-    clientId: "GOOGLE_CLIENT_ID_REPLACE_WITH_ENV",
-    clientSecret: "GOCSPX_REPLACE_WITH_ENV_SECRET"
+    clientId: GOOGLE_OAUTH_CLIENT_ID,
+    clientSecret: GOOGLE_OAUTH_CLIENT_SECRET
   },
   "gemini-cli": {
     baseUrl: "https://cloudcode-pa.googleapis.com/v1internal",
     format: "gemini-cli",
-    clientId: "GOOGLE_CLIENT_ID_REPLACE_WITH_ENV",
-    clientSecret: "GOCSPX_REPLACE_WITH_ENV_SECRET"
+    clientId: GOOGLE_OAUTH_CLIENT_ID,
+    clientSecret: GOOGLE_OAUTH_CLIENT_SECRET
   },
   codex: {
     baseUrl: "https://chatgpt.com/backend-api/codex/responses",
@@ -113,8 +116,8 @@ export const PROVIDERS = {
     ],
     format: "antigravity",
     headers: { "User-Agent": `antigravity/1.107.0 ${platform()}/${arch()}` },
-    clientId: "GOOGLE_CLIENT_ID_REPLACE_WITH_ENV",
-    clientSecret: "GOCSPX_REPLACE_WITH_ENV_SECRET"
+    clientId: process.env.ANTIGRAVITY_OAUTH_CLIENT_ID || GOOGLE_OAUTH_CLIENT_ID,
+    clientSecret: process.env.ANTIGRAVITY_OAUTH_CLIENT_SECRET || GOOGLE_OAUTH_CLIENT_SECRET
   },
   canopywave: {
     baseUrl: "https://inference.canopywave.io/v1/chat/completions",

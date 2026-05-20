@@ -5,6 +5,9 @@
 import { CLIENT_METADATA, getPlatformUserAgent } from "../config/appConstants.js";
 import { proxyAwareFetch } from "../utils/proxyFetch.js";
 
+const GOOGLE_OAUTH_CLIENT_ID = process.env.GOOGLE_OAUTH_CLIENT_ID || process.env.GOOGLE_CLIENT_ID || "GOOGLE_CLIENT_ID_REPLACE_WITH_ENV";
+const GOOGLE_OAUTH_CLIENT_SECRET = process.env.GOOGLE_OAUTH_CLIENT_SECRET || process.env.GOOGLE_CLIENT_SECRET || "GOCSPX_REPLACE_WITH_ENV_SECRET";
+
 // GitHub API config
 const GITHUB_CONFIG = {
   apiVersion: "2022-11-28",
@@ -34,8 +37,8 @@ const ANTIGRAVITY_CONFIG = {
   quotaApiUrl: "https://cloudcode-pa.googleapis.com/v1internal:fetchAvailableModels",
   loadProjectApiUrl: "https://cloudcode-pa.googleapis.com/v1internal:loadCodeAssist",
   tokenUrl: "https://oauth2.googleapis.com/token",
-  clientId: "GOOGLE_CLIENT_ID_REPLACE_WITH_ENV",
-  clientSecret: "GOCSPX_REPLACE_WITH_ENV_SECRET",
+  clientId: process.env.ANTIGRAVITY_OAUTH_CLIENT_ID || GOOGLE_OAUTH_CLIENT_ID,
+  clientSecret: process.env.ANTIGRAVITY_OAUTH_CLIENT_SECRET || GOOGLE_OAUTH_CLIENT_SECRET,
   userAgent: getPlatformUserAgent(),
 };
 

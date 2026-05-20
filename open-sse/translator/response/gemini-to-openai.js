@@ -53,8 +53,9 @@ export function geminiToOpenAIResponse(chunk, state) {
 
   // Initialize state
   if (!state.messageId) {
+    state.requestModel = state.model || null;
     state.messageId = response.responseId || `msg_${Date.now()}`;
-    state.model = response.modelVersion || "gemini";
+    state.model = response.modelVersion || state.requestModel || "gemini";
     state.functionIndex = 0;
     results.push({
       id: `chatcmpl-${state.messageId}`,
@@ -132,21 +133,32 @@ export function geminiToOpenAIResponse(chunk, state) {
 
       // Text content (non-thinking)
       if (part.text !== undefined && part.text !== "") {
-        const textToolCall = extractTextToolCall(part.text);
-        if (textToolCall) {
-          pushToolCallChunk(results, state, textToolCall.name, textToolCall.arguments);
+        const isGemmaToolShim = /^gemma-4-31b-it$/i.test(state.requestModel || state.model || "");
+        if (isGemmaToolShim) {
+          state.gemmaTextBuffer = (state.gemmaTextBuffer || "") + part.text;
+          const textToolCall = extractTextToolCall(state.gemmaTextBuffer);
+          if (textToolCall) {
+            state.gemmaTextBuffer = "";
+            state.gemmaToolCallEmitted = true;
+            pushToolCallChunk(results, state, textToolCall.name, textToolCall.arguments);
+          }
         } else {
-          results.push({
-            id: `chatcmpl-${state.messageId}`,
-            object: "chat.completion.chunk",
-            created: Math.floor(Date.now() / 1000),
-            model: state.model,
-            choices: [{
-              index: 0,
-              delta: { content: part.text },
-              finish_reason: null
-            }]
-          });
+          const textToolCall = extractTextToolCall(part.text);
+          if (textToolCall) {
+            pushToolCallChunk(results, state, textToolCall.name, textToolCall.arguments);
+          } else {
+            results.push({
+              id: `chatcmpl-${state.messageId}`,
+              object: "chat.completion.chunk",
+              created: Math.floor(Date.now() / 1000),
+              model: state.model,
+              choices: [{
+                index: 0,
+                delta: { content: part.text },
+                finish_reason: null
+              }]
+            });
+          }
         }
       }
 
@@ -251,6 +263,16 @@ export function geminiToOpenAIResponse(chunk, state) {
 
   // Finish reason - include usage in final chunk
   if (candidate.finishReason) {
+    if (state.gemmaTextBuffer && !state.gemmaToolCallEmitted) {
+      results.push({
+        id: `chatcmpl-${state.messageId}`,
+        object: "chat.completion.chunk",
+        created: Math.floor(Date.now() / 1000),
+        model: state.model,
+        choices: [{ index: 0, delta: { content: state.gemmaTextBuffer }, finish_reason: null }]
+      });
+      state.gemmaTextBuffer = "";
+    }
     let finishReason = candidate.finishReason.toLowerCase();
     if (finishReason === "stop" && state.toolCalls.size > 0) {
       finishReason = "tool_calls";

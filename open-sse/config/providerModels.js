@@ -312,6 +312,8 @@ export const PROVIDER_MODELS = {
     { id: "gemini-3.1-flash-lite-preview", name: "Gemini 3.1 Flash Lite Preview", upstreamModelId: "google/gemini-3.1-flash-lite-preview" },
   ],
   gemini: [
+    // Gemini 3.5 series
+    { id: "gemini-3.5-flash", name: "Gemini 3.5 Flash" },
     // Gemini 3.1 series
     { id: "gemini-3.1-pro-preview", name: "Gemini 3.1 Pro Preview" },
     { id: "gemini-3.1-flash-lite-preview", name: "Gemini 3.1 Flash Lite Preview", upstreamModelId: "google/gemini-3.1-flash-lite-preview" },
@@ -324,6 +326,8 @@ export const PROVIDER_MODELS = {
     // Gemini 2.0 series (retiring June 1, 2026)
     { id: "gemini-2.0-flash", name: "Gemini 2.0 Flash" },
     { id: "gemini-2.0-flash-lite", name: "Gemini 2.0 Flash Lite" },
+    // Gemma series
+    { id: "gemma-4-26b-it", name: "Gemma 4 26B IT" },
     { id: "gemma-4-31b-it", name: "Gemma 4 31B IT" },
 
     // Embedding models

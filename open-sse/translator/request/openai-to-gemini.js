@@ -20,7 +20,7 @@ import {
 } from "../helpers/geminiHelper.js";
 import { deriveSessionId } from "../../utils/sessionManager.js";
 
-const GEMMA_AGENTIC_TOOL_HINT = `\n\n[Agent tool protocol]\nThe client may provide tools, but this model endpoint does not support native function calling.\nIf the task requires web/search/browser/terminal/delegation/API discovery or any listed tool, DO NOT explain and DO NOT answer directly.\nRespond with exactly one JSON object and no markdown, no preamble, no commentary:\n{"tool_call":{"name":"tool_name","arguments":{}}}\nWhen no tool is needed, answer normally.\nUse only tool names listed below. Keep arguments valid JSON.`;
+const GEMMA_AGENTIC_TOOL_HINT = `\n\n[Agent tool protocol]\nThe client may provide tools, but this model endpoint does not support native function calling.\nIf the task requires web/search/browser/terminal/delegation/API discovery or any listed tool, DO NOT explain and DO NOT answer directly.\nRespond with exactly one JSON object and no markdown, no preamble, no commentary:\n{"tool_call":{"name":"tool_name","arguments":{}}}\nAfter a tool result is provided, do not call the same tool again unless the result explicitly says more data is needed. Synthesize the tool result into a final answer.\nDo not say “I already gave/listed” or ask the user to choose unless the tool result is genuinely ambiguous.\nWhen no tool is needed, answer normally.\nUse only tool names listed below. Keep arguments valid JSON.`;
 
 function formatGemmaToolHint(tools) {
   if (!Array.isArray(tools) || tools.length === 0) return "";
@@ -128,6 +128,10 @@ function openaiToGeminiBase(model, body, stream, signature = DEFAULT_THINKING_AG
         if (parts.length > 0) {
           result.contents.push({ role: "user", parts });
         }
+      } else if (role === "tool" || role === "function") {
+        const label = msg.name || msg.tool_call_id || "tool_result";
+        const text = typeof content === "string" ? content : JSON.stringify(content ?? "");
+        result.contents.push({ role: "user", parts: [{ text: `[${label} result]\n${text}` }] });
       } else if (role === "assistant") {
         const parts = [];
 

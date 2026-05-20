@@ -331,6 +331,10 @@ export const PROVIDERS = {
     baseUrl: "https://api.groq.com/openai/v1/chat/completions",
     format: "openai"
   },
+  sambanova: {
+    baseUrl: "https://api.sambanova.ai/v1/chat/completions",
+    format: "openai"
+  },
   xai: {
     baseUrl: "https://api.x.ai/v1/chat/completions",
     format: "openai"
@@ -338,6 +342,24 @@ export const PROVIDERS = {
   mistral: {
     baseUrl: "https://api.mistral.ai/v1/chat/completions",
     format: "openai"
+  },
+  "github-models": {
+    baseUrl: "https://models.github.ai/inference/chat/completions",
+    format: "openai"
+  },
+  kilo: {
+    baseUrl: "https://api.kilo.ai/api/gateway/v1/chat/completions",
+    format: "openai"
+  },
+  pollinations: {
+    baseUrl: "https://text.pollinations.ai/openai/v1/chat/completions",
+    format: "openai",
+    noAuth: true
+  },
+  llm7: {
+    baseUrl: "https://api.llm7.io/v1/chat/completions",
+    format: "openai",
+    noAuth: true
   },
   perplexity: {
     baseUrl: "https://api.perplexity.ai/chat/completions",

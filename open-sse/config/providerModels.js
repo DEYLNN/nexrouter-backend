@@ -345,6 +345,20 @@ export const PROVIDER_MODELS = {
     { id: "gemini-2.0-flash", name: "Gemini 2.0 Flash", type: "stt", params: ["language", "prompt"] },
   ],
   openrouter: [
+    // Free LLM models imported/cross-checked from FreeLLMAPI catalog
+    { id: "minimax/minimax-m2.5:free", name: "MiniMax M2.5 (Free)" },
+    { id: "qwen/qwen3-coder:free", name: "Qwen3 Coder (Free)" },
+    { id: "qwen/qwen3-next-80b-a3b-instruct:free", name: "Qwen3 Next 80B A3B Instruct (Free)" },
+    { id: "deepseek/deepseek-v3.1:free", name: "DeepSeek V3.1 (Free)" },
+    { id: "moonshotai/kimi-k2:free", name: "Kimi K2 (Free)" },
+    { id: "z-ai/glm-4.5-air:free", name: "GLM 4.5 Air (Free)" },
+    { id: "inclusionai/ling-2.6-flash:free", name: "Ling 2.6 Flash (Free)" },
+    { id: "arcee-ai/trinity-large-preview:free", name: "Trinity Large Preview (Free)" },
+    { id: "nvidia/nemotron-3-nano-30b-a3b:free", name: "NVIDIA Nemotron Nano 30B (Free)" },
+    { id: "openai/gpt-oss-20b:free", name: "GPT OSS 20B (Free)" },
+    { id: "meta-llama/llama-3.3-70b-instruct:free", name: "Llama 3.3 70B (Free)" },
+    { id: "google/gemma-4-31b-it:free", name: "Gemma 4 31B IT (Free)" },
+    { id: "nousresearch/hermes-3-llama-3.1-405b:free", name: "Hermes 3 Llama 3.1 405B (Free)" },
     // Embedding models
     { id: "openai/text-embedding-3-large", name: "OpenAI Text Embedding 3 Large", type: "embedding" },
     { id: "openai/text-embedding-3-small", name: "OpenAI Text Embedding 3 Small", type: "embedding" },
@@ -366,7 +380,6 @@ export const PROVIDER_MODELS = {
     { id: "poolside/laguna-m.1:free", name: "Poolside Laguna M.1 (Free)" },
     { id: "openai/gpt-oss-120b:free", name: "GPT OSS 120B (Free)" },
     { id: "nvidia/nemotron-3-super-120b-a12b:free", name: "NVIDIA Nemotron Super 120B (Free)" },
-    { id: "minimax/minimax-m2.5:free", name: "MiniMax M2.5 (Free)" },
   ],
   glm: [
     { id: "glm-5.1", name: "GLM 5.1" },
@@ -505,10 +518,14 @@ export const PROVIDER_MODELS = {
     { id: "stepfun/Step-3.5-Flash", name: "Step 3.5 Flash" },
   ],
   groq: [
+    { id: "groq/compound", name: "Compound" },
+    { id: "groq/compound-mini", name: "Compound Mini" },
     { id: "llama-3.3-70b-versatile", name: "Llama 3.3 70B" },
     { id: "meta-llama/llama-4-maverick-17b-128e-instruct", name: "Llama 4 Maverick" },
     { id: "qwen/qwen3-32b", name: "Qwen3 32B" },
     { id: "openai/gpt-oss-120b", name: "GPT-OSS 120B" },
+    { id: "openai/gpt-oss-20b", name: "GPT-OSS 20B" },
+    { id: "llama-3.1-8b-instant", name: "Llama 3.1 8B Instant" },
     // STT models
     { id: "whisper-large-v3", name: "Whisper Large v3", type: "stt", params: ["language", "response_format", "temperature", "prompt"] },
     { id: "whisper-large-v3-turbo", name: "Whisper Large v3 Turbo", type: "stt", params: ["language", "response_format", "temperature", "prompt"] },
@@ -523,6 +540,8 @@ export const PROVIDER_MODELS = {
   mistral: [
     { id: "mistral-large-latest", name: "Mistral Large 3" },
     { id: "codestral-latest", name: "Codestral" },
+    { id: "devstral-latest", name: "Devstral" },
+    { id: "magistral-medium-latest", name: "Magistral Medium" },
     { id: "mistral-medium-latest", name: "Mistral Medium 3" },
     { id: "mistral-embed", name: "Mistral Embed", type: "embedding" },
   ],
@@ -545,12 +564,24 @@ export const PROVIDER_MODELS = {
     { id: "nomic-ai/nomic-embed-text-v1.5", name: "Nomic Embed Text v1.5", type: "embedding" },
   ],
   cerebras: [
+    { id: "qwen-3-coder-480b", name: "Qwen3 Coder 480B" },
+    { id: "llama-4-maverick-17b-128e-instruct", name: "Llama 4 Maverick" },
     { id: "gpt-oss-120b", name: "GPT OSS 120B" },
     { id: "zai-glm-4.7", name: "ZAI GLM 4.7" },
     { id: "llama-3.3-70b", name: "Llama 3.3 70B" },
     { id: "llama-4-scout-17b-16e-instruct", name: "Llama 4 Scout" },
     { id: "qwen-3-235b-a22b-instruct-2507", name: "Qwen3 235B A22B" },
     { id: "qwen-3-32b", name: "Qwen3 32B" },
+    { id: "llama3.1-8b", name: "Llama 3.1 8B" },
+  ],
+  sambanova: [
+    { id: "DeepSeek-V3.2", name: "DeepSeek V3.2" },
+    { id: "DeepSeek-V3.1", name: "DeepSeek V3.1" },
+    { id: "DeepSeek-V3.1-cb", name: "DeepSeek V3.1 (CB)" },
+    { id: "gpt-oss-120b", name: "GPT OSS 120B" },
+    { id: "Llama-4-Maverick-17B-128E-Instruct", name: "Llama 4 Maverick" },
+    { id: "Meta-Llama-3.3-70B-Instruct", name: "Llama 3.3 70B" },
+    { id: "gemma-3-12b-it", name: "Gemma 3 12B IT" },
   ],
   cohere: [
     { id: "command-r-plus-08-2024", name: "Command R+ (Aug 2024)" },
@@ -558,6 +589,15 @@ export const PROVIDER_MODELS = {
     { id: "command-a-03-2025", name: "Command A (Mar 2025)" },
   ],
   nvidia: [
+    { id: "deepseek-ai/deepseek-v4-pro", name: "DeepSeek V4 Pro" },
+    { id: "mistralai/mistral-large-3-675b-instruct-2512", name: "Mistral Large 3 675B" },
+    { id: "moonshotai/kimi-k2.6", name: "Kimi K2.6" },
+    { id: "google/gemma-4-31b-it", name: "Gemma 4 31B IT" },
+    { id: "meta/llama-4-maverick-17b-128e-instruct", name: "Llama 4 Maverick" },
+    { id: "meta/llama-3.3-70b-instruct", name: "Llama 3.3 70B" },
+    { id: "meta/llama-3.1-70b-instruct", name: "Llama 3.1 70B" },
+    { id: "nvidia/nemotron-3-super-120b-a12b", name: "Nemotron 3 Super 120B" },
+    { id: "nvidia/nemotron-3-nano-30b-a3b", name: "Nemotron 3 Nano 30B" },
     { id: "minimaxai/minimax-m2.7", name: "Minimax M2.7" },
     { id: "z-ai/glm4.7", name: "GLM 4.7" },
     { id: "nvidia/nv-embedqa-e5-v5", name: "NV EmbedQA E5 v5", type: "embedding" },
@@ -667,6 +707,24 @@ export const PROVIDER_MODELS = {
     { id: "Qwen/Qwen2.5-72B-Instruct", name: "Qwen 2.5 72B" },
     { id: "Qwen/Qwen2.5-Coder-32B-Instruct", name: "Qwen 2.5 Coder 32B" },
     { id: "NousResearch/Hermes-3-Llama-3.1-70B", name: "Hermes 3 70B" },
+  ],
+  "github-models": [
+    { id: "openai/gpt-5", name: "GPT-5 (GitHub Models)" },
+    { id: "openai/gpt-4.1", name: "GPT-4.1 (GitHub Models)" },
+    { id: "openai/gpt-4o", name: "GPT-4o (GitHub Models)" },
+  ],
+  kilo: [
+    { id: "nvidia/nemotron-3-super-120b-a12b:free", name: "Nemotron 3 Super 120B (Free)" },
+  ],
+  pollinations: [
+    { id: "openai-fast", name: "GPT-OSS 20B (Pollinations)" },
+  ],
+  llm7: [
+    { id: "gpt-oss-20b", name: "GPT-OSS 20B" },
+    { id: "meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo", name: "Llama 3.1 8B Turbo" },
+    { id: "codestral-latest", name: "Codestral" },
+    { id: "ministral-8b-2512", name: "Ministral 8B" },
+    { id: "GLM-4.6V-Flash", name: "GLM 4.6V Flash" },
   ],
   ollama: [
     { id: "gpt-oss:120b", name: "GPT OSS 120B" },

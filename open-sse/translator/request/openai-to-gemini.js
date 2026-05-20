@@ -20,6 +20,31 @@ import {
 } from "../helpers/geminiHelper.js";
 import { deriveSessionId } from "../../utils/sessionManager.js";
 
+const GEMMA_AGENTIC_TOOL_HINT = `\n\n[Agent tool protocol]\nThe client may provide tools, but this model endpoint does not support native function calling.\nWhen a tool is needed, respond with exactly one JSON object and no markdown:\n{"tool_call":{"name":"tool_name","arguments":{}}}\nWhen no tool is needed, answer normally.\nUse only tool names listed below. Keep arguments valid JSON.`;
+
+function formatGemmaToolHint(tools) {
+  if (!Array.isArray(tools) || tools.length === 0) return "";
+  const lines = [];
+  for (const t of tools) {
+    const fn = t.type === "function" ? t.function : t;
+    const name = fn?.name;
+    if (!name) continue;
+    const desc = fn.description ? ` — ${fn.description}` : "";
+    const schema = fn.parameters || fn.input_schema || { type: "object", properties: {} };
+    lines.push(`- ${name}${desc}\n  schema: ${JSON.stringify(schema)}`);
+  }
+  return lines.length ? `${GEMMA_AGENTIC_TOOL_HINT}\n\nAvailable tools:\n${lines.join("\n")}` : "";
+}
+
+function appendSystemText(result, text) {
+  if (!text) return;
+  if (result.systemInstruction?.parts) {
+    result.systemInstruction.parts.push({ text });
+  } else {
+    result.systemInstruction = { role: "user", parts: [{ text }] };
+  }
+}
+
 // Sanitize function names for Gemini API.
 // Gemini requires: starts with [a-zA-Z_], followed by [a-zA-Z0-9_.:\-], max 64 chars.
 // Replace any invalid character with '_' and truncate to 64.
@@ -189,6 +214,10 @@ function openaiToGeminiBase(model, body, stream, signature = DEFAULT_THINKING_AG
         }
       }
     }
+  }
+
+  if (disableTools) {
+    appendSystemText(result, formatGemmaToolHint(body.tools));
   }
 
   // Convert tools

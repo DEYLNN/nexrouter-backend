@@ -44,6 +44,10 @@ function openaiToGeminiBase(model, body, stream, signature = DEFAULT_THINKING_AG
     safetySettings: DEFAULT_SAFETY_SETTINGS
   };
 
+  // Gemma API models currently reject Gemini function-calling payloads.
+  // Keep them usable for agent clients by stripping tool declarations/history instead of returning 400.
+  const disableTools = /^gemma-4-31b-it$/i.test(model);
+
   // Generation config
   if (body.temperature !== undefined) {
     result.generationConfig.temperature = body.temperature;
@@ -121,7 +125,7 @@ function openaiToGeminiBase(model, body, stream, signature = DEFAULT_THINKING_AG
           }
         }
 
-        if (msg.tool_calls && Array.isArray(msg.tool_calls)) {
+        if (!disableTools && msg.tool_calls && Array.isArray(msg.tool_calls)) {
           const toolCallIds = [];
           for (const tc of msg.tool_calls) {
             if (tc.type !== "function") continue;
@@ -188,7 +192,7 @@ function openaiToGeminiBase(model, body, stream, signature = DEFAULT_THINKING_AG
   }
 
   // Convert tools
-  if (body.tools && Array.isArray(body.tools) && body.tools.length > 0) {
+  if (!disableTools && body.tools && Array.isArray(body.tools) && body.tools.length > 0) {
     const functionDeclarations = [];
     for (const t of body.tools) {
       // Check if already in Anthropic/Claude format (no type field, direct name/description/input_schema)

@@ -20,20 +20,45 @@ import {
 } from "../helpers/geminiHelper.js";
 import { deriveSessionId } from "../../utils/sessionManager.js";
 
-const GEMMA_AGENTIC_TOOL_HINT = `\n\n[Agent tool protocol]\nThe client may provide tools, but this model endpoint does not support native function calling.\nIf the task requires web/search/browser/terminal/delegation/API discovery or any listed tool, DO NOT explain and DO NOT answer directly.\nRespond with exactly one JSON object and no markdown, no preamble, no commentary:\n{"tool_call":{"name":"tool_name","arguments":{}}}\nAfter a tool result is provided, do not call the same tool again unless the result explicitly says more data is needed. Synthesize the tool result into a final answer.\nDo not say “I already gave/listed” or ask the user to choose unless the tool result is genuinely ambiguous.\nWhen no tool is needed, answer normally.\nUse only tool names listed below. Keep arguments valid JSON.`;
+const GEMMA_AGENTIC_TOOL_HINT = `\n\n[Gemma 4 native tool protocol]\nThis endpoint cannot pass API-native tools, so tools are provided in Gemma 4 chat-template text format.\nWhen a tool is needed, emit ONLY this native tool-call form, no markdown/preamble/commentary:\n<|tool_call>call:tool_name{arg:<|\"|>value<|\"|>}<tool_call|><|tool_response>\nAfter a tool response is present, synthesize the result into the final answer. Do not re-ask or repeat unless more data is explicitly needed.`;
+
+function gemmaType(t) {
+  const s = String(t || "STRING").toLowerCase();
+  if (s === "object") return "OBJECT";
+  if (s === "array") return "ARRAY";
+  if (s === "number") return "NUMBER";
+  if (s === "integer") return "INTEGER";
+  if (s === "boolean") return "BOOLEAN";
+  return "STRING";
+}
+
+function quoteGemma(v) {
+  return `<|\"|>${String(v ?? "").replace(/\n/g, " ").replace(/[{}]/g, "")}<|\"|>`;
+}
+
+function schemaToGemma(schema = {}) {
+  const props = schema.properties || {};
+  const propText = Object.entries(props).map(([k, v]) => {
+    const desc = v?.description ? `description:${quoteGemma(v.description)},` : "";
+    const en = Array.isArray(v?.enum) ? `enum:[${v.enum.map(quoteGemma).join(",")}],` : "";
+    return `${k}:{${desc}${en}type:${quoteGemma(gemmaType(v?.type))}}`;
+  }).join(",");
+  const req = Array.isArray(schema.required) ? schema.required.map(quoteGemma).join(",") : "";
+  return `{properties:{${propText}},required:[${req}],type:${quoteGemma(gemmaType(schema.type || "object"))}}`;
+}
 
 function formatGemmaToolHint(tools) {
   if (!Array.isArray(tools) || tools.length === 0) return "";
-  const lines = [];
+  const decls = [];
   for (const t of tools) {
     const fn = t.type === "function" ? t.function : t;
     const name = fn?.name;
     if (!name) continue;
-    const desc = fn.description ? ` — ${fn.description}` : "";
-    const schema = fn.parameters || fn.input_schema || { type: "object", properties: {} };
-    lines.push(`- ${name}${desc}\n  schema: ${JSON.stringify(schema)}`);
+    const desc = fn.description ? `description:${quoteGemma(fn.description)},` : "";
+    const schema = schemaToGemma(fn.parameters || fn.input_schema || { type: "object", properties: {} });
+    decls.push(`<|tool>declaration:${name}{${desc}parameters:${schema}}<tool|>`);
   }
-  return lines.length ? `${GEMMA_AGENTIC_TOOL_HINT}\n\nAvailable tools:\n${lines.join("\n")}` : "";
+  return decls.length ? `${GEMMA_AGENTIC_TOOL_HINT}\n\n${decls.join("\n")}` : "";
 }
 
 function appendSystemText(result, text) {

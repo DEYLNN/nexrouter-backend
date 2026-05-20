@@ -1,8 +1,29 @@
 import { register } from "../index.js";
 import { FORMATS } from "../formats.js";
 
+function parseGemmaValue(v) {
+  const s = String(v ?? "").trim();
+  if (/^-?\d+(?:\.\d+)?$/.test(s)) return Number(s);
+  if (/^(true|false)$/i.test(s)) return /^true$/i.test(s);
+  return s.replace(/^['"]|['"]$/g, "");
+}
+
+function extractNativeGemmaToolCall(text) {
+  if (!text || typeof text !== "string") return null;
+  const m = text.match(/<\|tool_call>call:([A-Za-z_][\w.-]*)\{([\s\S]*?)\}<tool_call\|>/);
+  if (!m) return null;
+  const args = {};
+  const body = m[2] || "";
+  const re = /(\w+):(?:<\|"\|>(.*?)<\|"\|>|([^,}]+))/g;
+  let a;
+  while ((a = re.exec(body))) args[a[1]] = parseGemmaValue(a[2] ?? a[3]);
+  return { name: m[1], arguments: JSON.stringify(args) };
+}
+
 function extractTextToolCall(text) {
   if (!text || typeof text !== "string") return null;
+  const nativeCall = extractNativeGemmaToolCall(text);
+  if (nativeCall) return nativeCall;
   let trimmed = text.trim().replace(/^```(?:json)?\s*/i, "").replace(/\s*```$/i, "");
   const marker = trimmed.match(/\{\s*"(?:tool_call|toolCall|function_call|functionCall)"\s*:/);
   if (marker?.index > 0) trimmed = trimmed.slice(marker.index);
@@ -156,7 +177,7 @@ export function geminiToOpenAIResponse(chunk, state) {
             pushToolCallChunk(results, state, textToolCall.name, textToolCall.arguments);
           } else {
             const t = state.gemmaTextBuffer.trimStart();
-            const maybeTool = t.startsWith("{") || t.startsWith("```") || /\{\s*"(?:tool_call|toolCall|function_call|functionCall)"\s*:/.test(t);
+            const maybeTool = t.startsWith("{") || t.startsWith("```") || t.startsWith("<|tool_call>") || /\{\s*"(?:tool_call|toolCall|function_call|functionCall)"\s*:/.test(t);
             if (!maybeTool || state.gemmaTextBuffer.length > 512) {
               results.push({
                 id: `chatcmpl-${state.messageId}`,

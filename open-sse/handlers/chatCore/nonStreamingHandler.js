@@ -28,15 +28,22 @@ export function translateNonStreamingResponse(responseBody, targetFormat, source
 
     const extractTextToolCall = (text) => {
       if (!text || typeof text !== "string") return null;
-      const trimmed = text.trim().replace(/^```(?:json)?\s*/i, "").replace(/\s*```$/i, "");
-      try {
-        const parsed = JSON.parse(trimmed);
-        const call = parsed.tool_call || parsed.toolCall || parsed.function_call || parsed.functionCall;
-        const name = call?.name || call?.function?.name;
-        const args = call?.arguments ?? call?.args ?? call?.function?.arguments ?? {};
-        if (!name) return null;
-        return { name, arguments: typeof args === "string" ? args : JSON.stringify(args || {}) };
-      } catch { return null; }
+      let trimmed = text.trim().replace(/^```(?:json)?\s*/i, "").replace(/\s*```$/i, "");
+      const marker = trimmed.match(/\{\s*"(?:tool_call|toolCall|function_call|functionCall)"\s*:/);
+      if (marker?.index > 0) trimmed = trimmed.slice(marker.index);
+      const tryParse = (s) => { try { return JSON.parse(s); } catch { return null; } };
+      let parsed = tryParse(trimmed);
+      if (!parsed && marker) {
+        for (let end = trimmed.length; end > marker.index; end--) {
+          const candidate = tryParse(trimmed.slice(0, end));
+          if (candidate) { parsed = candidate; break; }
+        }
+      }
+      const call = parsed?.tool_call || parsed?.toolCall || parsed?.function_call || parsed?.functionCall;
+      const name = call?.name || call?.function?.name;
+      const args = call?.arguments ?? call?.args ?? call?.function?.arguments ?? {};
+      if (!name) return null;
+      return { name, arguments: typeof args === "string" ? args : JSON.stringify(args || {}) };
     };
 
     if (content?.parts) {

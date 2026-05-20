@@ -20,7 +20,7 @@ import {
 } from "../helpers/geminiHelper.js";
 import { deriveSessionId } from "../../utils/sessionManager.js";
 
-const GEMMA_AGENTIC_TOOL_HINT = `\n\n[Agent tool protocol]\nThe client may provide tools, but this model endpoint does not support native function calling.\nWhen a tool is needed, respond with exactly one JSON object and no markdown:\n{"tool_call":{"name":"tool_name","arguments":{}}}\nWhen no tool is needed, answer normally.\nUse only tool names listed below. Keep arguments valid JSON.`;
+const GEMMA_AGENTIC_TOOL_HINT = `\n\n[Agent tool protocol]\nThe client may provide tools, but this model endpoint does not support native function calling.\nIf the task requires web/search/browser/terminal/delegation/API discovery or any listed tool, DO NOT explain and DO NOT answer directly.\nRespond with exactly one JSON object and no markdown, no preamble, no commentary:\n{"tool_call":{"name":"tool_name","arguments":{}}}\nWhen no tool is needed, answer normally.\nUse only tool names listed below. Keep arguments valid JSON.`;
 
 function formatGemmaToolHint(tools) {
   if (!Array.isArray(tools) || tools.length === 0) return "";

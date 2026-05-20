@@ -1,7 +1,7 @@
 import { getProviderConnections, validateApiKey, updateProviderConnection, getSettings } from "@/lib/localDb";
 import { formatRetryAfter, checkFallbackError, isModelLockActive, buildModelLockUpdate, getEarliestModelLockUntil } from "open-sse/services/accountFallback.js";
 import { MAX_RATE_LIMIT_COOLDOWN_MS } from "open-sse/config/errorConfig.js";
-import { resolveProviderId, FREE_PROVIDERS } from "@/shared/constants/providers.js";
+import { resolveProviderId, AI_PROVIDERS } from "@/shared/constants/providers.js";
 import * as log from "../utils/logger.js";
 import { isCodexConnectionEligibleForModel, normalizeCodexPlan } from "@/lib/codexPlanRules.js";
 import { isCodexConnectionQuotaAvailable } from "@/lib/codexQuotaCache.js";
@@ -49,7 +49,7 @@ export async function getProviderCredentials(provider, excludeConnectionIds = nu
     const providerId = resolveProviderId(provider);
 
     // Inject a virtual connection for no-auth free providers (with optional proxy pool from settings)
-    if (FREE_PROVIDERS[providerId]?.noAuth) {
+    if (AI_PROVIDERS[providerId]?.noAuth) {
       return {
         id: "noauth",
         connectionName: "Public",

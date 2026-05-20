@@ -41,7 +41,20 @@ function pushToolCallChunk(results, state, fcName, fcArgs) {
 
 // Convert Gemini response chunk to OpenAI format
 export function geminiToOpenAIResponse(chunk, state) {
-  if (!chunk) return null;
+  if (!chunk) {
+    if (state?.gemmaTextBuffer) {
+      const text = state.gemmaTextBuffer;
+      state.gemmaTextBuffer = "";
+      return [{
+        id: `chatcmpl-${state.messageId || `msg_${Date.now()}`}`,
+        object: "chat.completion.chunk",
+        created: Math.floor(Date.now() / 1000),
+        model: state.model || state.requestModel || "gemini",
+        choices: [{ index: 0, delta: { content: text }, finish_reason: null }]
+      }];
+    }
+    return null;
+  }
   
   // Handle Antigravity wrapper
   const response = chunk.response || chunk;

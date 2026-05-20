@@ -327,7 +327,6 @@ export const PROVIDER_MODELS = {
     { id: "gemini-2.0-flash", name: "Gemini 2.0 Flash" },
     { id: "gemini-2.0-flash-lite", name: "Gemini 2.0 Flash Lite" },
     // Gemma series
-    { id: "gemma-4-26b-it", name: "Gemma 4 26B IT" },
     { id: "gemma-4-31b-it", name: "Gemma 4 31B IT" },
 
     // Embedding models

@@ -721,10 +721,13 @@ export const PROVIDER_MODELS = {
   ],
   llm7: [
     { id: "gpt-oss-20b", name: "GPT-OSS 20B" },
-    { id: "meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo", name: "Llama 3.1 8B Turbo" },
     { id: "codestral-latest", name: "Codestral" },
-    { id: "ministral-8b-2512", name: "Ministral 8B" },
     { id: "GLM-4.6V-Flash", name: "GLM 4.6V Flash" },
+    { id: "meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo", name: "Llama 3.1 8B Turbo (Pro)" },
+    { id: "ministral-8b-2512", name: "Ministral 8B (Pro)" },
+    { id: "devstral-small-2:24b-cloud", name: "Devstral Small 2 24B Cloud (Pro)" },
+    { id: "deepseek-v4-flash", name: "DeepSeek V4 Flash (Pro)" },
+    { id: "deepseek-v3.1:671b-terminus", name: "DeepSeek V3.1 Terminus (Pro)" },
   ],
   ollama: [
     { id: "gpt-oss:120b", name: "GPT OSS 120B" },

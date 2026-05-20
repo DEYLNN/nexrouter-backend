@@ -154,6 +154,19 @@ export function geminiToOpenAIResponse(chunk, state) {
             state.gemmaTextBuffer = "";
             state.gemmaToolCallEmitted = true;
             pushToolCallChunk(results, state, textToolCall.name, textToolCall.arguments);
+          } else {
+            const t = state.gemmaTextBuffer.trimStart();
+            const maybeTool = t.startsWith("{") || t.startsWith("```") || /\{\s*"(?:tool_call|toolCall|function_call|functionCall)"\s*:/.test(t);
+            if (!maybeTool || state.gemmaTextBuffer.length > 512) {
+              results.push({
+                id: `chatcmpl-${state.messageId}`,
+                object: "chat.completion.chunk",
+                created: Math.floor(Date.now() / 1000),
+                model: state.model,
+                choices: [{ index: 0, delta: { content: state.gemmaTextBuffer }, finish_reason: null }]
+              });
+              state.gemmaTextBuffer = "";
+            }
           }
         } else {
           const textToolCall = extractTextToolCall(part.text);

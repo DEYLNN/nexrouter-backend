@@ -16,6 +16,7 @@ import {
   KILOCODE_CONFIG,
 } from "@/lib/oauth/constants/oauth";
 import { buildClineHeaders } from "@/shared/utils/clineAuth";
+import { refreshNousAccessToken, shouldRefreshNousAccessToken } from "@/lib/oauth/nous";
 
 // OAuth provider test endpoints
 const OAUTH_TEST_CONFIG = {
@@ -53,6 +54,7 @@ const OAUTH_TEST_CONFIG = {
     authPrefix: "Bearer ",
     extraHeaders: { "User-Agent": "9Router", "Accept": "application/vnd.github+json" },
   },
+  "nous-portal": { refreshable: true },
   iflow: {
     // iFlow getUserInfo requires accessToken as query param, not header
     buildUrl: (token) => `https://iflow.cn/api/oauth/getUserInfo?accessToken=${encodeURIComponent(token)}`,
@@ -222,7 +224,72 @@ function isTokenExpired(connection) {
   return expiresAt <= Date.now() + buffer;
 }
 
+async function testNousPortalConnection(connection, effectiveProxy = null) {
+  if (!connection.accessToken && !connection.refreshToken) {
+    return { valid: false, error: "No access token", refreshed: false };
+  }
+
+  let accessToken = connection.accessToken;
+  let refreshed = false;
+  let newTokens = null;
+
+  if (!accessToken || shouldRefreshNousAccessToken(connection.expiresAt)) {
+    if (!connection.refreshToken) return { valid: false, error: "Token expired", refreshed: false };
+    let tokens;
+    try {
+      tokens = await refreshNousAccessToken(connection.refreshToken);
+    } catch (err) {
+      return { valid: false, error: err.message || "Token expired and refresh failed", refreshed: false };
+    }
+    if (!tokens?.accessToken) return { valid: false, error: "Token expired and refresh failed", refreshed: false };
+    accessToken = tokens.accessToken;
+    refreshed = true;
+    newTokens = tokens;
+  }
+
+  const probe = async (token) => fetchWithConnectionProxy("https://inference-api.nousresearch.com/v1/chat/completions", {
+    method: "POST",
+    headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json", Accept: "application/json" },
+    body: JSON.stringify({
+      model: "stepfun/step-3.7-flash:free",
+      messages: [{ role: "user", content: "test" }],
+      max_tokens: 1,
+      stream: false,
+    }),
+  }, effectiveProxy);
+
+  let res = await probe(accessToken);
+  if (res.status === 401 && connection.refreshToken && !refreshed) {
+    let tokens;
+    try {
+      tokens = await refreshNousAccessToken(connection.refreshToken);
+    } catch (err) {
+      tokens = null;
+    }
+    if (tokens?.accessToken) {
+      accessToken = tokens.accessToken;
+      refreshed = true;
+      newTokens = tokens;
+      res = await probe(accessToken);
+    }
+  }
+
+  const valid = res.status !== 401 && res.status !== 403;
+  if (valid) return { valid: true, error: null, refreshed, newTokens };
+  let detail = "Invalid or expired Nous token";
+  try {
+    const text = await res.text();
+    const data = text ? JSON.parse(text) : null;
+    detail = data?.message || data?.error_description || data?.error?.message || detail;
+  } catch { }
+  return { valid: false, error: detail, refreshed };
+}
+
 async function testOAuthConnection(connection, effectiveProxy = null) {
+  if (connection.provider === "nous-portal") {
+    return testNousPortalConnection(connection, effectiveProxy);
+  }
+
   const config = OAUTH_TEST_CONFIG[connection.provider];
   if (!config) return { valid: false, error: "Provider test not supported", refreshed: false };
   if (!connection.accessToken) return { valid: false, error: "No access token", refreshed: false };
@@ -717,6 +784,12 @@ export async function testSingleConnection(id) {
     if (result.newTokens.refreshToken) updateData.refreshToken = result.newTokens.refreshToken;
     if (result.newTokens.expiresIn) {
       updateData.expiresAt = new Date(Date.now() + result.newTokens.expiresIn * 1000).toISOString();
+    }
+    if (result.newTokens.providerSpecificData) {
+      updateData.providerSpecificData = {
+        ...(connection.providerSpecificData || {}),
+        ...result.newTokens.providerSpecificData,
+      };
     }
   }
 

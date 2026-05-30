@@ -665,6 +665,31 @@ async function testApiKeyConnection(connection, effectiveProxy = null) {
         const res = await fetchWithConnectionProxy("https://llm.chutes.ai/v1/models", { headers: { Authorization: `Bearer ${connection.apiKey}` } }, effectiveProxy);
         return { valid: res.ok, error: res.ok ? null : "Invalid API key" };
       }
+      case "xiaomi-mimo": {
+        const res = await fetchWithConnectionProxy("https://api.xiaomimimo.com/v1/models", { headers: { Authorization: `Bearer ${connection.apiKey}` } }, effectiveProxy);
+        return { valid: res.ok, error: res.ok ? null : `API returned ${res.status}` };
+      }
+      case "xiaomi-mimo-plan-sgp": {
+        const res = await fetchWithConnectionProxy("https://token-plan-sgp.xiaomimimo.com/v1/chat/completions", {
+          method: "POST",
+          headers: { Authorization: `Bearer ${connection.apiKey}`, "Content-Type": "application/json" },
+          body: JSON.stringify({
+            model: "mimo-v2.5",
+            messages: [{ role: "user", content: "test" }],
+            max_tokens: 1,
+            stream: false,
+          }),
+        }, effectiveProxy);
+        const valid = res.status !== 401 && res.status !== 403;
+        if (valid) return { valid: true, error: null };
+        let detail = "Invalid API key";
+        try {
+          const text = await res.text();
+          const data = text ? JSON.parse(text) : null;
+          detail = data?.error?.message || data?.message || detail;
+        } catch { }
+        return { valid: false, error: detail };
+      }
       case "routeway": {
         const res = await fetchWithConnectionProxy("https://api.routeway.ai/v1/chat/completions", {
           method: "POST",

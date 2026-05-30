@@ -59,6 +59,7 @@ export const PROVIDER_MODELS = {
     { id: "gemini-3-pro-preview", name: "Gemini 3 Pro Preview" },
   ],
   nous: [  // Nous Portal
+    { id: "stepfun/step-3.7-flash:free", name: "StepFun Step 3.7 Flash (Free)" },
     { id: "stepfun/step-3.5-flash", name: "StepFun Step 3.5 Flash" },
     { id: "deepseek/deepseek-v4-flash", name: "DeepSeek V4 Flash" },
     { id: "google/lyria-3-clip-preview", name: "Google Lyria 3 Clip Preview" },

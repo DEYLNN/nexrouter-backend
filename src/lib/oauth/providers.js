@@ -25,7 +25,7 @@ import {
   GITLAB_CONFIG,
   CODEBUDDY_CONFIG,
 } from "./constants/oauth";
-import { requestNousDeviceCode, pollNousToken, mintNousAgentKey } from "./nous.js";
+import { requestNousDeviceCode, pollNousToken, buildNousInvokeJwtData } from "./nous.js";
 import { FREEBUFF_CONFIG } from "./constants/oauth.js";
 import { randomUUID } from "crypto";
 
@@ -214,14 +214,9 @@ const PROVIDERS = {
         return { ok: true, data: { error: err, error_description: msg } };
       }
     },
-    postExchange: async (tokens) => {
-      try {
-        const agent = await mintNousAgentKey(tokens.access_token);
-        return { agent };
-      } catch {
-        return { agent: null };
-      }
-    },
+    postExchange: async (tokens) => ({
+      agent: buildNousInvokeJwtData(tokens.access_token, tokens.expires_in || 900, tokens.inference_base_url),
+    }),
     mapTokens: (tokens, extra) => ({
       accessToken: tokens.access_token,
       refreshToken: tokens.refresh_token,

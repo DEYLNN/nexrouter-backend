@@ -64,7 +64,7 @@ export const NOUS_CONFIG = {
   tokenUrl: "https://portal.nousresearch.com/api/oauth/token",
   agentKeyUrl: "https://portal.nousresearch.com/api/oauth/agent-key",
   inferenceBaseUrl: "https://inference-api.nousresearch.com/v1",
-  scope: "inference:mint_agent_key",
+  scope: "inference:invoke",
 };
 
 // Qwen OAuth Configuration (Device Code Flow with PKCE)

@@ -1,7 +1,7 @@
 const NOUS_PORTAL_URL = process.env.NOUS_PORTAL_URL || "https://portal.nousresearch.com";
 export const NOUS_INFERENCE_URL = process.env.NOUS_INFERENCE_URL || "https://inference-api.nousresearch.com/v1";
 export const NOUS_CLIENT_ID = process.env.NOUS_CLIENT_ID || "hermes-cli";
-export const NOUS_SCOPE = process.env.NOUS_SCOPE || "inference:mint_agent_key";
+export const NOUS_SCOPE = process.env.NOUS_SCOPE || "inference:invoke";
 
 const ACCESS_TOKEN_REFRESH_SKEW_MS = 120_000;
 const AGENT_KEY_REFRESH_SKEW_MS = 60_000;
@@ -39,30 +39,48 @@ export async function refreshNousAccessToken(refreshToken) {
     client_id: NOUS_CLIENT_ID,
     refresh_token: refreshToken,
   });
+  const expiresIn = data.expires_in || 900;
   return {
     accessToken: data.access_token,
     refreshToken: data.refresh_token || refreshToken,
-    expiresIn: data.expires_in || 3600,
-    providerSpecificData: data.inference_base_url ? { inferenceBaseUrl: data.inference_base_url } : undefined,
+    expiresIn,
+    providerSpecificData: buildNousInvokeJwtData(data.access_token, expiresIn, data.inference_base_url),
+  };
+}
+
+function decodeJwtPayload(token) {
+  try {
+    const payload = String(token || "").split(".")[1];
+    if (!payload) return null;
+    const json = Buffer.from(payload.replace(/-/g, "+").replace(/_/g, "/"), "base64").toString("utf8");
+    return JSON.parse(json);
+  } catch {
+    return null;
+  }
+}
+
+function accessTokenTtlSeconds(accessToken, fallbackExpiresIn = 900) {
+  const exp = Number(decodeJwtPayload(accessToken)?.exp || 0);
+  if (!exp) return Number(fallbackExpiresIn || 900);
+  return Math.max(0, Math.floor(exp - Date.now() / 1000));
+}
+
+export function buildNousInvokeJwtData(accessToken, expiresIn = 900, inferenceBaseUrl) {
+  return {
+    agentKey: accessToken,
+    agentKeyId: "invoke_jwt",
+    agentKeyObtainedAt: Date.now(),
+    agentKeyExpiresIn: accessTokenTtlSeconds(accessToken, expiresIn),
+    inferenceBaseUrl: inferenceBaseUrl || NOUS_INFERENCE_URL,
+    authPath: "invoke_jwt",
   };
 }
 
 export async function mintNousAgentKey(accessToken, minTtlSeconds = 1800) {
-  const res = await fetch(`${NOUS_PORTAL_URL}/api/oauth/agent-key`, {
-    method: "POST",
-    headers: { Authorization: `Bearer ${accessToken}`, "Content-Type": "application/json", Accept: "application/json" },
-    body: JSON.stringify({ min_ttl_seconds: Math.max(60, minTtlSeconds) }),
-  });
-  const text = await res.text();
-  const data = text ? JSON.parse(text) : {};
-  if (!res.ok) throw new Error(`${data.error || "agent_key_failed"}: ${data.error_description || text || res.status}`);
-  return {
-    agentKey: data.api_key,
-    agentKeyId: data.key_id || "",
-    agentKeyObtainedAt: Date.now(),
-    agentKeyExpiresIn: data.expires_in || 1800,
-    inferenceBaseUrl: data.inference_base_url || undefined,
-  };
+  // Nous/Hermes upstream changed: free OAuth no longer mints a separate
+  // /api/oauth/agent-key. The access JWT with inference:invoke is the runtime
+  // inference credential (Hermes Agent calls this auth path "invoke_jwt").
+  return buildNousInvokeJwtData(accessToken, minTtlSeconds);
 }
 
 export function isNousAgentKeyValid(providerSpecificData = {}) {

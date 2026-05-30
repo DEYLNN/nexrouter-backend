@@ -151,7 +151,10 @@ export class DefaultExecutor extends BaseExecutor {
         break;
       default:
         if (this.provider === "nous-portal") {
-          headers["Authorization"] = `Bearer ${credentials.providerSpecificData?.agentKey || credentials.apiKey || credentials.accessToken}`;
+          // Nous/Hermes free OAuth now uses the access JWT (inference:invoke)
+          // directly for inference. Prefer accessToken over stale persisted
+          // agentKey because the 401 refresh path mutates accessToken first.
+          headers["Authorization"] = `Bearer ${credentials.accessToken || credentials.providerSpecificData?.agentKey || credentials.apiKey}`;
         } else if (this.provider?.startsWith?.("anthropic-compatible-")) {
           if (credentials.apiKey) {
             headers["x-api-key"] = credentials.apiKey;

@@ -78,13 +78,14 @@ export const QWEN_CONFIG = {
 
 // Qoder OAuth Configuration (Device Token Flow)
 export const QODER_CONFIG = {
-  apiBaseUrl: "https://api2.qoder.sh",
-  deviceTokenUrl: "https://api2.qoder.sh/api/v1/deviceToken/poll",
-  deviceRefreshUrl: "https://api2.qoder.sh/api/v1/deviceToken/refresh",
-  refreshUrl: "https://api2.qoder.sh/api/v3/user/refresh_token",
-  userInfoUrl: "https://api2.qoder.sh/api/v1/userinfo",
-  statusUrl: "https://api2.qoder.sh/api/v3/user/status",
-  loginUrl: "https://qoder.com/login",
+  openApiBaseUrl: "https://openapi.qoder.sh",
+  centerBaseUrl: "https://center.qoder.sh",
+  chatBaseUrl: "https://api3.qoder.sh",
+  deviceTokenUrl: "https://openapi.qoder.sh/api/v1/deviceToken/poll",
+  refreshUrl: "https://center.qoder.sh/algo/api/v3/user/refresh_token",
+  userInfoUrl: "https://openapi.qoder.sh/api/v1/userinfo",
+  quotaUsageUrl: "https://openapi.qoder.sh/api/v2/quota/usage",
+  loginUrl: "https://qoder.com/device/selectAccounts",
 };
 
 // iFlow OAuth Configuration (Authorization Code)

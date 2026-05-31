@@ -8,6 +8,7 @@ const ALIAS_TO_PROVIDER_ID = {
   ag: "antigravity",
   gh: "github",
   kr: "kiro",
+  qd: "qoder",
   cu: "cursor",
   kc: "kilocode",
   kmc: "kimi-coding",

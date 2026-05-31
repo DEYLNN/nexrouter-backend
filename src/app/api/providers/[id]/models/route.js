@@ -5,6 +5,7 @@ import { KiroService } from "@/lib/oauth/services/kiro";
 import { GEMINI_CONFIG } from "@/lib/oauth/constants/oauth";
 import { refreshGoogleToken, updateProviderCredentials, refreshKiroToken } from "@/sse/services/tokenRefresh";
 import { resolveOllamaLocalHost } from "open-sse/config/providers.js";
+import { resolveQoderModels } from "open-sse/services/qoderModels.js";
 
 const GEMINI_CLI_MODELS_URL = "https://cloudcode-pa.googleapis.com/v1internal:fetchAvailableModels";
 
@@ -348,6 +349,40 @@ export async function GET(request, { params }) {
         models: [],
         warning,
       });
+    }
+
+    // Qoder: live model catalog via COSY-signed /model/list
+    if (connection.provider === "qoder") {
+      let warning;
+      try {
+        const result = await resolveQoderModels({
+          accessToken: connection.accessToken,
+          refreshToken: connection.refreshToken,
+          email: connection.email,
+          displayName: connection.displayName,
+          providerSpecificData: connection.providerSpecificData || {},
+        }, { forceRefresh: true });
+        if (result?.models?.length) {
+          return NextResponse.json({
+            provider: connection.provider,
+            connectionId: connection.id,
+            models: result.models.map((m) => ({
+              id: `qoder/${m.id}`,
+              name: m.name,
+              contextLength: m.contextLength,
+              isVL: m.isVL,
+              isReasoning: m.isReasoning,
+              maxOutputTokens: m.maxOutputTokens,
+              description: m.description,
+            })),
+          });
+        }
+        warning = "Qoder returned no models; falling back to static catalog.";
+      } catch (error) {
+        warning = `Failed to fetch Qoder models: ${error.message}`;
+        console.log("Failed to fetch Qoder models dynamically, falling back to static:", error.message);
+      }
+      return NextResponse.json({ provider: connection.provider, connectionId: connection.id, models: [], warning });
     }
 
     if (connection.provider === "gemini-cli") {

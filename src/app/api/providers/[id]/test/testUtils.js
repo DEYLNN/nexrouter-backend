@@ -63,6 +63,13 @@ const OAUTH_TEST_CONFIG = {
   },
   qwen: { checkExpiry: true, refreshable: true },
   kiro: { checkExpiry: true, refreshable: true },
+  qoder: {
+    url: "https://openapi.qoder.sh/api/v1/userinfo",
+    method: "GET",
+    authHeader: "Authorization",
+    authPrefix: "Bearer ",
+    refreshable: false,
+  },
   "kimi-coding": { checkExpiry: true, refreshable: false },
   cursor: { tokenExists: true },
   kilocode: {
@@ -549,12 +556,10 @@ async function testApiKeyConnection(connection, effectiveProxy = null) {
         const valid = res.status !== 401 && res.status !== 403;
         return { valid, error: valid ? null : "Invalid API key" };
       }
-      case "aim":
-      case "aimurah": {
-        const res = await fetchWithConnectionProxy("https://aimurah.my.id/api/v1/chat/completions", {
-          method: "POST",
+      case "aimux": {
+        const res = await fetchWithConnectionProxy("https://aimux.id/v1/models", {
+          method: "GET",
           headers: { Authorization: `Bearer ${connection.apiKey}`, "content-type": "application/json" },
-          body: JSON.stringify({ model: "deepseek-v4-flash", messages: [{ role: "user", content: "test" }], max_tokens: 1, stream: false }),
         }, effectiveProxy);
         const valid = res.status !== 401 && res.status !== 403;
         return { valid, error: valid ? null : "Invalid API key" };

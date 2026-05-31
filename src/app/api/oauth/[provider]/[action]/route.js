@@ -102,7 +102,7 @@ export async function GET(request, { params }) {
         : undefined;
       
       // Providers that don't use PKCE for device code
-      const noPkceDeviceProviders = ["github", "kiro", "kimi-coding", "kilocode", "codebuddy"];
+      const noPkceDeviceProviders = ["github", "kiro", "kimi-coding", "kilocode", "codebuddy", "qoder"];
       let deviceData;
       if (noPkceDeviceProviders.includes(provider)) {
         deviceData = await requestDeviceCode(provider, undefined, deviceOptions);
@@ -113,7 +113,7 @@ export async function GET(request, { params }) {
 
       return NextResponse.json({
         ...deviceData,
-        codeVerifier: authData.codeVerifier,
+        codeVerifier: deviceData.codeVerifier || authData.codeVerifier,
       });
     }
 
@@ -179,7 +179,7 @@ export async function POST(request, { params }) {
 
       // Providers that don't use PKCE for device code
       const noPkceProviders = ["github", "kimi-coding", "kilocode", "codebuddy"];
-      const noPkceWithExtraDataProviders = ["freebuff", "qoder"];
+      const noPkceWithExtraDataProviders = ["freebuff"];
       let result;
       if (noPkceProviders.includes(provider)) {
         result = await pollForToken(provider, deviceCode);
@@ -188,6 +188,12 @@ export async function POST(request, { params }) {
       } else if (provider === "kiro") {
         // Kiro needs extraData (clientId, clientSecret) from device code response
         result = await pollForToken(provider, deviceCode, null, extraData);
+      } else if (provider === "qoder") {
+        // Qoder needs its own PKCE verifier plus machineId metadata.
+        if (!codeVerifier) {
+          return NextResponse.json({ error: "Missing code verifier" }, { status: 400 });
+        }
+        result = await pollForToken(provider, deviceCode, codeVerifier, extraData);
       } else {
         // Qwen and other PKCE providers
         if (!codeVerifier) {

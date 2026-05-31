@@ -170,6 +170,7 @@ export default function OAuthModal({ isOpen, provider, providerInfo, onSuccess, 
           extraData = {
             _qoderNonce: data._qoderNonce,
             _qoderMachineId: data._qoderMachineId,
+            _qoderVerifier: data.codeVerifier,
           };
         }
         startPolling(data.device_code, data.codeVerifier, data.interval || 5, extraData);

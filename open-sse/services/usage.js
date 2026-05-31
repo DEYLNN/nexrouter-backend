@@ -1141,30 +1141,47 @@ async function getQoderUsage(accessToken, proxyOptions = null) {
     }
     const userQuota = body.userQuota || {};
     const orgQuota = body.orgResourcePackage || {};
-    const expiresAtMs = Number.isFinite(Number(body.expiresAt)) && Number(body.expiresAt) > 0
-      ? Number(body.expiresAt)
+    const expiresAtRaw = Number(body.expiresAt);
+    // Qoder returns 253402214400000 (year 9999) for “no scheduled reset”.
+    // Do not render that as a 2912-day countdown.
+    const expiresAtMs = Number.isFinite(expiresAtRaw) && expiresAtRaw > 0 && expiresAtRaw < Date.now() + 5 * 365 * 24 * 60 * 60 * 1000
+      ? expiresAtRaw
       : null;
     const resetAt = expiresAtMs ? new Date(expiresAtMs).toISOString() : null;
+    const normalizeQuota = (quota, fallbackName) => {
+      const total = Number(quota.total);
+      const used = Number(quota.used);
+      const remaining = Number(quota.remaining);
+      const safeTotal = Number.isFinite(total) ? total : 0;
+      const safeUsed = Number.isFinite(used) ? used : 0;
+      const safeRemaining = Number.isFinite(remaining) ? remaining : Math.max(safeTotal - safeUsed, 0);
+      return {
+        total: safeTotal,
+        used: safeUsed,
+        remaining: safeRemaining,
+        unit: quota.unit || "credits",
+        resetAt,
+        quotaExceeded: !!body.isQuotaExceeded,
+        source: "qoder",
+        displayStatus: safeTotal === 0 && safeRemaining === 0
+          ? (body.isQuotaExceeded ? "No quota / trial not active" : "No quota reported")
+          : undefined,
+      };
+    };
+    const quotas = {
+      user: normalizeQuota(userQuota, "user"),
+    };
+    if (Object.keys(orgQuota).length > 0) {
+      quotas.organization = normalizeQuota(orgQuota, "organization");
+    }
     return {
-      quotas: {
-        user: {
-          total: Number(userQuota.total) || 0,
-          used: Number(userQuota.used) || 0,
-          remaining: Number(userQuota.remaining) || 0,
-          unit: userQuota.unit || "credits",
-          resetAt,
-        },
-        organization: {
-          total: Number(orgQuota.total) || 0,
-          used: Number(orgQuota.used) || 0,
-          remaining: Number(orgQuota.remaining) || 0,
-          unit: orgQuota.unit || "credits",
-          resetAt,
-        },
-      },
+      plan: body.userType || "qoder",
+      quotas,
       totalUsagePercentage: Number(body.totalUsagePercentage) || 0,
       isQuotaExceeded: !!body.isQuotaExceeded,
       expiresAt: expiresAtMs,
+      upgradeUrl: body.upgradeUrl || null,
+      rawQuotaStatus: body.isQuotaExceeded ? "quota_exceeded" : "ok",
     };
   } catch (error) {
     return { message: `Qoder connected. Unable to fetch usage: ${error.message}` };

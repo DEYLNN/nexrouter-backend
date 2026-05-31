@@ -352,8 +352,7 @@ export async function POST(request) {
         case "deepseek":
         case "freemodel-dev":
         case "fmd":
-        case "aim":
-        case "aimurah":
+        case "aimux":
         case "bai":
         case "qiniu":
         case "groq":
@@ -421,25 +420,9 @@ export async function POST(request) {
                 stream: false,
               },
             },
-            aim: {
-              url: "https://aimurah.my.id/api/v1/chat/completions",
-              method: "POST",
-              body: {
-                model: "deepseek-v4-flash",
-                messages: [{ role: "user", content: "test" }],
-                max_tokens: 1,
-                stream: false,
-              },
-            },
-            aimurah: {
-              url: "https://aimurah.my.id/api/v1/chat/completions",
-              method: "POST",
-              body: {
-                model: "deepseek-v4-flash",
-                messages: [{ role: "user", content: "test" }],
-                max_tokens: 1,
-                stream: false,
-              },
+            aimux: {
+              url: "https://aimux.id/v1/models",
+              method: "GET",
             },
             bai: {
               url: "https://api.b.ai/v1/chat/completions",

@@ -101,9 +101,10 @@ export class QoderService {
     const url = `${QODER_DEVICE_TOKEN_URL}?nonce=${encodeURIComponent(nonce)}&verifier=${encodeURIComponent(codeVerifier)}&challenge_method=S256`;
 
     const response = await fetchWithTimeout(url, {
-      method: "GET",
+      method: "POST",
       headers: {
         Accept: "application/json",
+        "Content-Type": "application/json",
         "User-Agent": "Go-http-client/2.0",
       },
     });

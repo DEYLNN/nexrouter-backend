@@ -24,6 +24,7 @@ import {
   CLINE_CONFIG,
   GITLAB_CONFIG,
   CODEBUDDY_CONFIG,
+  XAI_CONFIG,
 } from "./constants/oauth";
 import { requestNousDeviceCode, pollNousToken, buildNousInvokeJwtData } from "./nous.js";
 import { FREEBUFF_CONFIG } from "./constants/oauth.js";
@@ -1273,6 +1274,70 @@ const PROVIDERS = {
       expiresIn: 86400,
       providerSpecificData: {},
     }),
+  },
+
+  // xAI (Grok) - PKCE Authorization Code Flow with loopback
+  xai: {
+    config: XAI_CONFIG,
+    flowType: "authorization_code_pkce",
+    buildAuthUrl: (config, redirectUri, state, codeChallenge) => {
+      const nonce = crypto.randomUUID();
+      const params = new URLSearchParams({
+        response_type: "code",
+        client_id: config.clientId,
+        redirect_uri: redirectUri,
+        scope: config.scope,
+        code_challenge: codeChallenge,
+        code_challenge_method: config.codeChallengeMethod,
+        state,
+        nonce,
+        plan: "generic",
+        referrer: "9router",
+      });
+      return `${config.authorizeUrl}?${params.toString()}`;
+    },
+    exchangeToken: async (config, code, redirectUri, codeVerifier, state) => {
+      const res = await fetch(config.tokenUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+          Accept: "application/json",
+        },
+        body: new URLSearchParams({
+          grant_type: "authorization_code",
+          client_id: config.clientId,
+          code,
+          redirect_uri: redirectUri,
+          code_verifier: codeVerifier,
+        }),
+      });
+      if (!res.ok) {
+        const err = await res.text();
+        throw new Error(`xAI token exchange failed: ${err}`);
+      }
+      return await res.json();
+    },
+    mapTokens: (tokens) => {
+      const parts = (tokens.id_token || "").split(".");
+      let email = "";
+      if (parts.length === 3) {
+        try {
+          const base64 = parts[1].replace(/-/g, "+").replace(/_/g, "/");
+          const padding = (4 - (base64.length % 4)) % 4;
+          const json = Buffer.from(base64 + "=".repeat(padding), "base64").toString("utf8");
+          const payload = JSON.parse(json);
+          email = payload.email || payload.preferred_username || payload.sub || "";
+        } catch { /* skip */ }
+      }
+      return {
+        accessToken: tokens.access_token,
+        refreshToken: tokens.refresh_token || "",
+        expiresIn: Number(tokens.expires_in) || 3600,
+        email: email,
+        providerSpecificData: {},
+      };
+    },
+    authKind: "oauth",
   },
 };
 

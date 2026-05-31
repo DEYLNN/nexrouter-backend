@@ -234,6 +234,45 @@ export async function POST(request, { params }) {
       });
     }
 
+    if (action === "manual-code") {
+      // xAI manual code entry (loopback port 56121 is on user's machine, not server)
+      if (provider !== "xai") {
+        return NextResponse.json({ error: "Manual code only supported for xai" }, { status: 400 });
+      }
+      const { code, state, codeVerifier } = body;
+      if (!code || !state || !codeVerifier) {
+        return NextResponse.json({ error: "Missing required fields: code, state, codeVerifier" }, { status: 400 });
+      }
+
+      const tokenData = await exchangeTokens(
+        provider,
+        String(code).trim(),
+        "http://127.0.0.1:56121/callback",
+        codeVerifier,
+        state
+      );
+
+      const connection = await createProviderConnection({
+        provider,
+        authType: "oauth",
+        ...tokenData,
+        expiresAt: tokenData.expiresIn
+          ? new Date(Date.now() + tokenData.expiresIn * 1000).toISOString()
+          : null,
+        testStatus: "active",
+      });
+
+      return NextResponse.json({
+        success: true,
+        connection: {
+          id: connection.id,
+          provider: connection.provider,
+          email: connection.email,
+          displayName: connection.displayName,
+        },
+      });
+    }
+
     return NextResponse.json({ error: "Unknown action" }, { status: 400 });
   } catch (error) {
     console.log("OAuth POST error:", error);

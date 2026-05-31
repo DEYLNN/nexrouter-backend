@@ -551,6 +551,12 @@ export const PROVIDER_MODELS = {
     { id: "grok-code-fast-1", name: "Grok Code Fast" },
     { id: "grok-3", name: "Grok 3" },
   ],
+  "xai-apikey": [
+    { id: "grok-4", name: "Grok 4" },
+    { id: "grok-4-fast-reasoning", name: "Grok 4 Fast Reasoning" },
+    { id: "grok-code-fast-1", name: "Grok Code Fast" },
+    { id: "grok-3", name: "Grok 3" },
+  ],
   mistral: [
     { id: "mistral-large-latest", name: "Mistral Large 3" },
     { id: "codestral-latest", name: "Codestral" },

@@ -335,6 +335,10 @@ export const PROVIDERS = {
     baseUrl: "https://api.x.ai/v1/chat/completions",
     format: "openai"
   },
+  "xai-apikey": {
+    baseUrl: "https://api.x.ai/v1/chat/completions",
+    format: "openai"
+  },
   mistral: {
     baseUrl: "https://api.mistral.ai/v1/chat/completions",
     format: "openai"

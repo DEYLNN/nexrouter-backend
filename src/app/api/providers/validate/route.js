@@ -357,6 +357,7 @@ export async function POST(request) {
         case "qiniu":
         case "groq":
         case "xai":
+        case "xai-apikey":
         case "mistral":
         case "perplexity":
         case "together":

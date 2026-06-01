@@ -193,6 +193,10 @@ export async function handleNonStreamingResponse({ providerResponse, provider, m
     }
   }
 
+  if ((provider === "cline" || provider === "cline-apikey") && responseBody?.data?.choices) {
+    responseBody = responseBody.data;
+  }
+
   reqLogger.logProviderResponse(providerResponse.status, providerResponse.statusText, providerResponse.headers, responseBody);
   if (onRequestSuccess) await onRequestSuccess();
 

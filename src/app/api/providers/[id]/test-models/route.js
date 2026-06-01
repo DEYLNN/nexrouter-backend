@@ -16,21 +16,22 @@ async function getInternalApiKey() {
  * Ping a single model via internal completions endpoint (OpenAI format).
  * open-sse handles all provider translation automatically.
  */
-async function pingModel(modelId, baseUrl, apiKey) {
+async function pingModel(modelId, baseUrl, apiKey, options = {}) {
   const start = Date.now();
   try {
     const headers = { "Content-Type": "application/json" };
     if (apiKey) headers["Authorization"] = `Bearer ${apiKey}`;
+    const maxTokens = options.maxTokens || 16;
     const res = await fetch(`${baseUrl}/api/v1/chat/completions`, {
       method: "POST",
       headers,
       body: JSON.stringify({
         model: modelId,
-        max_tokens: 1,
+        max_tokens: maxTokens,
         stream: false,
-        messages: [{ role: "user", content: "hi" }],
+        messages: [{ role: "user", content: "Reply with exactly: ok" }],
       }),
-      signal: AbortSignal.timeout(15000),
+      signal: AbortSignal.timeout(30000),
     });
     const latencyMs = Date.now() - start;
     // 200 = working; 400 = bad request but auth passed (model reachable)
@@ -93,13 +94,14 @@ export async function POST(request, { params }) {
     // Warm up with first model to trigger token refresh (if needed) before parallel calls.
     // This prevents race condition where multiple requests concurrently refresh the same token.
     const [first, ...rest] = models;
-    const firstResult = await pingModel(`${alias}/${first.id}`, baseUrl, apiKey);
+    const testOptions = providerId === "cline-apikey" ? { maxTokens: 16 } : {};
+    const firstResult = await pingModel(`${alias}/${first.id}`, baseUrl, apiKey, testOptions);
     const results = [{ modelId: first.id, name: first.name || first.id, ...firstResult }];
 
     if (rest.length > 0) {
       const restResults = await Promise.all(
         rest.map(async (model) => {
-          const result = await pingModel(`${alias}/${model.id}`, baseUrl, apiKey);
+          const result = await pingModel(`${alias}/${model.id}`, baseUrl, apiKey, testOptions);
           return { modelId: model.id, name: model.name || model.id, ...result };
         })
       );

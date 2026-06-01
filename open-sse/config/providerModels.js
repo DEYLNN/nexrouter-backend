@@ -206,15 +206,10 @@ export const PROVIDER_MODELS = {
     // { id: "trinity-large-preview-free", name: "Trinity Large Preview" },
   ],
 
-  cl: [  // Cline
-    { id: "anthropic/claude-opus-4.7", name: "Claude Opus 4.7" },
-    { id: "anthropic/claude-sonnet-4.6", name: "Claude Sonnet 4.6" },
-    { id: "anthropic/claude-opus-4.6", name: "Claude Opus 4.6" },
-    { id: "openai/gpt-5.3-codex", name: "GPT-5.3 Codex" },
-    { id: "openai/gpt-5.4", name: "GPT-5.4" },
-    { id: "google/gemini-3.1-pro-preview", name: "Gemini 3.1 Pro Preview" },
-    { id: "google/gemini-3.1-flash-lite-preview", name: "Gemini 3.1 Flash Lite Preview" },
-    { id: "kwaipilot/kat-coder-pro", name: "KAT Coder Pro" },
+  cl: [  // Cline — free/low-cost working models only
+    { id: "minimax/minimax-m2.5", name: "MiniMax M2.5" },
+    { id: "minimax/minimax-m3", name: "MiniMax M3" },
+    { id: "kwaipilot/kat-coder-pro", name: "KAT Coder Pro", upstreamModelId: "kwaipilot/kat-coder-pro-v1" },
   ],
 
   cb: [  // CodeBuddy

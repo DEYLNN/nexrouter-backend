@@ -26,6 +26,8 @@ const ALIAS_TO_PROVIDER_ID = {
   openrouter: "openrouter",
   glm: "glm",
   "glm-cn": "glm-cn",
+  alistudio: "alibaba-studio",
+  "alibaba-studio": "alibaba-studio",
   kimi: "kimi",
   minimax: "minimax",
   "minimax-cn": "minimax-cn",

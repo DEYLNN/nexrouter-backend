@@ -286,7 +286,7 @@ export async function POST(request) {
         case "minimax":
         case "minimax-cn":
         case "alicode-intl":
-        case "alicloud-modelstudio":
+        case "alibaba-studio":
         case "alicode": {
           const claudeBaseUrls = {
             glm: "https://api.z.ai/api/anthropic/v1/messages",
@@ -296,11 +296,11 @@ export async function POST(request) {
             "minimax-cn": "https://api.minimaxi.com/anthropic/v1/messages",
             alicode: "https://coding.dashscope.aliyuncs.com/v1/chat/completions",
             "alicode-intl": "https://coding-intl.dashscope.aliyuncs.com/v1/chat/completions",
-            "alicloud-modelstudio": "https://dashscope-intl.aliyuncs.com/compatible-mode/v1/chat/completions",
+            "alibaba-studio": "https://dashscope-intl.aliyuncs.com/compatible-mode/v1/chat/completions",
           };
 
           // glm-cn, alicode and alicode-intl use OpenAI format
-          if (provider === "glm-cn" || provider === "alicode" || provider === "alicode-intl" || provider === "alicloud-modelstudio") {
+          if (provider === "glm-cn" || provider === "alicode" || provider === "alicode-intl" || provider === "alibaba-studio") {
             const testModel = getDefaultModel(provider);
             const glmCnRes = await fetch(claudeBaseUrls[provider], {
               method: "POST",

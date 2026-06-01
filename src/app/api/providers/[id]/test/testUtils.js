@@ -524,7 +524,7 @@ async function testApiKeyConnection(connection, effectiveProxy = null) {
       }
       case "alicode":
       case "alicode-intl":
-  case "alicloud-modelstudio": {
+  case "alibaba-studio": {
         // Aliyun Coding Plan uses OpenAI-compatible API
         const aliBaseUrl = connection.provider === "alicode-intl"
           ? "https://coding-intl.dashscope.aliyuncs.com/v1/chat/completions"

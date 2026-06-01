@@ -220,7 +220,7 @@ export const PROVIDERS = {
     format: "openai",
     headers: {}
   },
-  "alicloud-modelstudio": {
+  "alibaba-studio": {
     baseUrl: "https://dashscope-intl.aliyuncs.com/compatible-mode/v1/chat/completions",
     format: "openai",
     headers: {}

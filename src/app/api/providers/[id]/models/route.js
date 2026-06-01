@@ -189,7 +189,7 @@ const PROVIDER_MODELS_CONFIG = {
     authPrefix: "Bearer ",
     parseResponse: (data) => data.data || []
   },
-  "alicloud-modelstudio": {
+  "alibaba-studio": {
     url: "https://dashscope-intl.aliyuncs.com/compatible-mode/v1/models",
     method: "GET",
     headers: { "Content-Type": "application/json" },

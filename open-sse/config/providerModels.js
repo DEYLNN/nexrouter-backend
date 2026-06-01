@@ -466,7 +466,7 @@ export const PROVIDER_MODELS = {
     { id: "qwen3-coder-plus", name: "Qwen3 Coder Plus" },
     { id: "glm-4.7", name: "GLM 4.7" },
   ],
-  "alicloud-modelstudio": [
+  "alibaba-studio": [
     { id: "qwen-plus", name: "Qwen Plus" },
     { id: "qwen-max", name: "Qwen Max" },
     { id: "qwen-turbo", name: "Qwen Turbo" },

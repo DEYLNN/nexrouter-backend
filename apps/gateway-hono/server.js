@@ -31,6 +31,7 @@ import { POST as providersPost } from "../../src/app/api/providers/route.js";
 import { POST as providerValidatePost } from "../../src/app/api/providers/validate/route.js";
 import { GET as providerModelsGet } from "../../src/app/api/providers/[id]/models/route.js";
 import { POST as providerTestPost } from "../../src/app/api/providers/[id]/test/route.js";
+import { POST as providerTestModelPost } from "../../src/app/api/providers/[id]/test-model/route.js";
 import { POST as providerTestModelsPost } from "../../src/app/api/providers/[id]/test-models/route.js";
 import { GET as mimoUsageGet } from "../../src/app/api/providers/mimo-usage/route.js";
 import { GET as availableModelsGet } from "../../src/app/api/keys/available-models/route.js";
@@ -405,6 +406,7 @@ app.post("/api/providers/validate", (c) => nextRouteHandler(c, providerValidateP
 app.post("/api/providers/:id/refresh-token", (c) => nextRouteHandler(c, providerRefreshTokenPost, { id: c.req.param("id") }));
 app.get("/api/providers/:id/models", (c) => nextRouteHandler(c, providerModelsGet, { id: c.req.param("id") }));
 app.post("/api/providers/:id/test", (c) => nextRouteHandler(c, providerTestPost, { id: c.req.param("id") }));
+app.post("/api/providers/:id/test-model", (c) => nextRouteHandler(c, providerTestModelPost, { id: c.req.param("id") }));
 app.post("/api/providers/:id/test-models", (c) => nextRouteHandler(c, providerTestModelsPost, { id: c.req.param("id") }));
 
 app.post("/api/provider-nodes", (c) => nextRouteHandler(c, providerNodesPost));

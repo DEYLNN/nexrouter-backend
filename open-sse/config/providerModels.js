@@ -466,6 +466,14 @@ export const PROVIDER_MODELS = {
     { id: "qwen3-coder-plus", name: "Qwen3 Coder Plus" },
     { id: "glm-4.7", name: "GLM 4.7" },
   ],
+  "alicloud-modelstudio": [
+    { id: "qwen-plus", name: "Qwen Plus" },
+    { id: "qwen-max", name: "Qwen Max" },
+    { id: "qwen-turbo", name: "Qwen Turbo" },
+    { id: "qwen-long", name: "Qwen Long" },
+    { id: "qwen3-coder-plus", name: "Qwen3 Coder Plus" },
+    { id: "qwen3-coder-flash", name: "Qwen3 Coder Flash" },
+  ],
   "volcengine-ark": [
     { id: "Doubao-Seed-2.0-Code", name: "Doubao-Seed-2.0-Code" },
     { id: "Doubao-Seed-2.0-pro", name: "Doubao-Seed-2.0-pro" },

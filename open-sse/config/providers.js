@@ -220,6 +220,11 @@ export const PROVIDERS = {
     format: "openai",
     headers: {}
   },
+  "alicloud-modelstudio": {
+    baseUrl: "https://dashscope-intl.aliyuncs.com/compatible-mode/v1/chat/completions",
+    format: "openai",
+    headers: {}
+  },
   "volcengine-ark": {
     baseUrl: "https://ark.cn-beijing.volces.com/api/coding/v3/chat/completions",
     format: "openai",

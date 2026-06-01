@@ -523,7 +523,8 @@ async function testApiKeyConnection(connection, effectiveProxy = null) {
         return { valid, error: valid ? null : "Invalid API key" };
       }
       case "alicode":
-      case "alicode-intl": {
+      case "alicode-intl":
+  case "alicloud-modelstudio": {
         // Aliyun Coding Plan uses OpenAI-compatible API
         const aliBaseUrl = connection.provider === "alicode-intl"
           ? "https://coding-intl.dashscope.aliyuncs.com/v1/chat/completions"

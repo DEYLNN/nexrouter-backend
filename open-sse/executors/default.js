@@ -176,6 +176,8 @@ export class DefaultExecutor extends BaseExecutor {
           }
         } else if (this.provider === "cline") {
           Object.assign(headers, buildClineHeaders(credentials.apiKey || credentials.accessToken));
+        } else if (this.provider === "cline-apikey") {
+          Object.assign(headers, buildClineHeaders(credentials.apiKey));
         } else {
           headers["Authorization"] = `Bearer ${credentials.apiKey || credentials.accessToken}`;
         }

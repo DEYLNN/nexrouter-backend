@@ -358,6 +358,7 @@ export async function POST(request) {
         case "groq":
         case "xai":
         case "xai-apikey":
+        case "cline-apikey":
         case "mistral":
         case "perplexity":
         case "together":
@@ -434,6 +435,10 @@ export async function POST(request) {
                 max_tokens: 1,
                 stream: false,
               },
+            },
+            "cline-apikey": {
+              url: "https://api.cline.bot/api/v1/users/me",
+              method: "GET",
             },
             morph: {
               url: "https://api.morphllm.com/v1/chat/completions",

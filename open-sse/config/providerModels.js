@@ -212,6 +212,13 @@ export const PROVIDER_MODELS = {
     { id: "kwaipilot/kat-coder-pro", name: "KAT Coder Pro", upstreamModelId: "kwaipilot/kat-coder-pro-v1" },
   ],
 
+  "cline-apikey": [  // Cline API Key
+    { id: "minimax/minimax-m2.5", name: "MiniMax M2.5" },
+    { id: "minimax/minimax-m3", name: "MiniMax M3" },
+    { id: "kwaipilot/kat-coder-pro-v1", name: "KAT Coder Pro v1" },
+    { id: "kwaipilot/kat-coder-pro-v2", name: "KAT Coder Pro v2" },
+  ],
+
   cb: [  // CodeBuddy
     { id: "default", name: "Default" },
     { id: "lite", name: "Lite" },

@@ -447,14 +447,12 @@ export const PROVIDERS = {
   glb: {
     baseUrl: "https://opengateway.gitlawb.com/v1/chat/completions",
     format: "openai",
-    headers: { "Accept-Encoding": "identity" },
-    noAuth: true
+    headers: { "Accept-Encoding": "identity" }
   },
   gitlawb: {
     baseUrl: "https://opengateway.gitlawb.com/v1/chat/completions",
     format: "openai",
-    headers: { "Accept-Encoding": "identity" },
-    noAuth: true
+    headers: { "Accept-Encoding": "identity" }
   },
   "opencode-go": {
     baseUrl: "https://opencode.ai/zen/go/v1/chat/completions",

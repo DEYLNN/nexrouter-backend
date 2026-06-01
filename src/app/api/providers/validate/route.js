@@ -377,6 +377,8 @@ export async function POST(request) {
         case "xiaomi-mimo-plan-sgp":
         case "canopywave":
         case "swiftrouter":
+        case "gitlawb":
+        case "glb":
         case "routeway":
         case "morph": {
           const validationConfigs = {
@@ -390,6 +392,14 @@ export async function POST(request) {
             },
             swiftrouter: {
               url: "https://api.swiftrouter.com/v1/models",
+              method: "GET",
+            },
+            gitlawb: {
+              url: "https://opengateway.gitlawb.com/v1/models",
+              method: "GET",
+            },
+            glb: {
+              url: "https://opengateway.gitlawb.com/v1/models",
               method: "GET",
             },
             routeway: {
@@ -493,6 +503,8 @@ export async function POST(request) {
             "xiaomi-mimo-plan-sgp": "https://token-plan-sgp.xiaomimimo.com/v1/models",
             canopywave: "https://inference.canopywave.io/v1/models",
             swiftrouter: "https://api.swiftrouter.com/v1/models",
+            gitlawb: "https://opengateway.gitlawb.com/v1/models",
+            glb: "https://opengateway.gitlawb.com/v1/models",
             routeway: "https://api.routeway.ai/v1/models"
           };
           const headers = {};

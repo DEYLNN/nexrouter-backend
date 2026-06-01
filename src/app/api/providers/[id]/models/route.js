@@ -159,6 +159,8 @@ const PROVIDER_MODELS_CONFIG = {
   "xiaomi-mimo-plan-sgp": createOpenAIModelsConfig("https://token-plan-sgp.xiaomimimo.com/v1/models"),
   canopywave: createOpenAIModelsConfig("https://inference.canopywave.io/v1/models"),
   swiftrouter: createOpenAIModelsConfig("https://api.swiftrouter.com/v1/models"),
+  gitlawb: createOpenAIModelsConfig("https://opengateway.gitlawb.com/v1/models"),
+  glb: createOpenAIModelsConfig("https://opengateway.gitlawb.com/v1/models"),
   routeway: createOpenAIModelsConfig("https://api.routeway.ai/v1/models"),
   anthropic: {
     url: "https://api.anthropic.com/v1/models",

@@ -73,6 +73,8 @@ export const PROVIDER_ENDPOINTS = {
   morph: "https://api.morphllm.com/v1/chat/completions",
   gmi: "https://api.gmi-serving.com/v1/chat/completions",
   "gmi-cloud": "https://api.gmi-serving.com/v1/chat/completions",
+  gitlawb: "https://opengateway.gitlawb.com/v1/chat/completions",
+  glb: "https://opengateway.gitlawb.com/v1/chat/completions",
   "cline-apikey": "https://api.cline.bot/api/v1/chat/completions",
   glm: "https://api.z.ai/api/anthropic/v1/messages",
   "glm-cn": "https://open.bigmodel.cn/api/coding/paas/v4/chat/completions",

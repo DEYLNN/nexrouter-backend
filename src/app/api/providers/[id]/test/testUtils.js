@@ -564,6 +564,15 @@ async function testApiKeyConnection(connection, effectiveProxy = null) {
         const valid = res.status !== 401 && res.status !== 403;
         return { valid, error: valid ? null : "Invalid API key" };
       }
+      case "gitlawb":
+      case "glb": {
+        const res = await fetchWithConnectionProxy("https://opengateway.gitlawb.com/v1/models", {
+          method: "GET",
+          headers: { Authorization: `Bearer ${connection.apiKey}`, "content-type": "application/json" },
+        }, effectiveProxy);
+        const valid = res.status !== 401 && res.status !== 403;
+        return { valid, error: valid ? null : "Invalid API key" };
+      }
       case "bai": {
         const res = await fetchWithConnectionProxy("https://api.b.ai/v1/chat/completions", {
           method: "POST",

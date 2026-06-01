@@ -6,6 +6,9 @@ export function getClineAccessToken(token) {
   if (typeof token !== "string") return "";
   const trimmed = token.trim();
   if (!trimmed) return "";
+  // Cline API keys (`sk_...`) must be sent raw. OAuth access tokens use the
+  // WorkOS prefix expected by the extension auth flow.
+  if (trimmed.startsWith("sk_")) return trimmed;
   return trimmed.startsWith("workos:") ? trimmed : `workos:${trimmed}`;
 }
 

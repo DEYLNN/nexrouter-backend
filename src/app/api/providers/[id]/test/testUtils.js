@@ -524,15 +524,15 @@ async function testApiKeyConnection(connection, effectiveProxy = null) {
       }
       case "alicode":
       case "alicode-intl":
-  case "alibaba-studio": {
-        // Aliyun Coding Plan uses OpenAI-compatible API
-        const aliBaseUrl = connection.provider === "alicode-intl"
-          ? "https://coding-intl.dashscope.aliyuncs.com/v1/chat/completions"
-          : "https://coding.dashscope.aliyuncs.com/v1/chat/completions";
-        const res = await fetchWithConnectionProxy(aliBaseUrl, {
-          method: "POST",
+      case "alibaba-studio": {
+        const aliModelsUrl = connection.provider === "alibaba-studio"
+          ? "https://dashscope-intl.aliyuncs.com/compatible-mode/v1/models"
+          : connection.provider === "alicode-intl"
+            ? "https://coding-intl.dashscope.aliyuncs.com/v1/models"
+            : "https://coding.dashscope.aliyuncs.com/v1/models";
+        const res = await fetchWithConnectionProxy(aliModelsUrl, {
+          method: "GET",
           headers: { "Authorization": `Bearer ${connection.apiKey}`, "content-type": "application/json" },
-          body: JSON.stringify({ model: getDefaultModel(connection.provider), max_tokens: 1, messages: [{ role: "user", content: "test" }] }),
         }, effectiveProxy);
         const valid = res.status !== 401 && res.status !== 403;
         return { valid, error: valid ? null : "Invalid API key" };

@@ -191,6 +191,10 @@ async function handleSingleModelChat(body, modelStr, clientRawRequest = null, re
 
   while (true) {
     const credentials = await getProviderCredentials(provider, excludeConnectionIds, model, { preferredConnectionId });
+    if (preferredConnectionId && credentials?.connectionId && credentials.connectionId !== preferredConnectionId) {
+      log.warn("AUTH", `${provider} | preferred connection ${preferredConnectionId?.slice(0, 8)} unavailable for ${model}; refusing fallback`);
+      return errorResponse(HTTP_STATUS.SERVICE_UNAVAILABLE, `Pinned connection unavailable for ${provider}/${model}`);
+    }
 
     // All accounts unavailable
     if (!credentials || credentials.allRateLimited || credentials.noEligiblePlan) {
@@ -265,6 +269,10 @@ async function handleSingleModelChat(body, modelStr, clientRawRequest = null, re
     const { shouldFallback } = await markAccountUnavailable(credentials.connectionId, result.status, result.error, provider, model, result.resetsAtMs);
 
     if (shouldFallback) {
+      if (preferredConnectionId) {
+        log.warn("AUTH", `Pinned account ${credentials.connectionName} unavailable (${result.status}); refusing fallback`);
+        return result.response;
+      }
       log.warn("AUTH", `Account ${credentials.connectionName} unavailable (${result.status}), trying fallback`);
       excludeConnectionIds.add(credentials.connectionId);
       lastError = result.error;

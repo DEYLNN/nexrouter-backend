@@ -48,17 +48,19 @@ export async function POST(request) {
     }
 
     // Default: chat completions
-    const isClineApiKeyModel = String(model).startsWith("cl-ak/") || String(model).startsWith("cline-apikey/");
+    const modelName = String(model);
+    const isClineApiKeyModel = modelName.startsWith("cl-ak/") || modelName.startsWith("cline-apikey/");
+    const isClineM25 = isClineApiKeyModel && modelName.includes("minimax/minimax-m2.5");
     const res = await fetch(`${baseUrl}/api/v1/chat/completions`, {
       method: "POST",
       headers,
       body: JSON.stringify({
         model,
-        max_tokens: isClineApiKeyModel ? 16 : 1,
+        max_tokens: isClineM25 ? 256 : (isClineApiKeyModel ? 16 : 1),
         stream: false,
         messages: [{ role: "user", content: isClineApiKeyModel ? "Reply with exactly: ok" : "hi" }],
       }),
-      signal: AbortSignal.timeout(isClineApiKeyModel ? 30000 : 15000),
+      signal: AbortSignal.timeout(isClineM25 ? 45000 : (isClineApiKeyModel ? 30000 : 15000)),
     });
     const latencyMs = Date.now() - start;
 

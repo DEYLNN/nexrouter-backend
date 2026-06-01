@@ -94,14 +94,16 @@ export async function POST(request, { params }) {
     // Warm up with first model to trigger token refresh (if needed) before parallel calls.
     // This prevents race condition where multiple requests concurrently refresh the same token.
     const [first, ...rest] = models;
-    const testOptions = providerId === "cline-apikey" ? { maxTokens: 16 } : {};
-    const firstResult = await pingModel(`${alias}/${first.id}`, baseUrl, apiKey, testOptions);
+    const getTestOptions = (modelId) => providerId === "cline-apikey"
+      ? { maxTokens: modelId === "minimax/minimax-m2.5" ? 256 : 16 }
+      : {};
+    const firstResult = await pingModel(`${alias}/${first.id}`, baseUrl, apiKey, getTestOptions(first.id));
     const results = [{ modelId: first.id, name: first.name || first.id, ...firstResult }];
 
     if (rest.length > 0) {
       const restResults = await Promise.all(
         rest.map(async (model) => {
-          const result = await pingModel(`${alias}/${model.id}`, baseUrl, apiKey, testOptions);
+          const result = await pingModel(`${alias}/${model.id}`, baseUrl, apiKey, getTestOptions(model.id));
           return { modelId: model.id, name: model.name || model.id, ...result };
         })
       );

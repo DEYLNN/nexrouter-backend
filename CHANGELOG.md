@@ -3,6 +3,7 @@
 ## [0.4.31] - 2026-06-01
 
 ### Chore
+- Tighten project rules: every change must bump package version and CHANGELOG.md together
 - Add repository rule requiring CHANGELOG.md updates for every future backend change
 - Add changelog generation helper script and npm script
 - Rebrand backend metadata/docs from AI Gateway/9Router to NexRouter

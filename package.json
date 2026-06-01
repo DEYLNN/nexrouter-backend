@@ -1,9 +1,10 @@
 {
   "name": "9router-app",
   "version": "0.4.30",
-  "description": "9Router web dashboard",
+  "description": "NexRouter backend",
   "private": true,
   "scripts": {
+    "changelog": "bash scripts/gen-changelog.sh",
     "dev": "next dev --webpack --port 20128",
     "build": "NODE_ENV=production next build",
     "start": "NODE_ENV=production next start",

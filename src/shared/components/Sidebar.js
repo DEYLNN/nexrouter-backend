@@ -396,7 +396,7 @@ export default function Sidebar({ onClose, forceExpanded }) {
         isOpen={showUpdateModal}
         onClose={() => setShowUpdateModal(false)}
         onConfirm={handleUpdate}
-        title="Update 9Router"
+        title="Update NexRouter"
         message={`Show install command for v${updateInfo?.latestVersion || ""}?`}
         confirmText="Show Command"
         cancelText="Cancel"
@@ -442,7 +442,7 @@ function ManualUpdatePanel({ latestVersion, installCmd, copied, onCopyAndShutdow
           {I.update}
         </div>
         <div>
-          <h2 style={{ fontSize: "15px", fontWeight: 600, marginBottom: "2px" }}>Update 9Router{latestVersion ? ` to v${latestVersion}` : ""}</h2>
+          <h2 style={{ fontSize: "15px", fontWeight: 600, marginBottom: "2px" }}>Update NexRouter{latestVersion ? ` to v${latestVersion}` : ""}</h2>
           <p style={{ fontSize: "12px", color: "var(--theme-shell-text-muted)" }}>
             {isDisconnected ? "Server stopped. Paste the command into a terminal." : isCountingDown ? `Shutting down in ${countdown}s...` : "Copy the install command and shutdown to update."}
           </p>

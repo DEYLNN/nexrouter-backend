@@ -1,6 +1,6 @@
-# AI Gateway Hono Backend
+# NexRouter Hono Backend
 
-Backend-only Hono runtime extracted from 9Router.
+Backend-only Hono runtime extracted from upstream 9Router.
 
 ## Critical data rule
 

@@ -114,8 +114,8 @@ function ProfileMenu({ onLogout }) {
           animation: "fadeIn 100ms ease",
         }}>
           <div style={{ padding: "10px 12px", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
-            <div style={{ fontSize: "12px", fontWeight: 600, color: "var(--theme-shell-text)" }}>9Router</div>
-            <div style={{ fontSize: "11px", color: "var(--theme-shell-text-subtle)", marginTop: "1px" }}>AI Gateway</div>
+            <div style={{ fontSize: "12px", fontWeight: 600, color: "var(--theme-shell-text)" }}>NexRouter</div>
+            <div style={{ fontSize: "11px", color: "var(--theme-shell-text-subtle)", marginTop: "1px" }}>NexRouter</div>
           </div>
           <div style={{ padding: "6px" }}>
             <Link

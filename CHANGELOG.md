@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.4.33] - 2026-06-02
+
+### Fixes
+- Restrict Gitlawb MiMo provider models to upstream-supported `xiaomi/mimo-*` chat models
+- Remove non-MiMo catalog entries from the static Gitlawb MiMo list because `/v1/xiaomi-mimo/chat/completions` rejects them
+
 ## [0.4.32] - 2026-06-02
 
 ### Features

@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.4.34] - 2026-06-02
+
+### Features
+- Enable per-model live chat probe endpoint for Husada API-key connections
+- Reuse `/api/providers/:id/test-model` for supported live-test providers beyond Kiro
+
 ## [0.4.33] - 2026-06-02
 
 ### Fixes

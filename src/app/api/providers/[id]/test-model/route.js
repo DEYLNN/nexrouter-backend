@@ -19,8 +19,9 @@ export async function POST(request, { params }) {
     if (!connection) {
       return NextResponse.json({ error: "Connection not found" }, { status: 404 });
     }
-    if (connection.provider !== "kiro") {
-      return NextResponse.json({ error: "Model probe is only enabled for Kiro connections" }, { status: 400 });
+    const supportedProviders = new Set(["kiro", "husada"]);
+    if (!supportedProviders.has(connection.provider)) {
+      return NextResponse.json({ error: "Model probe is only enabled for supported live-test providers" }, { status: 400 });
     }
 
     const { model } = await request.json();
@@ -29,7 +30,7 @@ export async function POST(request, { params }) {
 
     const allowedModels = getAllowedModelIds(connection.provider);
     if (!allowedModels.has(modelId)) {
-      return NextResponse.json({ error: `Unknown Kiro model: ${modelId}` }, { status: 400 });
+      return NextResponse.json({ error: `Unknown ${connection.provider} model: ${modelId}` }, { status: 400 });
     }
 
     const alias = PROVIDER_ID_TO_ALIAS[connection.provider] || connection.provider;

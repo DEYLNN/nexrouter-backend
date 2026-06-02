@@ -136,6 +136,10 @@ export const PROVIDERS = {
     format: "openai",
     headers: {}
   },
+  zenmux: {
+    baseUrl: "https://zenmux.ai/api/v1/chat/completions",
+    format: "openai"
+  },
   routeway: {
     baseUrl: "https://api.routeway.ai/v1/chat/completions",
     format: "openai"

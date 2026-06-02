@@ -708,6 +708,10 @@ export const PROVIDER_MODELS = {
     { id: "ag/gemini-3.1-pro-low", name: "Gemini 3.1 Pro Low" },
     { id: "ag/gemini-3-flash", name: "Gemini 3 Flash" },
   ],
+  zenmux: [
+    { id: "z-ai/glm-4.7-flash-free", name: "GLM 4.7 Flash Free" },
+    { id: "z-ai/glm-4.6v-flash-free", name: "GLM 4.6V Flash Free" },
+  ],
   routeway: [
     { id: "ling-2.6-flash:free", name: "Ling 2.6 Flash Free" },
     { id: "gemma-4-31b-it:free", name: "Gemma 4 31B IT Free" },

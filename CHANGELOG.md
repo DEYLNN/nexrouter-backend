@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.4.35] - 2026-06-02
+
+### Features
+- Register Zenmux OpenAI-compatible provider at `https://zenmux.ai/api/v1/chat/completions`
+- Add constant Zenmux models: `z-ai/glm-4.7-flash-free`, `z-ai/glm-4.6v-flash-free`
+
 ## [0.4.34] - 2026-06-02
 
 ### Features

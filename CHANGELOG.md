@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.4.38] - 2026-06-02
+
+### Fixed
+- Add Ocenza to per-key test button validation via `/v1/models`.
+
+### Changed
+- Restore Ocenza static models to `gpt-oss-120b` and `step-3.5-flash-2603`.
+
 ## [0.4.37] - 2026-06-02
 
 ### Fixed

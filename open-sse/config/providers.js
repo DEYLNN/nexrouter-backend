@@ -464,6 +464,11 @@ export const PROVIDERS = {
     format: "openai",
     headers: { "Accept-Encoding": "identity" }
   },
+  "gitlawb-mimo": {
+    baseUrl: "https://opengateway.gitlawb.com/v1/xiaomi-mimo/chat/completions",
+    format: "openai",
+    headers: { "Accept-Encoding": "identity" }
+  },
   "opencode-go": {
     baseUrl: "https://opencode.ai/zen/go/v1/chat/completions",
     format: "openai",

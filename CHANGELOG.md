@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.4.32] - 2026-06-02
+
+### Features
+- Add separate Gitlawb MiMo API-key provider using the `/v1/xiaomi-mimo/chat/completions` OpenGateway route
+- Register 343 Gitlawb MiMo catalog models from `/v1/xiaomi-mimo/models`, including `minimax/minimax-m3`
+- Keep existing global Gitlawb provider endpoint unchanged
+
 ## [0.4.31] - 2026-06-01
 
 ### Chore

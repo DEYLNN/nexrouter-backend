@@ -22,6 +22,8 @@ import { updateProviderCredentials, checkAndRefreshToken } from "../services/tok
 import { getProjectIdForConnection } from "open-sse/services/projectId.js";
 
 const PROVIDER_ALIAS_TO_CANONICAL = {
+  "glb-mimo": "gitlawb-mimo",
+  "gitlawb-mimo": "gitlawb-mimo",
   fb: "freebuff",
   freebuff: "freebuff",
   cwv: "canopywave",

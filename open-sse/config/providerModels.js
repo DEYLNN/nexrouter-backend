@@ -713,8 +713,13 @@ export const PROVIDER_MODELS = {
     { id: "z-ai/glm-4.6v-flash-free", name: "GLM 4.6V Flash Free" },
   ],
   ocenza: [
-    { id: "gpt-oss-120b", name: "GPT OSS 120B" },
-    { id: "step-3.5-flash-2603", name: "Step 3.5 Flash 2603" },
+    { id: "deepseek-v4-flash", name: "DeepSeek V4 Flash" },
+    { id: "deepseek-v4-pro", name: "DeepSeek V4 Pro" },
+    { id: "gpt-5.2", name: "GPT 5.2" },
+    { id: "gpt-5.4", name: "GPT 5.4" },
+    { id: "gpt-5.4-mini", name: "GPT 5.4 Mini" },
+    { id: "gpt-5.5", name: "GPT 5.5" },
+    { id: "gpt-image-2", name: "GPT Image 2", type: "image" },
   ],
   routeway: [
     { id: "ling-2.6-flash:free", name: "Ling 2.6 Flash Free" },

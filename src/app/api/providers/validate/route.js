@@ -382,6 +382,7 @@ export async function POST(request) {
         case "gitlawb":
         case "glb":
         case "husada":
+        case "ocenza":
         case "routeway":
         case "morph": {
           const validationConfigs = {
@@ -407,6 +408,10 @@ export async function POST(request) {
             },
             husada: {
               url: "https://husada.net/v1/models",
+              method: "GET",
+            },
+            ocenza: {
+              url: "https://ocenza.com/v1/models",
               method: "GET",
             },
             routeway: {

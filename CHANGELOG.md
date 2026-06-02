@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.4.37] - 2026-06-02
+
+### Fixed
+- Validate Ocenza API keys via `/v1/models` and update static models to the key-exposed model list.
+
 ## [0.4.36] - 2026-06-02
 
 ### Added

@@ -690,6 +690,14 @@ export const PROVIDER_MODELS = {
     { id: "am/claude-opus-4.8", name: "Claude Opus 4.8" },
     { id: "am/glm-5", name: "GLM 5" },
   ],
+  husada: [
+    { id: "ag/gemini-3.5-flash-extra-low", name: "Gemini 3.5 Flash Extra Low" },
+    { id: "ag/gemini-3-flash-agent", name: "Gemini 3 Flash Agent" },
+    { id: "ag/gemini-3.5-flash-low", name: "Gemini 3.5 Flash Low" },
+    { id: "ag/gemini-pro-agent", name: "Gemini Pro Agent" },
+    { id: "ag/gemini-3.1-pro-low", name: "Gemini 3.1 Pro Low" },
+    { id: "ag/gemini-3-flash", name: "Gemini 3 Flash" },
+  ],
   routeway: [
     { id: "ling-2.6-flash:free", name: "Ling 2.6 Flash Free" },
     { id: "gemma-4-31b-it:free", name: "Gemma 4 31B IT Free" },

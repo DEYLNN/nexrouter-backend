@@ -381,6 +381,7 @@ export async function POST(request) {
         case "swiftrouter":
         case "gitlawb":
         case "glb":
+        case "husada":
         case "routeway":
         case "morph": {
           const validationConfigs = {
@@ -402,6 +403,10 @@ export async function POST(request) {
             },
             glb: {
               url: "https://opengateway.gitlawb.com/v1/models",
+              method: "GET",
+            },
+            husada: {
+              url: "https://husada.net/v1/models",
               method: "GET",
             },
             routeway: {
@@ -507,6 +512,7 @@ export async function POST(request) {
             swiftrouter: "https://api.swiftrouter.com/v1/models",
             gitlawb: "https://opengateway.gitlawb.com/v1/models",
             glb: "https://opengateway.gitlawb.com/v1/models",
+            husada: "https://husada.net/v1/models",
             routeway: "https://api.routeway.ai/v1/models"
           };
           const headers = {};

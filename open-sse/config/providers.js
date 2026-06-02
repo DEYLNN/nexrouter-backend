@@ -131,6 +131,11 @@ export const PROVIDERS = {
     baseUrl: "https://api.gmi-serving.com/v1/chat/completions",
     format: "openai"
   },
+  husada: {
+    baseUrl: "https://husada.net/v1/chat/completions",
+    format: "openai",
+    headers: {}
+  },
   routeway: {
     baseUrl: "https://api.routeway.ai/v1/chat/completions",
     format: "openai"

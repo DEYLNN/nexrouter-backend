@@ -161,6 +161,7 @@ const PROVIDER_MODELS_CONFIG = {
   swiftrouter: createOpenAIModelsConfig("https://api.swiftrouter.com/v1/models"),
   gitlawb: createOpenAIModelsConfig("https://opengateway.gitlawb.com/v1/models"),
   glb: createOpenAIModelsConfig("https://opengateway.gitlawb.com/v1/models"),
+  husada: createOpenAIModelsConfig("https://husada.net/v1/models"),
   routeway: createOpenAIModelsConfig("https://api.routeway.ai/v1/models"),
   anthropic: {
     url: "https://api.anthropic.com/v1/models",

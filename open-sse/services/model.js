@@ -54,6 +54,7 @@ const ALIAS_TO_PROVIDER_ID = {
   gmi: "gmi-cloud",
   "gmi-cloud": "gmi-cloud",
   routeway: "routeway",
+  husada: "husada",
   "mimo-sgp": "xiaomi-mimo-plan-sgp",
   dg: "deepgram",
   deepgram: "deepgram",

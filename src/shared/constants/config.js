@@ -72,6 +72,7 @@ export const PROVIDER_ENDPOINTS = {
   qiniu: "https://api.qnaigc.com/v1/chat/completions",
   morph: "https://api.morphllm.com/v1/chat/completions",
   gmi: "https://api.gmi-serving.com/v1/chat/completions",
+  husada: "https://husada.net/v1/chat/completions",
   "gmi-cloud": "https://api.gmi-serving.com/v1/chat/completions",
   gitlawb: "https://opengateway.gitlawb.com/v1/chat/completions",
   glb: "https://opengateway.gitlawb.com/v1/chat/completions",

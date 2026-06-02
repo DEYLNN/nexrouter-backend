@@ -213,6 +213,7 @@ export const PROVIDER_MODELS = {
   ],
 
   "cline-apikey": [  // Cline API Key
+    { id: "qwen/qwen3.7-plus", name: "Qwen3.7 Plus" },
     { id: "minimax/minimax-m2.5", name: "MiniMax M2.5" },
     { id: "minimax/minimax-m3", name: "MiniMax M3" },
     { id: "kwaipilot/kat-coder-pro-v1", name: "KAT Coder Pro v1" },

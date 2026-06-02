@@ -74,6 +74,7 @@ export const PROVIDER_ENDPOINTS = {
   gmi: "https://api.gmi-serving.com/v1/chat/completions",
   husada: "https://husada.net/v1/chat/completions",
   zenmux: "https://zenmux.ai/api/v1/chat/completions",
+  ocenza: "https://ocenza.com/v1/chat/completions",
   "gmi-cloud": "https://api.gmi-serving.com/v1/chat/completions",
   gitlawb: "https://opengateway.gitlawb.com/v1/chat/completions",
   glb: "https://opengateway.gitlawb.com/v1/chat/completions",

@@ -140,6 +140,10 @@ export const PROVIDERS = {
     baseUrl: "https://zenmux.ai/api/v1/chat/completions",
     format: "openai"
   },
+  ocenza: {
+    baseUrl: "https://ocenza.com/v1/chat/completions",
+    format: "openai"
+  },
   routeway: {
     baseUrl: "https://api.routeway.ai/v1/chat/completions",
     format: "openai"

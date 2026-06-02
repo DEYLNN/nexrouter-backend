@@ -712,6 +712,10 @@ export const PROVIDER_MODELS = {
     { id: "z-ai/glm-4.7-flash-free", name: "GLM 4.7 Flash Free" },
     { id: "z-ai/glm-4.6v-flash-free", name: "GLM 4.6V Flash Free" },
   ],
+  ocenza: [
+    { id: "gpt-oss-120b", name: "GPT OSS 120B" },
+    { id: "step-3.5-flash-2603", name: "Step 3.5 Flash 2603" },
+  ],
   routeway: [
     { id: "ling-2.6-flash:free", name: "Ling 2.6 Flash Free" },
     { id: "gemma-4-31b-it:free", name: "Gemma 4 31B IT Free" },

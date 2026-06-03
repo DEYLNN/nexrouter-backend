@@ -260,7 +260,11 @@ export function handleAnumaResponsesStreaming({ providerResponse, provider, mode
   let buffer = "";
   let textBuffer = "";
   let sawTool = false;
-  const expectsTool = Array.isArray(body?.tools) && body.tools.length > 0;
+  const hasRecentToolResult = (body?.messages || []).slice(-8).some((message) => {
+    const text = typeof message?.content === "string" ? message.content : JSON.stringify(message?.content || "");
+    return message?.role === "tool" || message?.role === "function" || /^\[[^\]]+ result\]/i.test(text.trim());
+  });
+  const expectsTool = Array.isArray(body?.tools) && body.tools.length > 0 && !hasRecentToolResult;
   const stripAnumaThinking = (text) => String(text || "").replace(/<think>[\s\S]*?<\/think>/gi, "").replace(/^[\s\S]*?<\/think>\s*/i, "");
   const send = (controller, delta, finish_reason = null, usage = null) => {
     const payload = { id, object: "chat.completion.chunk", created: Math.floor(Date.now() / 1000), model, choices: [{ index: 0, delta, finish_reason }] };
@@ -304,7 +308,9 @@ export function handleAnumaResponsesStreaming({ providerResponse, provider, mode
             }
             const maybeToolJson = /^(\s|`)*(\{|```json action|<function_calls>|Requested tool calls?:)/i.test(textBuffer.trimStart()) || /"?(tool_call|toolCall|function_call|functionCall)"?\s*:/i.test(textBuffer);
             if (!expectsTool && !maybeToolJson) {
-              send(controller, { content: text });
+              if (/<think>/i.test(textBuffer) && !/<\/think>/i.test(textBuffer)) continue;
+              const cleanText = /<\/think>/i.test(textBuffer) ? stripAnumaThinking(textBuffer) : text;
+              if (cleanText) send(controller, { content: cleanText });
               textBuffer = textBuffer.slice(-80);
             }
           }

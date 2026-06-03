@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.4.59] - 2026-06-03
+
+### Fixed
+- After an Anuma tool result, stop forcing JSON tool-call mode and stream the follow-up answer normally; suppress `<think>` chunks while streaming.
+
 ## [0.4.58] - 2026-06-03
 
 ### Fixed

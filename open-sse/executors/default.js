@@ -62,9 +62,13 @@ function normalizeAnumaAgentPayload(body, upstreamStream = false) {
     };
   };
   const compactTools = originalTools.map(compactTool).filter(Boolean);
+  const hasRecentToolResult = (body.messages || []).slice(-8).some((message) => {
+    const text = textContent(message?.content);
+    return message?.role === "tool" || message?.role === "function" || /^\[[^\]]+ result\]/i.test(text.trim());
+  });
   const preferredTools = compactTools.filter((tool) => preferredToolNames.has(tool.name));
   const otherTools = compactTools.filter((tool) => !preferredToolNames.has(tool.name));
-  const toolSpec = [...preferredTools, ...otherTools].slice(0, 10);
+  const toolSpec = hasRecentToolResult ? [] : [...preferredTools, ...otherTools].slice(0, 10);
   const next = { ...body };
   // Anuma is OpenAI-shaped, but live tests show upstream can reset/fail when
   // coding agents send native tools[]. Preserve tool context as transcript text

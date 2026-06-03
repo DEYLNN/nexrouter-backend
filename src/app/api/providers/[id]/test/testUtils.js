@@ -728,6 +728,24 @@ async function testApiKeyConnection(connection, effectiveProxy = null) {
         const valid = res.status !== 401 && res.status !== 403;
         return { valid, error: valid ? null : "Invalid API key" };
       }
+      case "anuma": {
+        const res = await fetchWithConnectionProxy("https://portal.anuma.ai/api/v1/chat/completions", {
+          method: "POST",
+          headers: {
+            "X-API-KEY": connection.apiKey,
+            "X-User-ID": "0x4888CFA67b3Db6dA384585e2eb61348075d705Be",
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            model: "kimi/kimi-k2.6",
+            messages: [{ role: "user", content: "test" }],
+            max_tokens: 1,
+            stream: false,
+          }),
+        }, effectiveProxy);
+        const valid = res.status !== 401 && res.status !== 403;
+        return { valid, error: valid ? null : "Invalid API key" };
+      }
       case "routeway": {
         const res = await fetchWithConnectionProxy("https://api.routeway.ai/v1/chat/completions", {
           method: "POST",

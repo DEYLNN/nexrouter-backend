@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.4.40] - 2026-06-03
+
+### Fixed
+- Fix the provider connection “Test Key” button for Anuma by using the provider-specific `X-API-KEY` and `X-User-ID` headers instead of Bearer auth.
+
 ## [0.4.39] - 2026-06-03
 
 ### Added

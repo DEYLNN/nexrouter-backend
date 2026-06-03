@@ -64,7 +64,7 @@ function normalizeAnumaAgentPayload(body, upstreamStream = false) {
   const compactTools = originalTools.map(compactTool).filter(Boolean);
   const preferredTools = compactTools.filter((tool) => preferredToolNames.has(tool.name));
   const otherTools = compactTools.filter((tool) => !preferredToolNames.has(tool.name));
-  const toolSpec = [...preferredTools, ...otherTools].slice(0, 18);
+  const toolSpec = [...preferredTools, ...otherTools].slice(0, 10);
   const next = { ...body };
   // Anuma is OpenAI-shaped, but live tests show upstream can reset/fail when
   // coding agents send native tools[]. Preserve tool context as transcript text
@@ -115,8 +115,8 @@ function normalizeAnumaAgentPayload(body, upstreamStream = false) {
     }
   }
 
-  const compactMessages = Array.isArray(next.messages) && next.messages.length > 42
-    ? [next.messages[0], { role: "user", content: `[context compacted: kept latest 40 of ${next.messages.length} messages for Anuma compatibility]` }, ...next.messages.slice(-40)]
+  const compactMessages = Array.isArray(next.messages) && next.messages.length > 16
+    ? [next.messages[0], { role: "user", content: `[context compacted: kept latest 14 of ${next.messages.length} messages for Anuma compatibility]` }, ...next.messages.slice(-14)]
     : (next.messages || []);
 
   const input = compactMessages
@@ -124,7 +124,7 @@ function normalizeAnumaAgentPayload(body, upstreamStream = false) {
     .filter((message) => message?.role !== "assistant" || textContent(message.content).trim())
     .map((message) => ({
       role: message.role === "system" ? "user" : (message.role || "user"),
-      content: [{ type: "text", text: textContent(message.content).slice(0, 12000) }]
+      content: [{ type: "text", text: textContent(message.content).slice(0, 5000) }]
     }))
     .filter((message) => message.content[0].text.trim());
 
@@ -132,7 +132,7 @@ function normalizeAnumaAgentPayload(body, upstreamStream = false) {
     input,
     model: next.model,
     stream: upstreamStream === true,
-    max_output_tokens: Math.min(next.max_tokens || next.max_completion_tokens || 8192, 8192),
+    max_output_tokens: Math.min(next.max_tokens || next.max_completion_tokens || 4096, 4096),
     temperature: next.temperature,
     top_p: next.top_p,
     conversation_id: `nexrouter_${Date.now()}`

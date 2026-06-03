@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.4.56] - 2026-06-03
+
+### Fixed
+- Make Anuma compatibility compaction more aggressive for Hermes/OpenClaw long transcripts: fewer tools, fewer history messages, shorter text blocks, and smaller max output.
+
 ## [0.4.55] - 2026-06-03
 
 ### Fixed

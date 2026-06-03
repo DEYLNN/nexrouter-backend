@@ -88,7 +88,7 @@ function normalizeAnumaAgentPayload(body) {
     });
 
     const toolInstruction = toolSpec.length > 0
-      ? `\n\nAvailable tools are represented for you as JSON-call mode, not native API tools. If you need a tool, output ONLY compact JSON in this exact shape: {"tool_call":{"name":"tool_name","arguments":{}}}. Available tools: ${JSON.stringify(toolSpec)}`
+      ? `\n\nAvailable tools are represented for you as JSON-call mode, not native API tools. If the user asks you to browse, inspect files, run commands, take screenshots, edit, or do any external action and a relevant tool is available, you MUST call a tool instead of answering in text. Output ONLY compact JSON in this exact shape: {"tool_call":{"name":"tool_name","arguments":{}}}. Available tools: ${JSON.stringify(toolSpec)}`
       : "";
     const agentSystem = {
       role: "system",

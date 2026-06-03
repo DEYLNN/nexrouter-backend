@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.4.47] - 2026-06-03
+
+### Fixed
+- Strengthen Anuma agent tool-use prompting so browser/file/command/screenshot tasks prefer tool calls instead of plain-text refusal.
+
 ## [0.4.46] - 2026-06-03
 
 ### Fixed

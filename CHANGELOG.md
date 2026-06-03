@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.4.42] - 2026-06-03
+
+### Fixed
+- Flip Anuma credential mapping: frontend/API-key field stores the EVM User ID/address, while the server injects fixed `X-API-KEY` from `ANUMA_X_API_KEY`.
+- Keep Anuma header handling isolated so other API-key providers continue using their normal Bearer/OpenAI-compatible flow.
+
 ## [0.4.41] - 2026-06-03
 
 ### Fixed

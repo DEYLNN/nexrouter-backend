@@ -146,10 +146,7 @@ export const PROVIDERS = {
   },
   anuma: {
     baseUrl: "https://portal.anuma.ai/api/v1/chat/completions",
-    format: "openai",
-    headers: {
-      "X-User-ID": "0x4888CFA67b3Db6dA384585e2eb61348075d705Be"
-    }
+    format: "openai"
   },
   routeway: {
     baseUrl: "https://api.routeway.ai/v1/chat/completions",

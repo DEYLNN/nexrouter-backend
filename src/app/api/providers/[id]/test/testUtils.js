@@ -732,8 +732,8 @@ async function testApiKeyConnection(connection, effectiveProxy = null) {
         const res = await fetchWithConnectionProxy("https://portal.anuma.ai/api/v1/chat/completions", {
           method: "POST",
           headers: {
-            "X-API-KEY": connection.apiKey,
-            "X-User-ID": "0x4888CFA67b3Db6dA384585e2eb61348075d705Be",
+            "X-API-KEY": process.env.ANUMA_X_API_KEY,
+            "X-User-ID": connection.apiKey,
             "Content-Type": "application/json",
           },
           body: JSON.stringify({

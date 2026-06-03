@@ -209,7 +209,8 @@ export class DefaultExecutor extends BaseExecutor {
             headers["anthropic-version"] = "2023-06-01";
           }
         } else if (this.provider === "anuma") {
-          headers["X-API-KEY"] = credentials.apiKey || credentials.accessToken;
+          headers["X-API-KEY"] = process.env.ANUMA_X_API_KEY;
+          headers["X-User-ID"] = credentials.apiKey || credentials.accessToken;
           delete headers["Authorization"];
         } else if (this.provider === "gitlab") {
           // GitLab Duo uses Bearer token (PAT with ai_features scope, or OAuth access token)

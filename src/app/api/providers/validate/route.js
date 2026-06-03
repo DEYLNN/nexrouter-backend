@@ -463,8 +463,8 @@ export async function POST(request) {
               url: "https://portal.anuma.ai/api/v1/chat/completions",
               method: "POST",
               headers: {
-                "X-API-KEY": apiKey,
-                "X-User-ID": "0x4888CFA67b3Db6dA384585e2eb61348075d705Be",
+                "X-API-KEY": process.env.ANUMA_X_API_KEY,
+                "X-User-ID": apiKey,
                 "Content-Type": "application/json",
               },
               body: {

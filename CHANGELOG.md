@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.4.60] - 2026-06-03
+
+### Fixed
+- Avoid duplicated text after stripping Anuma `<think>` sections in streamed follow-up answers.
+
 ## [0.4.59] - 2026-06-03
 
 ### Fixed

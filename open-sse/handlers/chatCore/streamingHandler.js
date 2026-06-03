@@ -309,9 +309,10 @@ export function handleAnumaResponsesStreaming({ providerResponse, provider, mode
             const maybeToolJson = /^(\s|`)*(\{|```json action|<function_calls>|Requested tool calls?:)/i.test(textBuffer.trimStart()) || /"?(tool_call|toolCall|function_call|functionCall)"?\s*:/i.test(textBuffer);
             if (!expectsTool && !maybeToolJson) {
               if (/<think>/i.test(textBuffer) && !/<\/think>/i.test(textBuffer)) continue;
-              const cleanText = /<\/think>/i.test(textBuffer) ? stripAnumaThinking(textBuffer) : text;
+              const hadThinkClose = /<\/think>/i.test(textBuffer);
+              const cleanText = hadThinkClose ? stripAnumaThinking(textBuffer) : text;
               if (cleanText) send(controller, { content: cleanText });
-              textBuffer = textBuffer.slice(-80);
+              textBuffer = hadThinkClose ? "" : textBuffer.slice(-80);
             }
           }
         }

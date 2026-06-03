@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.4.63] - 2026-06-03
+
+### Fixed
+- Ensure the FE provider models endpoint merges Morph static model `morph-dsv4flash` even when Morph upstream `/v1/models` omits it.
+
 ## [0.4.62] - 2026-06-03
 
 ### Added

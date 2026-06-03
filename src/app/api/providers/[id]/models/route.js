@@ -58,6 +58,15 @@ const appendCodexReviewModels = (models) => models.flatMap((model) => {
 
 const parseCodexModels = (data) => appendCodexReviewModels(parseOpenAIStyleModels(data));
 
+const MORPH_STATIC_MODELS = [
+  { id: "morph-dsv4flash", name: "Morph DeepSeek V4 Flash" },
+];
+
+const mergeStaticModels = (models, staticModels) => {
+  const seen = new Set(models.map((model) => model?.id).filter(Boolean));
+  return [...models, ...staticModels.filter((model) => model?.id && !seen.has(model.id))];
+};
+
 const createOpenAIModelsConfig = (url) => ({
   url,
   method: "GET",
@@ -153,7 +162,10 @@ const PROVIDER_MODELS_CONFIG = {
   openai: createOpenAIModelsConfig("https://api.openai.com/v1/models"),
   bai: createOpenAIModelsConfig("https://api.b.ai/v1/models"),
   qiniu: createOpenAIModelsConfig("https://api.qnaigc.com/v1/models"),
-  morph: createOpenAIModelsConfig("https://api.morphllm.com/v1/models"),
+  morph: {
+    ...createOpenAIModelsConfig("https://api.morphllm.com/v1/models"),
+    parseResponse: (data) => mergeStaticModels(parseOpenAIStyleModels(data), MORPH_STATIC_MODELS),
+  },
   openrouter: createOpenAIModelsConfig("https://openrouter.ai/api/v1/models"),
   "xiaomi-mimo": createOpenAIModelsConfig("https://api.xiaomimimo.com/v1/models"),
   "xiaomi-mimo-plan-sgp": createOpenAIModelsConfig("https://token-plan-sgp.xiaomimimo.com/v1/models"),

@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.4.50] - 2026-06-03
+
+### Fixed
+- Add true streaming support for Anuma `/responses` upstream instead of waiting for full JSON and fake-streaming, improving long task reliability and TTFT.
+- Parse Anuma Responses SSE `OfString` deltas into OpenAI chat completion chunks while preserving streamed tool-call detection.
+
 ## [0.4.49] - 2026-06-03
 
 ### Changed

@@ -215,7 +215,92 @@ function buildTransformStream({ provider, sourceFormat, targetFormat, userAgent,
 /**
  * Handle streaming response — pipe provider SSE through transform stream to client.
  */
+function extractAnumaResponsesText(obj) {
+  const delta = obj?.delta;
+  if (typeof delta === "string") return delta;
+  if (delta && typeof delta === "object") return delta.OfString || delta.OfResponseReasoningSummaryDeltaEventDelta || delta.text || delta.content || "";
+  if (obj?.type === "response.output_text.delta") return obj.delta || "";
+  return obj?.text || obj?.content || "";
+}
+
+function parseAnumaToolCallText(text) {
+  const completion = normalizeAnumaTextToolCall({ choices: [{ message: { role: "assistant", content: text }, finish_reason: "stop" }] });
+  return completion?.choices?.[0]?.message?.tool_calls || [];
+}
+
+export function handleAnumaResponsesStreaming({ providerResponse, provider, model, requestStartTime, connectionId, apiKey, clientRawRequest, body, finalBody, translatedBody, onRequestSuccess, trackDone, appendLog, streamController }) {
+  if (onRequestSuccess) onRequestSuccess();
+  const encoder = new TextEncoder();
+  const decoder = new TextDecoder();
+  const id = `chatcmpl-${Date.now()}`;
+  let buffer = "";
+  let textBuffer = "";
+  let sawTool = false;
+  const send = (controller, delta, finish_reason = null, usage = null) => {
+    const payload = { id, object: "chat.completion.chunk", created: Math.floor(Date.now() / 1000), model, choices: [{ index: 0, delta, finish_reason }] };
+    if (usage) payload.usage = usage;
+    controller.enqueue(encoder.encode(`data: ${JSON.stringify(payload)}\n\n`));
+  };
+  const readable = new ReadableStream({
+    async start(controller) {
+      trackDone();
+      send(controller, { role: "assistant" });
+      const reader = providerResponse.body.getReader();
+      let usage = null;
+      try {
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          buffer += decoder.decode(value, { stream: true });
+          let idx;
+          while ((idx = buffer.indexOf("\n")) >= 0) {
+            const line = buffer.slice(0, idx).trimEnd();
+            buffer = buffer.slice(idx + 1);
+            if (!line.startsWith("data:")) continue;
+            const data = line.slice(5).trim();
+            if (!data || data === "[DONE]") continue;
+            let obj;
+            try { obj = JSON.parse(data); } catch { continue; }
+            if (obj?.usage) usage = obj.usage;
+            if (obj?.response?.usage) usage = obj.response.usage;
+            const text = extractAnumaResponsesText(obj);
+            if (!text) continue;
+            textBuffer += text;
+            const toolCalls = parseAnumaToolCallText(textBuffer);
+            if (toolCalls.length) {
+              sawTool = true;
+              for (let i = 0; i < toolCalls.length; i++) {
+                const call = toolCalls[i];
+                send(controller, { tool_calls: [{ index: i, id: call.id, type: call.type || "function", function: { name: call.function?.name || call.name, arguments: call.function?.arguments || call.arguments || "{}" } }] });
+              }
+              textBuffer = "";
+              continue;
+            }
+            if (!textBuffer.includes("```json action") && !textBuffer.includes("<function_calls>") && !/Requested tool calls?:/i.test(textBuffer)) {
+              send(controller, { content: text });
+              textBuffer = textBuffer.slice(-40);
+            }
+          }
+        }
+        if (textBuffer && !sawTool) send(controller, { content: textBuffer });
+        send(controller, {}, sawTool ? "tool_calls" : "stop", usage);
+        controller.enqueue(encoder.encode("data: [DONE]\n\n"));
+        appendLog({ tokens: usage || { prompt_tokens: 0, completion_tokens: 0 }, status: "200 OK" });
+        saveUsageStats({ provider, model, tokens: usage || { prompt_tokens: 0, completion_tokens: 0 }, connectionId, apiKey, endpoint: clientRawRequest?.endpoint, label: "ANUMA STREAM USAGE" });
+        controller.close();
+      } catch (err) {
+        streamController?.handleError?.(err);
+        controller.error(err);
+      }
+    }
+  });
+  return { success: true, response: new Response(withSSEKeepAlive(readable), { headers: SSE_HEADERS }) };
+}
+
 export function handleStreamingResponse({ providerResponse, provider, model, sourceFormat, targetFormat, userAgent, body, stream, translatedBody, finalBody, requestStartTime, connectionId, apiKey, clientRawRequest, onRequestSuccess, reqLogger, toolNameMap, streamController, onStreamComplete }) {
+  if (provider === "anuma") {
+    return handleAnumaResponsesStreaming({ providerResponse, provider, model, requestStartTime, connectionId, apiKey, clientRawRequest, body, translatedBody, finalBody, onRequestSuccess, trackDone: () => {}, appendLog: () => {}, streamController });
+  }
   if (onRequestSuccess) onRequestSuccess();
 
   const transformStream = buildTransformStream({ provider, sourceFormat, targetFormat, userAgent, reqLogger, toolNameMap, model, connectionId, body, onStreamComplete, apiKey });

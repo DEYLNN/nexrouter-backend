@@ -45,7 +45,7 @@ function sanitizeGmiToolPayload(body) {
   return next;
 }
 
-function normalizeAnumaAgentPayload(body) {
+function normalizeAnumaAgentPayload(body, upstreamStream = false) {
   const originalTools = Array.isArray(body.tools) ? body.tools : [];
   const toolSpec = originalTools.map((tool) => tool?.function ? {
     name: tool.function.name,
@@ -113,7 +113,7 @@ function normalizeAnumaAgentPayload(body) {
   return {
     input,
     model: next.model,
-    stream: false,
+    stream: upstreamStream === true,
     max_output_tokens: next.max_tokens || next.max_completion_tokens || 32000,
     temperature: next.temperature,
     top_p: next.top_p,
@@ -126,7 +126,7 @@ export class DefaultExecutor extends BaseExecutor {
     super(provider, PROVIDERS[provider] || PROVIDERS.openai);
   }
 
-  transformRequest(model, body) {
+  transformRequest(model, body, stream = false) {
     let transformed = injectReasoningContent({ provider: this.provider, model, body });
     if (this.provider === "xiaomi-mimo-plan-sgp") {
       // Xiaomi MiMo SGP requires reasoning_content to be passed back in thinking mode.
@@ -145,7 +145,7 @@ export class DefaultExecutor extends BaseExecutor {
       transformed = sanitizeGmiToolPayload(transformed);
     }
     if (this.provider === "anuma") {
-      transformed = normalizeAnumaAgentPayload(transformed);
+      transformed = normalizeAnumaAgentPayload(transformed, stream);
     }
     return transformed;
   }

@@ -50,6 +50,8 @@ function normalizeAnumaAgentPayload(body) {
   // Anuma is OpenAI-shaped, but live tests show upstream can reset/fail when
   // coding agents send native tools[]. Preserve tool context as transcript text
   // and disable native tool mode for this provider only.
+  // Force non-stream upstream; NexRouter emits OpenAI SSE fake-stream to clients.
+  next.stream = false;
   delete next.tools;
   delete next.tool_choice;
   delete next.parallel_tool_calls;

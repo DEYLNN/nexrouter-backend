@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.4.44] - 2026-06-03
+
+### Fixed
+- Force Anuma upstream requests to `stream:false` when using NexRouter fake-streaming, preventing Hermes/OpenClaw streaming requests from being misread as JSON and reset.
+
 ## [0.4.43] - 2026-06-03
 
 ### Fixed

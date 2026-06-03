@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.4.51] - 2026-06-03
+
+### Fixed
+- Stop forwarding Anuma reasoning-summary SSE deltas as user-visible content; only output text deltas are streamed to clients.
+
 ## [0.4.50] - 2026-06-03
 
 ### Fixed

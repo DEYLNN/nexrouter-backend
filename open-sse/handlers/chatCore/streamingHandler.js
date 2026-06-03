@@ -218,7 +218,7 @@ function buildTransformStream({ provider, sourceFormat, targetFormat, userAgent,
 function extractAnumaResponsesText(obj) {
   const delta = obj?.delta;
   if (typeof delta === "string") return delta;
-  if (delta && typeof delta === "object") return delta.OfString || delta.OfResponseReasoningSummaryDeltaEventDelta || delta.text || delta.content || "";
+  if (delta && typeof delta === "object") return delta.OfString || delta.text || delta.content || "";
   if (obj?.type === "response.output_text.delta") return obj.delta || "";
   return obj?.text || obj?.content || "";
 }

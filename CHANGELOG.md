@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.4.54] - 2026-06-03
+
+### Fixed
+- Treat any streamed Anuma response beginning with `{` as potential structured tool JSON and buffer it until parsed, avoiding partial JSON-token leakage before tool_calls.
+
 ## [0.4.53] - 2026-06-03
 
 ### Fixed

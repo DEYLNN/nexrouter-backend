@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.4.48] - 2026-06-03
+
+### Fixed
+- Teach Anuma agent prompt that terminal/shell/exec tools are valid for browser automation and screenshots, avoiding false `No browser/screenshot tool` replies.
+
 ## [0.4.47] - 2026-06-03
 
 ### Fixed

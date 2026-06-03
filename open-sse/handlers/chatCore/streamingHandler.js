@@ -56,6 +56,17 @@ export async function handleFakeStreamingFromJson({ providerResponse, provider, 
     appendLog({ status: `FAILED 502` });
     return { success: false, response: new Response(JSON.stringify({ error: { message: `Invalid JSON response from ${provider}` } }), { status: 502, headers: { "Content-Type": "application/json" } }) };
   }
+  if (provider === "anuma") {
+    const choice = responseBody?.choices?.[0];
+    const msg = choice?.message;
+    const content = typeof msg?.content === "string" ? msg.content.trim() : "";
+    const hasToolCalls = Array.isArray(msg?.tool_calls) && msg.tool_calls.length > 0;
+    if (!content && !hasToolCalls && choice?.finish_reason !== "length") {
+      appendLog({ status: `FAILED 502` });
+      return { success: false, response: new Response(JSON.stringify({ error: { message: "Anuma returned empty assistant content; retry with another Anuma model or inspect upstream response." } }), { status: 502, headers: { "Content-Type": "application/json" } }) };
+    }
+  }
+
   if (onRequestSuccess) await onRequestSuccess();
   const usage = responseBody?.usage || { prompt_tokens: 0, completion_tokens: 0 };
   appendLog({ tokens: usage, status: "200 OK" });

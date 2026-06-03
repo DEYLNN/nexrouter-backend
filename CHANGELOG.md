@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.4.41] - 2026-06-03
+
+### Fixed
+- Tune Anuma for agentic clients by normalizing prior tool-call/tool-result messages into text transcript form.
+- Force Anuma streaming clients through validated fake-streaming from a non-stream upstream response to avoid empty SSE completions.
+- Return a clear 502 if Anuma returns empty assistant content instead of passing an empty successful response to Hermes/OpenClaw.
+
 ## [0.4.40] - 2026-06-03
 
 ### Fixed

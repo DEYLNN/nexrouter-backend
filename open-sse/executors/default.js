@@ -6,6 +6,19 @@ import { getCachedClaudeHeaders } from "../utils/claudeHeaderCache.js";
 import { proxyAwareFetch } from "../utils/proxyFetch.js";
 import { injectReasoningContent } from "../utils/reasoningContentInjector.js";
 
+function textContent(value) {
+  if (value == null) return "";
+  if (typeof value === "string") return value;
+  if (Array.isArray(value)) {
+    return value.map((part) => {
+      if (typeof part === "string") return part;
+      if (part?.type === "text") return part.text || "";
+      return JSON.stringify(part ?? "");
+    }).filter(Boolean).join("\n");
+  }
+  return JSON.stringify(value);
+}
+
 function sanitizeGmiToolPayload(body) {
   const next = { ...body };
   delete next.tools;
@@ -22,13 +35,41 @@ function sanitizeGmiToolPayload(body) {
 
       if (message.role === "tool" || message.role === "function") {
         const label = message.name || message.tool_call_id || "tool";
-        const content = typeof message.content === "string"
-          ? message.content
-          : JSON.stringify(message.content ?? "");
-        return { role: "user", content: `[${label} result]
-${content}` };
+        return { role: "user", content: `[${label} result]\n${textContent(message.content)}` };
       }
 
+      return clean;
+    });
+  }
+
+  return next;
+}
+
+function normalizeAnumaAgentPayload(body) {
+  const next = { ...body };
+
+  if (Array.isArray(next.messages)) {
+    next.messages = next.messages.map((message) => {
+      if (message.role === "tool" || message.role === "function") {
+        const label = message.name || message.tool_call_id || "tool";
+        return { role: "user", content: `[${label} result]\n${textContent(message.content)}` };
+      }
+
+      const clean = { ...message };
+      if (clean.content !== undefined) clean.content = textContent(clean.content);
+
+      if (Array.isArray(message.tool_calls) && message.tool_calls.length > 0) {
+        const summary = message.tool_calls.map((call) => {
+          const name = call?.function?.name || call?.name || call?.id || "tool";
+          const args = call?.function?.arguments || call?.arguments || "{}";
+          return `- ${name}(${args})`;
+        }).join("\n");
+        clean.content = `${clean.content || "Requested tool calls:"}\n${summary}`.trim();
+        delete clean.tool_calls;
+      }
+
+      delete clean.function_call;
+      delete clean.tool_call_id;
       return clean;
     });
   }
@@ -58,6 +99,9 @@ export class DefaultExecutor extends BaseExecutor {
     }
     if (this.provider === "gmi-cloud") {
       transformed = sanitizeGmiToolPayload(transformed);
+    }
+    if (this.provider === "anuma") {
+      transformed = normalizeAnumaAgentPayload(transformed);
     }
     return transformed;
   }

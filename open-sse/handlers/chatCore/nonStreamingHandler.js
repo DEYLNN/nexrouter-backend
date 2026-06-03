@@ -219,6 +219,15 @@ export async function handleNonStreamingResponse({ providerResponse, provider, m
     if (hasToolCalls && choice.finish_reason !== "tool_calls") {
       choice.finish_reason = "tool_calls";
     }
+
+    if (provider === "anuma") {
+      const content = typeof msg?.content === "string" ? msg.content.trim() : "";
+      const finish = choice.finish_reason || "stop";
+      if (!content && !hasToolCalls && finish !== "length") {
+        appendLog({ status: `FAILED ${HTTP_STATUS.BAD_GATEWAY}` });
+        return createErrorResult(HTTP_STATUS.BAD_GATEWAY, "Anuma returned empty assistant content; retry with another Anuma model or inspect upstream response.");
+      }
+    }
   }
 
   // Ensure OpenAI-required fields

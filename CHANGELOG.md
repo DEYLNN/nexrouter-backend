@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.4.57] - 2026-06-03
+
+### Fixed
+- Parse the first complete Anuma streamed JSON tool-call object and ignore duplicated trailing JSON fragments, preventing malformed tool JSON from leaking as content.
+
 ## [0.4.56] - 2026-06-03
 
 ### Fixed

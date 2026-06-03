@@ -41,8 +41,30 @@ function normalizeAnumaTextToolCall(completion) {
   const content = typeof msg?.content === "string" ? msg.content.trim() : "";
   if (!content || msg?.tool_calls?.length) return completion;
   const cleaned = content.replace(/^```(?:json)?\s*/i, "").replace(/\s*```$/i, "");
+  const extractFirstJsonObject = (text) => {
+    const start = text.indexOf("{");
+    if (start < 0) return null;
+    let depth = 0, inString = false, escape = false;
+    for (let i = start; i < text.length; i++) {
+      const ch = text[i];
+      if (escape) { escape = false; continue; }
+      if (ch === "\\") { escape = true; continue; }
+      if (ch === '"') { inString = !inString; continue; }
+      if (inString) continue;
+      if (ch === "{") depth++;
+      if (ch === "}") depth--;
+      if (depth === 0) return text.slice(start, i + 1);
+    }
+    return null;
+  };
   let parsed = null;
   try { parsed = JSON.parse(cleaned); } catch { }
+  if (!parsed) {
+    const firstJson = extractFirstJsonObject(cleaned);
+    if (firstJson) {
+      try { parsed = JSON.parse(firstJson); } catch { }
+    }
+  }
   let call = parsed?.tool_call || parsed?.toolCall || parsed?.function_call || parsed?.functionCall;
   let name = call?.name || call?.function?.name;
   let args = call?.arguments ?? call?.args ?? call?.function?.arguments ?? {};

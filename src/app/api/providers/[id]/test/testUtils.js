@@ -780,7 +780,7 @@ async function testApiKeyConnection(connection, effectiveProxy = null) {
           method: "POST",
           headers: { Authorization: `Bearer ${connection.apiKey}`, "Content-Type": "application/json" },
           body: JSON.stringify({
-            model: "morph-minimax27-230b",
+            model: "morph-dsv4flash",
             messages: [{ role: "user", content: "test" }],
             max_tokens: 1,
             stream: false,

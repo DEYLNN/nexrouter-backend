@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.4.62] - 2026-06-03
+
+### Added
+- Add Morph LLM static model `morph-dsv4flash` / Morph DeepSeek V4 Flash to FE/BE model catalogs.
+
+### Changed
+- Use `morph-dsv4flash` for Morph provider validation/test requests.
+
 ## [0.4.61] - 2026-06-03
 
 ### Fixed

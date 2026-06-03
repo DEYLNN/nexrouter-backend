@@ -482,7 +482,7 @@ export async function POST(request) {
               url: "https://api.morphllm.com/v1/chat/completions",
               method: "POST",
               body: {
-                model: "morph-minimax27-230b",
+                model: "morph-dsv4flash",
                 messages: [{ role: "user", content: "test" }],
                 max_tokens: 1,
               },

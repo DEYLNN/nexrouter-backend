@@ -260,6 +260,8 @@ export function handleAnumaResponsesStreaming({ providerResponse, provider, mode
   let buffer = "";
   let textBuffer = "";
   let sawTool = false;
+  const expectsTool = Array.isArray(body?.tools) && body.tools.length > 0;
+  const stripAnumaThinking = (text) => String(text || "").replace(/<think>[\s\S]*?<\/think>/gi, "").replace(/^[\s\S]*?<\/think>\s*/i, "");
   const send = (controller, delta, finish_reason = null, usage = null) => {
     const payload = { id, object: "chat.completion.chunk", created: Math.floor(Date.now() / 1000), model, choices: [{ index: 0, delta, finish_reason }] };
     if (usage) payload.usage = usage;
@@ -300,14 +302,17 @@ export function handleAnumaResponsesStreaming({ providerResponse, provider, mode
               textBuffer = "";
               continue;
             }
-            const maybeToolJson = /^(\s|`)*(\{|```json action|<function_calls>|Requested tool calls?:)/i.test(textBuffer.trimStart());
-            if (!maybeToolJson) {
+            const maybeToolJson = /^(\s|`)*(\{|```json action|<function_calls>|Requested tool calls?:)/i.test(textBuffer.trimStart()) || /"?(tool_call|toolCall|function_call|functionCall)"?\s*:/i.test(textBuffer);
+            if (!expectsTool && !maybeToolJson) {
               send(controller, { content: text });
               textBuffer = textBuffer.slice(-80);
             }
           }
         }
-        if (textBuffer && !sawTool) send(controller, { content: textBuffer });
+        if (textBuffer && !sawTool) {
+          const finalText = stripAnumaThinking(textBuffer).trim();
+          if (finalText) send(controller, { content: finalText });
+        }
         send(controller, {}, sawTool ? "tool_calls" : "stop", usage);
         controller.enqueue(encoder.encode("data: [DONE]\n\n"));
         appendLog({ tokens: usage || { prompt_tokens: 0, completion_tokens: 0 }, status: "200 OK" });

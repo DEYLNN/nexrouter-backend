@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.4.58] - 2026-06-03
+
+### Fixed
+- When Anuma requests include tools, buffer streamed text until a tool-call can be parsed or final text is known; also strip `<think>` blocks from Anuma streamed output.
+
 ## [0.4.57] - 2026-06-03
 
 ### Fixed

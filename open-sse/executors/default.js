@@ -46,6 +46,12 @@ function sanitizeGmiToolPayload(body) {
 }
 
 function normalizeAnumaAgentPayload(body) {
+  const originalTools = Array.isArray(body.tools) ? body.tools : [];
+  const toolSpec = originalTools.map((tool) => tool?.function ? {
+    name: tool.function.name,
+    description: tool.function.description || "",
+    parameters: tool.function.parameters || {}
+  } : null).filter(Boolean);
   const next = { ...body };
   // Anuma is OpenAI-shaped, but live tests show upstream can reset/fail when
   // coding agents send native tools[]. Preserve tool context as transcript text
@@ -81,9 +87,12 @@ function normalizeAnumaAgentPayload(body) {
       return clean;
     });
 
+    const toolInstruction = toolSpec.length > 0
+      ? `\n\nAvailable tools are represented for you as JSON-call mode, not native API tools. If you need a tool, output ONLY compact JSON in this exact shape: {"tool_call":{"name":"tool_name","arguments":{}}}. Available tools: ${JSON.stringify(toolSpec)}`
+      : "";
     const agentSystem = {
       role: "system",
-      content: "You are behind an OpenAI-compatible API used by coding/automation agents such as Hermes and OpenClaw. Tool calls and tool results may be represented as plain transcript text. Continue from the transcript, use the provided tool results, and return a concise non-empty assistant answer. Do not request tool calls in JSON unless explicitly asked; describe the next action or result in normal text."
+      content: "You are behind an OpenAI-compatible API used by coding/automation agents such as Hermes and OpenClaw. Tool calls and tool results may be represented as plain transcript text. Continue from the transcript, use the provided tool results, and return a concise non-empty assistant answer." + toolInstruction
     };
     const first = next.messages[0];
     if (first?.role === "system") {

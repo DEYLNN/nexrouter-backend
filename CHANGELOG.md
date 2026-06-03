@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.4.45] - 2026-06-03
+
+### Fixed
+- Add Anuma JSON tool-call shim: expose tools in prompt text, parse `{"tool_call": ...}` assistant JSON back into OpenAI `tool_calls`, and stream tool-call SSE deltas to Hermes/OpenClaw.
+
 ## [0.4.44] - 2026-06-03
 
 ### Fixed

@@ -15,12 +15,36 @@ const SSE_HEADERS = {
 
 const SSE_KEEPALIVE_MS = Number(process.env.SSE_KEEPALIVE_MS || 10000);
 
+function normalizeAnumaTextToolCall(completion) {
+  const choice = completion?.choices?.[0];
+  const msg = choice?.message;
+  const content = typeof msg?.content === "string" ? msg.content.trim() : "";
+  if (!content || msg?.tool_calls?.length) return completion;
+  const cleaned = content.replace(/^```(?:json)?\s*/i, "").replace(/\s*```$/i, "");
+  let parsed = null;
+  try { parsed = JSON.parse(cleaned); } catch { return completion; }
+  const call = parsed?.tool_call || parsed?.toolCall || parsed?.function_call || parsed?.functionCall;
+  const name = call?.name || call?.function?.name;
+  const args = call?.arguments ?? call?.args ?? call?.function?.arguments ?? {};
+  if (!name) return completion;
+  msg.content = null;
+  msg.tool_calls = [{
+    id: `call_${name}_${Date.now()}`,
+    type: "function",
+    function: { name, arguments: typeof args === "string" ? args : JSON.stringify(args || {}) }
+  }];
+  choice.finish_reason = "tool_calls";
+  return completion;
+}
+
 function fakeOpenAIStreamFromCompletion(completion) {
   const encoder = new TextEncoder();
   const id = completion?.id || `chatcmpl-${Date.now()}`;
   const created = completion?.created || Math.floor(Date.now() / 1000);
   const model = completion?.model || "unknown";
-  const content = completion?.choices?.[0]?.message?.content || "";
+  const message = completion?.choices?.[0]?.message || {};
+  const content = message.content || "";
+  const toolCalls = Array.isArray(message.tool_calls) ? message.tool_calls : [];
   const usage = completion?.usage || null;
 
   const chunk = (delta, finishReason = null, includeUsage = false) => {
@@ -34,13 +58,21 @@ function fakeOpenAIStreamFromCompletion(completion) {
   return new ReadableStream({
     start(controller) {
       controller.enqueue(encoder.encode(chunk({ role: "assistant" })));
-      if (content) {
-        const size = Number(process.env.FAKE_STREAM_CHUNK_SIZE || 96);
-        for (let i = 0; i < content.length; i += size) {
-          controller.enqueue(encoder.encode(chunk({ content: content.slice(i, i + size) })));
+      if (toolCalls.length > 0) {
+        for (let i = 0; i < toolCalls.length; i++) {
+          const call = toolCalls[i];
+          controller.enqueue(encoder.encode(chunk({ tool_calls: [{ index: i, id: call.id, type: call.type || "function", function: { name: call.function?.name || call.name, arguments: call.function?.arguments || call.arguments || "{}" } }] })));
         }
+        controller.enqueue(encoder.encode(chunk({}, "tool_calls", true)));
+      } else {
+        if (content) {
+          const size = Number(process.env.FAKE_STREAM_CHUNK_SIZE || 96);
+          for (let i = 0; i < content.length; i += size) {
+            controller.enqueue(encoder.encode(chunk({ content: content.slice(i, i + size) })));
+          }
+        }
+        controller.enqueue(encoder.encode(chunk({}, "stop", true)));
       }
-      controller.enqueue(encoder.encode(chunk({}, "stop", true)));
       controller.enqueue(encoder.encode("data: [DONE]\n\n"));
       controller.close();
     }
@@ -57,6 +89,7 @@ export async function handleFakeStreamingFromJson({ providerResponse, provider, 
     return { success: false, response: new Response(JSON.stringify({ error: { message: `Invalid JSON response from ${provider}` } }), { status: 502, headers: { "Content-Type": "application/json" } }) };
   }
   if (provider === "anuma") {
+    responseBody = normalizeAnumaTextToolCall(responseBody);
     const choice = responseBody?.choices?.[0];
     const msg = choice?.message;
     const content = typeof msg?.content === "string" ? msg.content.trim() : "";

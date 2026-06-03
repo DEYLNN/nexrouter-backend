@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.4.49] - 2026-06-03
+
+### Changed
+- Switch Anuma provider dispatch from `/chat/completions` shim to the Anuma `/responses` API style used by the reference AnumaAI gateway.
+- Convert OpenAI chat messages into Responses `input[]` blocks and normalize Responses JSON back into OpenAI chat completion output for NexRouter clients.
+
 ## [0.4.48] - 2026-06-03
 
 ### Fixed

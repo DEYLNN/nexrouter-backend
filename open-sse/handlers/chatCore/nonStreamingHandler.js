@@ -12,6 +12,26 @@ import { decloakToolNames } from "../../utils/claudeCloaking.js";
 /**
  * Translate non-streaming response body from provider format → OpenAI format.
  */
+function normalizeAnumaResponsesJson(responseBody) {
+  if (responseBody?.choices?.[0]) return responseBody;
+  if (responseBody?.object !== "response") return responseBody;
+  let text = "";
+  for (const item of responseBody.output || []) {
+    if (item?.type !== "message") continue;
+    for (const block of item.content || []) {
+      if (block?.type === "output_text" || block?.type === "text") text += block.text || "";
+    }
+  }
+  return {
+    id: `chatcmpl-${responseBody.id || Date.now()}`,
+    object: "chat.completion",
+    created: responseBody.created_at || Math.floor(Date.now() / 1000),
+    model: responseBody.model || "anuma",
+    choices: [{ index: 0, message: { role: "assistant", content: text }, finish_reason: "stop" }],
+    usage: responseBody.usage || null
+  };
+}
+
 export function translateNonStreamingResponse(responseBody, targetFormat, sourceFormat) {
   if (targetFormat === sourceFormat || targetFormat === FORMATS.OPENAI) return responseBody;
 
@@ -196,6 +216,7 @@ export async function handleNonStreamingResponse({ providerResponse, provider, m
   if ((provider === "cline" || provider === "cline-apikey") && responseBody?.data?.choices) {
     responseBody = responseBody.data;
   }
+  if (provider === "anuma") responseBody = normalizeAnumaResponsesJson(responseBody);
 
   reqLogger.logProviderResponse(providerResponse.status, providerResponse.statusText, providerResponse.headers, responseBody);
   if (onRequestSuccess) await onRequestSuccess();

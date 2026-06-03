@@ -102,7 +102,23 @@ function normalizeAnumaAgentPayload(body) {
     }
   }
 
-  return next;
+  const input = (next.messages || [])
+    .filter((message) => message?.role !== "assistant" || textContent(message.content).trim())
+    .map((message) => ({
+      role: message.role === "system" ? "user" : (message.role || "user"),
+      content: [{ type: "text", text: textContent(message.content) }]
+    }))
+    .filter((message) => message.content[0].text.trim());
+
+  return {
+    input,
+    model: next.model,
+    stream: false,
+    max_output_tokens: next.max_tokens || next.max_completion_tokens || 32000,
+    temperature: next.temperature,
+    top_p: next.top_p,
+    conversation_id: `nexrouter_${Date.now()}`
+  };
 }
 
 export class DefaultExecutor extends BaseExecutor {
@@ -157,6 +173,8 @@ export class DefaultExecutor extends BaseExecutor {
         return `${this.config.baseUrl}?beta=true`;
       case "gemini":
         return `${this.config.baseUrl}/${model}:${stream ? "streamGenerateContent?alt=sse" : "generateContent"}`;
+      case "anuma":
+        return "https://portal.anuma.ai/api/v1/responses";
       default: {
         const url = this.config.baseUrl;
         if (url?.includes("{accountId}")) {

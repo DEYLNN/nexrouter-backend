@@ -15,6 +15,26 @@ const SSE_HEADERS = {
 
 const SSE_KEEPALIVE_MS = Number(process.env.SSE_KEEPALIVE_MS || 10000);
 
+function normalizeAnumaResponsesJson(completion) {
+  if (completion?.choices?.[0]) return completion;
+  if (completion?.object !== "response") return completion;
+  let text = "";
+  for (const item of completion.output || []) {
+    if (item?.type !== "message") continue;
+    for (const block of item.content || []) {
+      if (block?.type === "output_text" || block?.type === "text") text += block.text || "";
+    }
+  }
+  return {
+    id: `chatcmpl-${completion.id || Date.now()}`,
+    object: "chat.completion",
+    created: completion.created_at || Math.floor(Date.now() / 1000),
+    model: completion.model || "anuma",
+    choices: [{ index: 0, message: { role: "assistant", content: text }, finish_reason: "stop" }],
+    usage: completion.usage || null
+  };
+}
+
 function normalizeAnumaTextToolCall(completion) {
   const choice = completion?.choices?.[0];
   const msg = choice?.message;
@@ -99,7 +119,7 @@ export async function handleFakeStreamingFromJson({ providerResponse, provider, 
     return { success: false, response: new Response(JSON.stringify({ error: { message: `Invalid JSON response from ${provider}` } }), { status: 502, headers: { "Content-Type": "application/json" } }) };
   }
   if (provider === "anuma") {
-    responseBody = normalizeAnumaTextToolCall(responseBody);
+    responseBody = normalizeAnumaTextToolCall(normalizeAnumaResponsesJson(responseBody));
     const choice = responseBody?.choices?.[0];
     const msg = choice?.message;
     const content = typeof msg?.content === "string" ? msg.content.trim() : "";

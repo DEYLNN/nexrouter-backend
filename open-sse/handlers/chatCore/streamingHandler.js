@@ -22,10 +22,20 @@ function normalizeAnumaTextToolCall(completion) {
   if (!content || msg?.tool_calls?.length) return completion;
   const cleaned = content.replace(/^```(?:json)?\s*/i, "").replace(/\s*```$/i, "");
   let parsed = null;
-  try { parsed = JSON.parse(cleaned); } catch { return completion; }
-  const call = parsed?.tool_call || parsed?.toolCall || parsed?.function_call || parsed?.functionCall;
-  const name = call?.name || call?.function?.name;
-  const args = call?.arguments ?? call?.args ?? call?.function?.arguments ?? {};
+  try { parsed = JSON.parse(cleaned); } catch { }
+  let call = parsed?.tool_call || parsed?.toolCall || parsed?.function_call || parsed?.functionCall;
+  let name = call?.name || call?.function?.name;
+  let args = call?.arguments ?? call?.args ?? call?.function?.arguments ?? {};
+
+  if (!name) {
+    const textCall = cleaned.match(/(?:Requested tool calls?:\s*)?-\s*([A-Za-z_][\w.-]*)\s*\((\{[\s\S]*\})\)\s*$/i)
+      || cleaned.match(/^([A-Za-z_][\w.-]*)\s*\((\{[\s\S]*\})\)\s*$/i);
+    if (textCall) {
+      name = textCall[1];
+      args = textCall[2];
+    }
+  }
+
   if (!name) return completion;
   msg.content = null;
   msg.tool_calls = [{

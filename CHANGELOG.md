@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.4.46] - 2026-06-03
+
+### Fixed
+- Parse Anuma textual tool-call transcripts like `Requested tool calls:
+- terminal({ ... })` back into streamed OpenAI `tool_calls` for Hermes/OpenClaw.
+
 ## [0.4.45] - 2026-06-03
 
 ### Fixed

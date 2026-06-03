@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.4.61] - 2026-06-03
+
+### Fixed
+- Clear Anuma text stream buffer after each emitted content chunk to prevent trailing-overlap duplicates in follow-up answers.
+
 ## [0.4.60] - 2026-06-03
 
 ### Fixed

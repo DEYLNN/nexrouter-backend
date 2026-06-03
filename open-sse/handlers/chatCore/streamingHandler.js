@@ -312,7 +312,7 @@ export function handleAnumaResponsesStreaming({ providerResponse, provider, mode
               const hadThinkClose = /<\/think>/i.test(textBuffer);
               const cleanText = hadThinkClose ? stripAnumaThinking(textBuffer) : text;
               if (cleanText) send(controller, { content: cleanText });
-              textBuffer = hadThinkClose ? "" : textBuffer.slice(-80);
+              textBuffer = "";
             }
           }
         }

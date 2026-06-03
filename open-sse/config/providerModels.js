@@ -716,6 +716,14 @@ export const PROVIDER_MODELS = {
     { id: "gpt-oss-120b", name: "GPT OSS 120B" },
     { id: "step-3.5-flash-2603", name: "Step 3.5 Flash 2603" },
   ],
+  anuma: [
+    { id: "anthropic/claude-sonnet-4-6", name: "Claude Sonnet 4.6" },
+    { id: "deepseek/deepseek-r1", name: "DeepSeek R1" },
+    { id: "openai/gpt-5.5", name: "GPT-5.5" },
+    { id: "grok/grok-4.3", name: "Grok 4.3" },
+    { id: "qwen/qwen-3.6-max-preview", name: "Qwen 3.6 Max Preview" },
+    { id: "kimi/kimi-k2.6", name: "Kimi K2.6" },
+  ],
   routeway: [
     { id: "ling-2.6-flash:free", name: "Ling 2.6 Flash Free" },
     { id: "gemma-4-31b-it:free", name: "Gemma 4 31B IT Free" },

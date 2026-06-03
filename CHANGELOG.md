@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.4.39] - 2026-06-03
+
+### Added
+- Add Anuma API-key provider using `https://portal.anuma.ai/api/v1/chat/completions`.
+- Inject Anuma-required `X-API-KEY` and fixed EVM-format `X-User-ID` headers for chat and validation requests.
+- Register Anuma static models: Claude Sonnet 4.6, DeepSeek R1, GPT-5.5, Grok 4.3, Qwen 3.6 Max Preview, Kimi K2.6.
+
 ## [0.4.38] - 2026-06-02
 
 ### Fixed

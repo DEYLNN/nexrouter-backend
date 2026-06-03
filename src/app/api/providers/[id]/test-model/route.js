@@ -19,7 +19,7 @@ export async function POST(request, { params }) {
     if (!connection) {
       return NextResponse.json({ error: "Connection not found" }, { status: 404 });
     }
-    const supportedProviders = new Set(["kiro", "husada"]);
+    const supportedProviders = new Set(["kiro", "husada", "anuma"]);
     if (!supportedProviders.has(connection.provider)) {
       return NextResponse.json({ error: "Model probe is only enabled for supported live-test providers" }, { status: 400 });
     }

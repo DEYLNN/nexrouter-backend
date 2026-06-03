@@ -383,6 +383,7 @@ export async function POST(request) {
         case "glb":
         case "husada":
         case "ocenza":
+        case "anuma":
         case "routeway":
         case "morph": {
           const validationConfigs = {
@@ -458,6 +459,21 @@ export async function POST(request) {
                 stream: false,
               },
             },
+            anuma: {
+              url: "https://portal.anuma.ai/api/v1/chat/completions",
+              method: "POST",
+              headers: {
+                "X-API-KEY": apiKey,
+                "X-User-ID": "0x4888CFA67b3Db6dA384585e2eb61348075d705Be",
+                "Content-Type": "application/json",
+              },
+              body: {
+                model: "kimi/kimi-k2.6",
+                messages: [{ role: "user", content: "test" }],
+                max_tokens: 1,
+                stream: false,
+              },
+            },
             "cline-apikey": {
               url: "https://api.cline.bot/api/v1/users/me",
               method: "GET",
@@ -479,7 +495,7 @@ export async function POST(request) {
           if (!cfg.url) throw new Error(`No validation endpoint configured for ${provider}`);
           const res = await fetch(cfg.url, {
             method: cfg.method,
-            headers: {
+            headers: cfg.headers || {
               "Authorization": `Bearer ${apiKey}`,
               "Content-Type": "application/json",
             },

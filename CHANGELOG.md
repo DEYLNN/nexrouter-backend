@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.4.53] - 2026-06-03
+
+### Fixed
+- Buffer streamed Anuma JSON tool-call text until it is parseable, preventing partial `{"tool_call":...}` text from leaking to agent clients.
+
 ## [0.4.52] - 2026-06-03
 
 ### Fixed

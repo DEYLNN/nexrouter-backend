@@ -278,9 +278,10 @@ export function handleAnumaResponsesStreaming({ providerResponse, provider, mode
               textBuffer = "";
               continue;
             }
-            if (!textBuffer.includes("```json action") && !textBuffer.includes("<function_calls>") && !/Requested tool calls?:/i.test(textBuffer)) {
+            const maybeToolJson = /^(\s|`)*(\{\s*\"?(tool_call|toolCall|function_call|functionCall)\"?\s*:|```json action|<function_calls>|Requested tool calls?:)/i.test(textBuffer.trimStart());
+            if (!maybeToolJson) {
               send(controller, { content: text });
-              textBuffer = textBuffer.slice(-40);
+              textBuffer = textBuffer.slice(-80);
             }
           }
         }

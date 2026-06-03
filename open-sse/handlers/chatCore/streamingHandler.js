@@ -216,6 +216,8 @@ function buildTransformStream({ provider, sourceFormat, targetFormat, userAgent,
  * Handle streaming response — pipe provider SSE through transform stream to client.
  */
 function extractAnumaResponsesText(obj) {
+  const type = String(obj?.type || "");
+  if (type.includes("reasoning")) return "";
   const delta = obj?.delta;
   if (typeof delta === "string") return delta;
   if (delta && typeof delta === "object") return delta.OfString || delta.text || delta.content || "";

@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.4.52] - 2026-06-03
+
+### Fixed
+- Filter Anuma `reasoning_summary` SSE events by event type before converting `/responses` stream output to OpenAI chat chunks.
+
 ## [0.4.51] - 2026-06-03
 
 ### Fixed

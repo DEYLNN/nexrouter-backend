@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.4.55] - 2026-06-03
+
+### Fixed
+- Compact Anuma agent payloads: trim long transcripts, cap output tokens, and send compact tool schemas to reduce upstream 400/402 failures on Hermes/OpenClaw long tasks.
+
 ## [0.4.54] - 2026-06-03
 
 ### Fixed

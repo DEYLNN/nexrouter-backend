@@ -47,11 +47,24 @@ function sanitizeGmiToolPayload(body) {
 
 function normalizeAnumaAgentPayload(body, upstreamStream = false) {
   const originalTools = Array.isArray(body.tools) ? body.tools : [];
-  const toolSpec = originalTools.map((tool) => tool?.function ? {
-    name: tool.function.name,
-    description: tool.function.description || "",
-    parameters: tool.function.parameters || {}
-  } : null).filter(Boolean);
+  const preferredToolNames = new Set(["terminal", "exec", "shell", "bash", "browser_navigate", "browser_snapshot", "browser_click", "browser_type", "browser_screenshot", "browser_vision"]);
+  const compactTool = (tool) => {
+    if (!tool?.function?.name) return null;
+    const props = tool.function.parameters?.properties || {};
+    const compactProps = Object.fromEntries(Object.entries(props).slice(0, 8).map(([key, value]) => [key, {
+      type: value?.type || "string",
+      description: String(value?.description || "").slice(0, 180)
+    }]));
+    return {
+      name: tool.function.name,
+      description: String(tool.function.description || "").slice(0, 260),
+      parameters: { type: "object", properties: compactProps, required: tool.function.parameters?.required || [] }
+    };
+  };
+  const compactTools = originalTools.map(compactTool).filter(Boolean);
+  const preferredTools = compactTools.filter((tool) => preferredToolNames.has(tool.name));
+  const otherTools = compactTools.filter((tool) => !preferredToolNames.has(tool.name));
+  const toolSpec = [...preferredTools, ...otherTools].slice(0, 18);
   const next = { ...body };
   // Anuma is OpenAI-shaped, but live tests show upstream can reset/fail when
   // coding agents send native tools[]. Preserve tool context as transcript text
@@ -88,7 +101,7 @@ function normalizeAnumaAgentPayload(body, upstreamStream = false) {
     });
 
     const toolInstruction = toolSpec.length > 0
-      ? `\n\nAvailable tools are represented for you as JSON-call mode, not native API tools. If the user asks you to browse, inspect files, run commands, take screenshots, edit, or do any external action and a relevant tool is available, you MUST call a tool instead of answering in text. If a terminal/shell/exec tool exists, treat it as capable of running browser automation scripts, screenshot scripts, filesystem commands, and helper programs. Never refuse because there is no dedicated browser/screenshot tool when terminal/shell/exec is available. Output ONLY compact JSON in this exact shape: {"tool_call":{"name":"tool_name","arguments":{}}}. Available tools: ${JSON.stringify(toolSpec)}`
+      ? `\n\nAvailable tools are represented for you as JSON-call mode, not native API tools. If the user asks you to browse, inspect files, run commands, take screenshots, edit, or do any external action and a relevant tool is available, you MUST call a tool instead of answering in text. If a terminal/shell/exec tool exists, treat it as capable of running browser automation scripts, screenshot scripts, filesystem commands, and helper programs. Never refuse because there is no dedicated browser/screenshot tool when terminal/shell/exec is available. Output ONLY compact JSON in this exact shape: {"tool_call":{"name":"tool_name","arguments":{}}}. Available compact tools: ${JSON.stringify(toolSpec)}`
       : "";
     const agentSystem = {
       role: "system",
@@ -102,11 +115,16 @@ function normalizeAnumaAgentPayload(body, upstreamStream = false) {
     }
   }
 
-  const input = (next.messages || [])
+  const compactMessages = Array.isArray(next.messages) && next.messages.length > 42
+    ? [next.messages[0], { role: "user", content: `[context compacted: kept latest 40 of ${next.messages.length} messages for Anuma compatibility]` }, ...next.messages.slice(-40)]
+    : (next.messages || []);
+
+  const input = compactMessages
+    .filter(Boolean)
     .filter((message) => message?.role !== "assistant" || textContent(message.content).trim())
     .map((message) => ({
       role: message.role === "system" ? "user" : (message.role || "user"),
-      content: [{ type: "text", text: textContent(message.content) }]
+      content: [{ type: "text", text: textContent(message.content).slice(0, 12000) }]
     }))
     .filter((message) => message.content[0].text.trim());
 
@@ -114,7 +132,7 @@ function normalizeAnumaAgentPayload(body, upstreamStream = false) {
     input,
     model: next.model,
     stream: upstreamStream === true,
-    max_output_tokens: next.max_tokens || next.max_completion_tokens || 32000,
+    max_output_tokens: Math.min(next.max_tokens || next.max_completion_tokens || 8192, 8192),
     temperature: next.temperature,
     top_p: next.top_p,
     conversation_id: `nexrouter_${Date.now()}`

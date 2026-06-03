@@ -47,6 +47,12 @@ function sanitizeGmiToolPayload(body) {
 
 function normalizeAnumaAgentPayload(body) {
   const next = { ...body };
+  // Anuma is OpenAI-shaped, but live tests show upstream can reset/fail when
+  // coding agents send native tools[]. Preserve tool context as transcript text
+  // and disable native tool mode for this provider only.
+  delete next.tools;
+  delete next.tool_choice;
+  delete next.parallel_tool_calls;
 
   if (Array.isArray(next.messages)) {
     next.messages = next.messages.map((message) => {
@@ -72,6 +78,17 @@ function normalizeAnumaAgentPayload(body) {
       delete clean.tool_call_id;
       return clean;
     });
+
+    const agentSystem = {
+      role: "system",
+      content: "You are behind an OpenAI-compatible API used by coding/automation agents such as Hermes and OpenClaw. Tool calls and tool results may be represented as plain transcript text. Continue from the transcript, use the provided tool results, and return a concise non-empty assistant answer. Do not request tool calls in JSON unless explicitly asked; describe the next action or result in normal text."
+    };
+    const first = next.messages[0];
+    if (first?.role === "system") {
+      next.messages = [{ ...first, content: `${agentSystem.content}\n\n${textContent(first.content)}` }, ...next.messages.slice(1)];
+    } else {
+      next.messages = [agentSystem, ...next.messages];
+    }
   }
 
   return next;

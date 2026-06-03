@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.4.43] - 2026-06-03
+
+### Fixed
+- Improve Anuma agentic compatibility for Hermes/OpenClaw by removing native `tools[]` from upstream requests and preserving tool calls/results as transcript text.
+- Add an Anuma-only agent system preface so coding-agent tool-result continuations produce non-empty normal text replies.
+
 ## [0.4.42] - 2026-06-03
 
 ### Fixed

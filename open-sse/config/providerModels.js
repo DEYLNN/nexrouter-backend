@@ -183,6 +183,7 @@ export const PROVIDER_MODELS = {
     { id: "inclusionai/ling-2.6-1t:free", name: "InclusionAI Ling 2.6 1T Free" },
     { id: "inclusionai/ling-2.6-flash:free", name: "InclusionAI Ling 2.6 Flash Free" },
     { id: "nvidia/nemotron-3-super-120b-a12b:free", name: "NVIDIA Nemotron 3 Super 120B Free" },
+    { id: "tencent/hy3-preview:free", name: "Tencent HY3 Preview Free" },
   ],
   "opencode-go": [  // OpenCode Go subscription (API key)
     { id: "kimi-k2.6", name: "Kimi K2.6" },

@@ -177,14 +177,9 @@ export const PROVIDER_MODELS = {
     { id: "kimi-latest", name: "Kimi Latest" },
   ],
   kc: [  // KiloCode
-    { id: "anthropic/claude-sonnet-4-20250514", name: "Claude Sonnet 4" },
-    { id: "anthropic/claude-opus-4-20250514", name: "Claude Opus 4" },
-    { id: "google/gemini-2.5-pro", name: "Gemini 2.5 Pro" },
-    { id: "google/gemini-2.5-flash", name: "Gemini 2.5 Flash" },
-    { id: "openai/gpt-4.1", name: "GPT-4.1" },
-    { id: "openai/o3", name: "o3" },
-    { id: "deepseek/deepseek-chat", name: "DeepSeek Chat" },
-    { id: "deepseek/deepseek-reasoner", name: "DeepSeek Reasoner" },
+    { id: "qwen/qwen3.7-plus:free", name: "Qwen 3.7 Plus Free" },
+    { id: "poolside/laguna-m.1:free", name: "Poolside Laguna M.1 Free" },
+    { id: "google/gemma-4-26b-a4b-it:free", name: "Google Gemma 4 26B Free" },
   ],
   "opencode-go": [  // OpenCode Go subscription (API key)
     { id: "kimi-k2.6", name: "Kimi K2.6" },

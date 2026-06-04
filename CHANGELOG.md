@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.4.64] - 2026-06-04
+
+### Fixed
+- Add Morph `morph-dsv4flash` to the FE provider definition (`APIKEY_PROVIDERS.morph.models`) so `/dashboard/providers/morph` can display it as a provider constant model.
+
 ## [0.4.63] - 2026-06-03
 
 ### Fixed

@@ -180,6 +180,9 @@ export const PROVIDER_MODELS = {
     { id: "qwen/qwen3.7-plus:free", name: "Qwen 3.7 Plus Free" },
     { id: "poolside/laguna-m.1:free", name: "Poolside Laguna M.1 Free" },
     { id: "google/gemma-4-26b-a4b-it:free", name: "Google Gemma 4 26B Free" },
+    { id: "inclusionai/ling-2.6-1t:free", name: "InclusionAI Ling 2.6 1T Free" },
+    { id: "inclusionai/ling-2.6-flash:free", name: "InclusionAI Ling 2.6 Flash Free" },
+    { id: "nvidia/nemotron-3-super-120b-a12b:free", name: "NVIDIA Nemotron 3 Super 120B Free" },
   ],
   "opencode-go": [  // OpenCode Go subscription (API key)
     { id: "kimi-k2.6", name: "Kimi K2.6" },

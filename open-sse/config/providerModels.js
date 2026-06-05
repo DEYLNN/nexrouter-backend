@@ -182,6 +182,7 @@ export const PROVIDER_MODELS = {
     { id: "inclusionai/ling-2.6-1t:free", name: "InclusionAI Ling 2.6 1T Free" },
     { id: "inclusionai/ling-2.6-flash:free", name: "InclusionAI Ling 2.6 Flash Free" },
     { id: "nvidia/nemotron-3-super-120b-a12b:free", name: "NVIDIA Nemotron 3 Super 120B Free" },
+    { id: "nvidia/nemotron-3-ultra-550b-a55b:free", name: "NVIDIA Nemotron 3 Ultra 550B Free" },
     { id: "tencent/hy3-preview:free", name: "Tencent HY3 Preview Free" },
     { id: "stepfun/step-3.7-flash:free", name: "StepFun Step 3.7 Flash Free" },
   ],

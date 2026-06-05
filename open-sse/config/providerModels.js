@@ -177,7 +177,6 @@ export const PROVIDER_MODELS = {
     { id: "kimi-latest", name: "Kimi Latest" },
   ],
   kc: [  // KiloCode
-    { id: "qwen/qwen3.7-plus:free", name: "Qwen 3.7 Plus Free" },
     { id: "poolside/laguna-m.1:free", name: "Poolside Laguna M.1 Free" },
     { id: "google/gemma-4-26b-a4b-it:free", name: "Google Gemma 4 26B Free" },
     { id: "inclusionai/ling-2.6-1t:free", name: "InclusionAI Ling 2.6 1T Free" },

@@ -186,10 +186,13 @@ function getJwtMeta(connection) {
   };
 }
 
-export async function GET() {
+export async function GET(request) {
   try {
+    const url = new URL(request.url);
+    const providerFilter = url.searchParams.get("provider") || url.searchParams.get("filters.provider");
+
     const [connections, nodes] = await Promise.all([
-      getProviderConnections(),
+      getProviderConnections(providerFilter && providerFilter !== "all" ? { provider: providerFilter } : undefined),
       getProviderNodes().catch(() => []),
     ]);
 

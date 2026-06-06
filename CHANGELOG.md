@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.4.65] - 2026-06-06
+
+### Fixed
+- Allow `/api/auth-files` to scope auth file results by `provider` / `filters.provider` so provider-specific status filters can use backend-filtered data.
+
 ## [0.4.64] - 2026-06-04
 
 ### Fixed

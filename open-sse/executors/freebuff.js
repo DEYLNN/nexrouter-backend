@@ -9,13 +9,14 @@ import { injectReasoningContent } from "../utils/reasoningContentInjector.js";
 const API_BASE_URL = process.env.FREEBUFF_API_BASE_URL || "https://www.codebuff.com";
 const CREDENTIALS_PATH = process.env.FREEBUFF_CREDENTIALS_PATH || join(homedir(), ".config", "manicode", "credentials.json");
 const REQUEST_TIMEOUT_MS = Number(process.env.FREEBUFF_TIMEOUT_MS || 120000);
-const AGENT_ID = process.env.FREEBUFF_AGENT_ID || "base2-free";
+const DEFAULT_AGENT_ID = process.env.FREEBUFF_AGENT_ID || "base2-free";
 const COST_MODE = process.env.FREEBUFF_COST_MODE || "free";
 const FREEBUFF_WAIT_TIMEOUT_MS = Number(process.env.FREEBUFF_WAIT_TIMEOUT_MS || 25000);
 const FREEBUFF_WAIT_POLL_MS = Number(process.env.FREEBUFF_WAIT_POLL_MS || 2000);
 const FREEBUFF_MAX_MESSAGES = Number(process.env.FREEBUFF_MAX_MESSAGES || 32);
 const FREEBUFF_MAX_MESSAGE_CHARS = Number(process.env.FREEBUFF_MAX_MESSAGE_CHARS || 16000);
 const FREEBUFF_MAX_TOOL_CHARS = Number(process.env.FREEBUFF_MAX_TOOL_CHARS || 8000);
+const CODEBUFF_CLI_VERSION = process.env.CODEBUFF_CLI_VERSION || "1.0.0";
 
 const MODEL_MAP = {
   "deepseek-v4-flash": "deepseek/deepseek-v4-flash",
@@ -30,6 +31,25 @@ const MODEL_MAP = {
   "minimax-m2.7": "minimax/minimax-m2.7",
   "fb/minimax-m2.7": "minimax/minimax-m2.7",
   "freebuff/minimax-m2.7": "minimax/minimax-m2.7",
+  "minimax-m3": "minimax/minimax-m3",
+  "fb/minimax-m3": "minimax/minimax-m3",
+  "freebuff/minimax-m3": "minimax/minimax-m3",
+  "mimo-v2.5": "mimo/mimo-v2.5",
+  "fb/mimo-v2.5": "mimo/mimo-v2.5",
+  "freebuff/mimo-v2.5": "mimo/mimo-v2.5",
+  "mimo-v2.5-pro": "mimo/mimo-v2.5-pro",
+  "fb/mimo-v2.5-pro": "mimo/mimo-v2.5-pro",
+  "freebuff/mimo-v2.5-pro": "mimo/mimo-v2.5-pro",
+};
+
+const FREEBUFF_AGENT_BY_MODEL = {
+  "deepseek/deepseek-v4-flash": "base2-free-deepseek-flash",
+  "deepseek/deepseek-v4-pro": "base2-free-deepseek",
+  "moonshotai/kimi-k2.6": "base2-free-kimi",
+  "minimax/minimax-m2.7": "base2-free",
+  "minimax/minimax-m3": "base2-free-minimax-m3",
+  "mimo/mimo-v2.5": "base2-free-mimo",
+  "mimo/mimo-v2.5-pro": "base2-free-mimo-pro",
 };
 
 const sessions = new Map();
@@ -126,6 +146,10 @@ function backendModelFor(model) {
   return MODEL_MAP[model] || MODEL_MAP[`fb/${model}`] || null;
 }
 
+function agentIdForBackendModel(backendModel) {
+  return FREEBUFF_AGENT_BY_MODEL[backendModel] || DEFAULT_AGENT_ID;
+}
+
 function loadCredentialsFromFile() {
   const raw = readFileSync(CREDENTIALS_PATH, "utf8");
   const parsed = JSON.parse(raw);
@@ -167,6 +191,8 @@ async function fetchRaw(pathname, token, body, extraHeaders = {}) {
         "content-type": "application/json",
         Authorization: `Bearer ${token}`,
         "x-codebuff-api-key": token,
+        "codebuff-version": CODEBUFF_CLI_VERSION,
+        "User-Agent": `codebuff/${CODEBUFF_CLI_VERSION}`,
         ...extraHeaders,
       },
       body: body === undefined ? undefined : JSON.stringify(body),
@@ -187,6 +213,8 @@ async function fetchJson(pathname, token, body, extraHeaders = {}) {
         "content-type": "application/json",
         Authorization: `Bearer ${token}`,
         "x-codebuff-api-key": token,
+        "codebuff-version": CODEBUFF_CLI_VERSION,
+        "User-Agent": `codebuff/${CODEBUFF_CLI_VERSION}`,
         ...extraHeaders,
       },
       body: body === undefined ? undefined : JSON.stringify(body),
@@ -208,7 +236,7 @@ function createSession(key, backendModel) {
     runId: null,
     freebuffInstanceId: null,
     costMode: COST_MODE,
-    agentId: AGENT_ID,
+    agentId: agentIdForBackendModel(backendModel),
     backendModel,
     n: 1,
     createdAt: new Date().toISOString(),
@@ -257,7 +285,11 @@ async function waitForFreeSessionActive(token, session) {
     const state = await getFreeSession(token, session.freebuffInstanceId);
     session.freebuffSessionState = state?.status || null;
     session.freebuffSessionUpdatedAt = new Date().toISOString();
-    if (state?.status === "active") return;
+    if (state?.status === "active" && (!state?.model || state.model === session.backendModel)) return;
+    if (state?.status === "active" && state?.model && state.model !== session.backendModel) {
+      session.freebuffInstanceId = null;
+      break;
+    }
     if (["ended", "superseded", "none"].includes(state?.status)) {
       session.freebuffInstanceId = null;
       break;
@@ -271,13 +303,15 @@ async function ensureFreeSession(token, session) {
   if (session.freebuffInstanceId) {
     try {
       await waitForFreeSessionActive(token, session);
-      if (session.freebuffSessionState === "active") return;
+      if (session.freebuffInstanceId && session.freebuffSessionState === "active") return;
     } catch {
       session.freebuffInstanceId = null;
     }
   }
   if (!session.freebuffInstanceId) {
-    const response = await fetchJson("/api/v1/freebuff/session", token, {});
+    const response = await fetchJson("/api/v1/freebuff/session", token, undefined, {
+      "x-freebuff-model": session.backendModel,
+    });
     if (!response.ok || !response.data?.instanceId) {
       throw Object.assign(new Error(response.data?.error || response.data?.message || "Failed to create FreeBuff session"), { statusCode: response.status, body: response.data });
     }
@@ -481,7 +515,8 @@ export class FreeBuffExecutor extends BaseExecutor {
       return { response: openAIError(error.message, 401, "missing_credentials") };
     }
 
-    const sessionKey = `${account.accountId || "default"}:${AGENT_ID}:${backendModel}`;
+    const agentId = agentIdForBackendModel(backendModel);
+    const sessionKey = `${account.accountId || "default"}:${agentId}:${backendModel}`;
     let session = sessions.get(sessionKey);
     if (!session) {
       session = createSession(sessionKey, backendModel);

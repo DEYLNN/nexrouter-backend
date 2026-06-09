@@ -214,6 +214,7 @@ export const PROVIDER_MODELS = {
 
   "cline-apikey": [  // Cline API Key
     { id: "qwen/qwen3.7-plus", name: "Qwen3.7 Plus" },
+    { id: "nvidia/nemotron-3-ultra-550b-a55b", name: "Nemotron 3 Ultra 550B A55B" },
     { id: "minimax/minimax-m2.5", name: "MiniMax M2.5" },
     { id: "minimax/minimax-m3", name: "MiniMax M3" },
     { id: "kwaipilot/kat-coder-pro-v1", name: "KAT Coder Pro v1" },
@@ -911,10 +912,13 @@ export const PROVIDER_MODELS = {
     { id: "gen3a_turbo", name: "Gen-3 Alpha Turbo", type: "video", params: [] },
   ],
   fb: [
-    { id: "deepseek-v4-flash", name: "DeepSeek V4 Flash" },
-    { id: "deepseek-v4-pro", name: "DeepSeek V4 Pro" },
-    { id: "kimi-k2.6", name: "Kimi K2.6" },
     { id: "minimax-m2.7", name: "MiniMax M2.7" },
+    { id: "minimax-m3", name: "MiniMax M3" },
+    { id: "mimo-v2.5", name: "MiMo V2.5" },
+    { id: "mimo-v2.5-pro", name: "MiMo V2.5 Pro" },
+    { id: "kimi-k2.6", name: "Kimi K2.6" },
+    { id: "deepseek-v4-pro", name: "DeepSeek V4 Pro" },
+    { id: "deepseek-v4-flash", name: "DeepSeek V4 Flash" },
   ],
 };
 

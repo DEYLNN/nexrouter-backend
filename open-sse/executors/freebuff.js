@@ -16,7 +16,6 @@ const FREEBUFF_WAIT_POLL_MS = Number(process.env.FREEBUFF_WAIT_POLL_MS || 2000);
 const FREEBUFF_MAX_MESSAGES = Number(process.env.FREEBUFF_MAX_MESSAGES || 32);
 const FREEBUFF_MAX_MESSAGE_CHARS = Number(process.env.FREEBUFF_MAX_MESSAGE_CHARS || 16000);
 const FREEBUFF_MAX_TOOL_CHARS = Number(process.env.FREEBUFF_MAX_TOOL_CHARS || 8000);
-const CODEBUFF_CLI_VERSION = process.env.CODEBUFF_CLI_VERSION || "1.0.0";
 
 const MODEL_MAP = {
   "deepseek-v4-flash": "deepseek/deepseek-v4-flash",
@@ -191,8 +190,6 @@ async function fetchRaw(pathname, token, body, extraHeaders = {}) {
         "content-type": "application/json",
         Authorization: `Bearer ${token}`,
         "x-codebuff-api-key": token,
-        "codebuff-version": CODEBUFF_CLI_VERSION,
-        "User-Agent": `codebuff/${CODEBUFF_CLI_VERSION}`,
         ...extraHeaders,
       },
       body: body === undefined ? undefined : JSON.stringify(body),
@@ -213,8 +210,6 @@ async function fetchJson(pathname, token, body, extraHeaders = {}) {
         "content-type": "application/json",
         Authorization: `Bearer ${token}`,
         "x-codebuff-api-key": token,
-        "codebuff-version": CODEBUFF_CLI_VERSION,
-        "User-Agent": `codebuff/${CODEBUFF_CLI_VERSION}`,
         ...extraHeaders,
       },
       body: body === undefined ? undefined : JSON.stringify(body),
@@ -279,6 +274,33 @@ async function getFreeSession(token, instanceId) {
   return response.data;
 }
 
+async function deleteFreeSession(token, instanceId) {
+  if (!instanceId) return null;
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/v1/freebuff/session`, {
+      method: "DELETE",
+      headers: {
+        "content-type": "application/json",
+        Authorization: `Bearer ${token}`,
+        "x-codebuff-api-key": token,
+        "x-freebuff-instance-id": instanceId,
+      },
+      signal: controller.signal,
+    });
+    const text = await response.text();
+    let data = null;
+    try { data = text ? JSON.parse(text) : null; } catch { data = { text }; }
+    if (!response.ok && response.status !== 404) {
+      throw Object.assign(new Error(data?.error || data?.message || "Failed to delete FreeBuff session"), { statusCode: response.status, body: data });
+    }
+    return data;
+  } finally {
+    clearTimeout(timeout);
+  }
+}
+
 async function waitForFreeSessionActive(token, session) {
   const started = Date.now();
   while (session.freebuffInstanceId && Date.now() - started < FREEBUFF_WAIT_TIMEOUT_MS) {
@@ -287,7 +309,9 @@ async function waitForFreeSessionActive(token, session) {
     session.freebuffSessionUpdatedAt = new Date().toISOString();
     if (state?.status === "active" && (!state?.model || state.model === session.backendModel)) return;
     if (state?.status === "active" && state?.model && state.model !== session.backendModel) {
+      await deleteFreeSession(token, session.freebuffInstanceId).catch(() => null);
       session.freebuffInstanceId = null;
+      session.freebuffSessionState = null;
       break;
     }
     if (["ended", "superseded", "none"].includes(state?.status)) {
@@ -309,9 +333,18 @@ async function ensureFreeSession(token, session) {
     }
   }
   if (!session.freebuffInstanceId) {
-    const response = await fetchJson("/api/v1/freebuff/session", token, undefined, {
+    let response = await fetchJson("/api/v1/freebuff/session", token, {}, {
       "x-freebuff-model": session.backendModel,
     });
+    if (!response.ok && response.status === 409) {
+      const current = await fetchJson("/api/v1/freebuff/session", token);
+      if (current.ok && current.data?.instanceId) {
+        await deleteFreeSession(token, current.data.instanceId).catch(() => null);
+        response = await fetchJson("/api/v1/freebuff/session", token, {}, {
+          "x-freebuff-model": session.backendModel,
+        });
+      }
+    }
     if (!response.ok || !response.data?.instanceId) {
       throw Object.assign(new Error(response.data?.error || response.data?.message || "Failed to create FreeBuff session"), { statusCode: response.status, body: response.data });
     }

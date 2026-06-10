@@ -35,6 +35,7 @@ import { POST as providerTestModelPost } from "../../src/app/api/providers/[id]/
 import { POST as providerTestModelsPost } from "../../src/app/api/providers/[id]/test-models/route.js";
 import { GET as mimoUsageGet } from "../../src/app/api/providers/mimo-usage/route.js";
 import { GET as suggestedModelsGet } from "../../src/app/api/providers/suggested-models/route.js";
+import { GET as kiloFreeModelsGet } from "../../src/app/api/providers/kilo/free-models/route.js";
 import { GET as availableModelsGet } from "../../src/app/api/keys/available-models/route.js";
 import { POST as providerNodesPost } from "../../src/app/api/provider-nodes/route.js";
 import { PUT as providerNodePut, DELETE as providerNodeDelete } from "../../src/app/api/provider-nodes/[id]/route.js";
@@ -403,6 +404,7 @@ app.post("/api/settings/database", (c) => nextRouteHandler(c, settingsDatabasePo
 app.post("/api/providers", (c) => nextRouteHandler(c, providersPost));
 app.get("/api/providers/mimo-usage", (c) => nextRouteHandler(c, mimoUsageGet));
 app.get("/api/providers/suggested-models", (c) => nextRouteHandler(c, suggestedModelsGet));
+app.get("/api/providers/kilo/free-models", (c) => nextRouteHandler(c, kiloFreeModelsGet));
 app.get("/api/providers/:id", (c) => nextRouteHandler(c, providerGet, { id: c.req.param("id") }));
 app.put("/api/providers/:id", (c) => nextRouteHandler(c, providerPut, { id: c.req.param("id") }));
 app.delete("/api/providers/:id", (c) => nextRouteHandler(c, providerDelete, { id: c.req.param("id") }));

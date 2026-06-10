@@ -18,6 +18,16 @@ const FILTERS = {
     models
       .filter((m) => m.id?.endsWith("-free"))
       .map((m) => ({ id: m.id, name: m.id })),
+
+  "kilocode-free": (models) =>
+    models
+      .filter((m) => m.isFree === true || String(m.id || "").includes(":free") || String(m.id || "").endsWith("/free"))
+      .map((m) => ({
+        id: m.id,
+        name: m.name || m.id,
+        contextLength: m.context_length || m.contextLength || m.top_provider?.context_length || 0,
+      }))
+      .filter((m) => m.id),
 };
 
 export async function GET(request) {

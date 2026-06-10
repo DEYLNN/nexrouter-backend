@@ -53,6 +53,7 @@ import { POST as authFilesRefreshCodexPost } from "../../src/app/api/auth-files/
 
 import { GET as usageConnectionGet } from "../../src/app/api/usage/[connectionId]/route.js";
 import { GET as usageChartGet } from "../../src/app/api/usage/chart/route.js";
+import { POST as usageClearPost } from "../../src/app/api/usage/clear/route.js";
 import { GET as usageHistoryGet } from "../../src/app/api/usage/history/route.js";
 import { GET as usageLogsGet } from "../../src/app/api/usage/logs/route.js";
 import { GET as usageProvidersGet } from "../../src/app/api/usage/providers/route.js";
@@ -376,6 +377,7 @@ app.post("/api/oauth/:provider/:action", (c) => nextRouteHandler(c, oauthPost, {
 
 // P2 usage/observability endpoints
 app.get("/api/usage/chart", (c) => nextRouteHandler(c, usageChartGet));
+app.post("/api/usage/clear", (c) => nextRouteHandler(c, usageClearPost));
 app.get("/api/usage/history", (c) => nextRouteHandler(c, usageHistoryGet));
 app.get("/api/usage/logs", (c) => nextRouteHandler(c, usageLogsGet));
 app.get("/api/usage/providers", (c) => nextRouteHandler(c, usageProvidersGet));

@@ -668,11 +668,14 @@ export async function appendRequestLog() {}
 export async function getRecentLogs(limit = 200) {
   try {
     const db = await getAdapter();
-    const rows = db.all(
+    const usageRows = db.all(
       `SELECT timestamp, provider, model, connectionId, promptTokens, completionTokens, status, tokens FROM usageHistory ORDER BY id DESC LIMIT ?`,
       [limit],
     );
-    if (!rows.length) return [];
+    const detailRows = db.all(
+      `SELECT data FROM requestDetails ORDER BY timestamp DESC LIMIT ?`,
+      [limit],
+    );
 
     const connMap = {};
     try {
@@ -681,16 +684,54 @@ export async function getRecentLogs(limit = 200) {
       for (const c of connections) connMap[c.id] = c.name || c.email || "";
     } catch {}
 
-    return rows.map((r) => {
-      const ts = r.timestamp || new Date().toISOString();
-      const p = r.provider?.toUpperCase() || "-";
-      const m = r.model || "-";
-      const account = connMap[r.connectionId] || (r.connectionId ? r.connectionId.slice(0, 8) : "-");
-      const tk = r.tokens ? parseJson(r.tokens, {}) : {};
-      const sent = r.promptTokens ?? tk.prompt_tokens ?? "-";
-      const received = r.completionTokens ?? tk.completion_tokens ?? "-";
-      return `${ts} | ${m} | ${p} | ${account} | ${sent} | ${received} | ${r.status || "-"}`;
-    });
+    const normalize = (row) => {
+      const tk = row.tokens || {};
+      const prompt = row.promptTokens ?? tk.prompt_tokens ?? tk.input_tokens ?? 0;
+      const completion = row.completionTokens ?? tk.completion_tokens ?? tk.output_tokens ?? 0;
+      return {
+        timestamp: row.timestamp || new Date().toISOString(),
+        provider: row.provider || "-",
+        model: row.model || "-",
+        connectionId: row.connectionId || "",
+        promptTokens: Number(prompt) || 0,
+        completionTokens: Number(completion) || 0,
+        status: row.status || "ok",
+      };
+    };
+
+    const merged = usageRows.map((r) => normalize({ ...r, tokens: r.tokens ? parseJson(r.tokens, {}) : {} }));
+
+    for (const r of detailRows) {
+      const d = parseJson(r.data, {});
+      const tokens = d.tokens || {};
+      const prompt = tokens.prompt_tokens ?? tokens.input_tokens ?? 0;
+      const completion = tokens.completion_tokens ?? tokens.output_tokens ?? 0;
+      const status = d.status || "success";
+      const isError = status !== "success" && status !== "ok";
+      const isZeroToken = (Number(prompt) || 0) === 0 && (Number(completion) || 0) === 0;
+      if (!isError && !isZeroToken) continue;
+      merged.push(normalize({
+        timestamp: d.timestamp, provider: d.provider, model: d.model, connectionId: d.connectionId,
+        tokens, status: isError ? "error" : "0 TOKENS",
+      }));
+    }
+
+    const seen = new Set();
+    return merged
+      .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
+      .filter((r) => {
+        const minute = r.timestamp ? r.timestamp.slice(0, 16) : "";
+        const key = `${r.model}|${r.provider}|${r.connectionId}|${r.promptTokens}|${r.completionTokens}|${r.status}|${minute}`;
+        if (seen.has(key)) return false;
+        seen.add(key);
+        return true;
+      })
+      .slice(0, limit)
+      .map((r) => {
+        const p = r.provider?.toUpperCase() || "-";
+        const account = connMap[r.connectionId] || (r.connectionId ? r.connectionId.slice(0, 8) : "-");
+        return `${r.timestamp} | ${r.model || "-"} | ${p} | ${account} | ${r.promptTokens} | ${r.completionTokens} | ${r.status || "-"}`;
+      });
   } catch (e) {
     console.error("[usageRepo] getRecentLogs failed:", e.message);
     return [];

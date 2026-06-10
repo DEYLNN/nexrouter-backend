@@ -1,9 +1,11 @@
 import { NextResponse } from "next/server";
 import { getRecentLogs } from "@/lib/usageDb";
 
-export async function GET() {
+export async function GET(request) {
   try {
-    const logs = await getRecentLogs(200);
+    const { searchParams } = new URL(request.url);
+    const limit = Math.min(Math.max(parseInt(searchParams.get("limit") || "200", 10) || 200, 1), 1000);
+    const logs = await getRecentLogs(limit);
     return NextResponse.json(logs);
   } catch (error) {
     console.error("[API ERROR] /api/usage/logs failed:", error);

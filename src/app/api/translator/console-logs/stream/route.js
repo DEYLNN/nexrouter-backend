@@ -1,5 +1,6 @@
 import { getConsoleLogs, getConsoleEmitter, initConsoleLogCapture } from "@/lib/consoleLogBuffer";
 import { getRecentLogs } from "@/lib/usageDb";
+import { CONSOLE_LOG_CONFIG } from "@/shared/constants/config.js";
 
 export const dynamic = "force-dynamic";
 
@@ -36,11 +37,13 @@ async function getInitialConsoleLogs() {
   const runtimeLogs = getConsoleLogs();
   let usageLogs = [];
   try {
-    usageLogs = (await getRecentLogs(120)).reverse().map(formatUsageLine);
+    const usageLimit = CONSOLE_LOG_CONFIG.usageInitialLines || 120;
+    usageLogs = (await getRecentLogs(usageLimit)).reverse().map(formatUsageLine);
   } catch (error) {
     usageLogs = [`[WARN] Failed to load SQLite usage logs: ${error.message}`];
   }
-  return dedupeLines([...usageLogs, ...runtimeLogs]).slice(-300);
+  const maxLines = CONSOLE_LOG_CONFIG.initialLines || CONSOLE_LOG_CONFIG.maxLines || 2000;
+  return dedupeLines([...usageLogs, ...runtimeLogs]).slice(-maxLines);
 }
 
 export async function GET(request) {

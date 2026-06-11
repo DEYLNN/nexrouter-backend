@@ -684,6 +684,23 @@ export async function getRecentLogs(limit = 200) {
       for (const c of connections) connMap[c.id] = c.name || c.email || "";
     } catch {}
 
+    const summarizeError = (value, fallbackStatus = "") => {
+      if (!value) return "";
+      let msg = "";
+      let code = fallbackStatus || "";
+      if (typeof value === "string") {
+        msg = value;
+      } else if (typeof value === "object") {
+        code = value.status || value.statusCode || value.code || code;
+        msg = value.error || value.message || value.body || value.text || "";
+        if (msg && typeof msg === "object") msg = msg.message || JSON.stringify(msg);
+      }
+      msg = String(msg || "").replace(/\s+/g, " ").replace(/\|/g, "/").trim();
+      if (!msg) return code ? `HTTP ${code}` : "";
+      if (msg.length > 180) msg = `${msg.slice(0, 177)}...`;
+      return code ? `HTTP ${code}: ${msg}` : msg;
+    };
+
     const normalize = (row) => {
       const tk = row.tokens || {};
       const prompt = row.promptTokens ?? tk.prompt_tokens ?? tk.input_tokens ?? 0;
@@ -696,6 +713,7 @@ export async function getRecentLogs(limit = 200) {
         promptTokens: Number(prompt) || 0,
         completionTokens: Number(completion) || 0,
         status: row.status || "ok",
+        error: row.error || "",
       };
     };
 
@@ -710,9 +728,12 @@ export async function getRecentLogs(limit = 200) {
       const isError = status !== "success" && status !== "ok";
       const isZeroToken = (Number(prompt) || 0) === 0 && (Number(completion) || 0) === 0;
       if (!isError && !isZeroToken) continue;
+      const errStatus = d.response?.status || d.providerResponse?.status || "";
+      const errSummary = isError ? summarizeError(d.response || d.providerResponse, errStatus) : "";
       merged.push(normalize({
         timestamp: d.timestamp, provider: d.provider, model: d.model, connectionId: d.connectionId,
-        tokens, status: isError ? "error" : "0 TOKENS",
+        tokens, status: isError ? (errStatus ? `ERROR ${errStatus}` : "ERROR") : "0 TOKENS",
+        error: errSummary,
       }));
     }
 
@@ -730,7 +751,7 @@ export async function getRecentLogs(limit = 200) {
       .map((r) => {
         const p = r.provider?.toUpperCase() || "-";
         const account = connMap[r.connectionId] || (r.connectionId ? r.connectionId.slice(0, 8) : "-");
-        return `${r.timestamp} | ${r.model || "-"} | ${p} | ${account} | ${r.promptTokens} | ${r.completionTokens} | ${r.status || "-"}`;
+        return `${r.timestamp} | ${r.model || "-"} | ${p} | ${account} | ${r.promptTokens} | ${r.completionTokens} | ${r.status || "-"} | ${r.error || ""}`;
       });
   } catch (e) {
     console.error("[usageRepo] getRecentLogs failed:", e.message);

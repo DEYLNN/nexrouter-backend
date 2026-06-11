@@ -186,8 +186,20 @@ export const PROVIDERS = {
     format: "openai",
     noAuth: true
   },
+  kimchi: {
+    baseUrl: "https://llm.kimchi.dev/openai/v1/chat/completions",
+    format: "openai"
+  },
   bai: {
     baseUrl: "https://api.b.ai/v1/chat/completions",
+    format: "openai"
+  },
+  tokenrouter: {
+    baseUrl: "https://api.tokenrouter.com/v1/chat/completions",
+    format: "openai"
+  },
+  tr: {
+    baseUrl: "https://api.tokenrouter.com/v1/chat/completions",
     format: "openai"
   },
   qiniu: {

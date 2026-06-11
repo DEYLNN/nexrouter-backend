@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { clearConsoleLogs, getConsoleLogs, initConsoleLogCapture } from "@/lib/consoleLogBuffer";
 import { getRecentLogs } from "@/lib/usageDb";
+import { CONSOLE_LOG_CONFIG } from "@/shared/constants/config.js";
 
 initConsoleLogCapture();
 
@@ -33,8 +34,10 @@ function dedupeLines(lines) {
 
 export async function GET() {
   try {
-    const usageLogs = (await getRecentLogs(120)).reverse().map(formatUsageLine);
-    const logs = dedupeLines([...usageLogs, ...getConsoleLogs()]).slice(-300);
+    const usageLimit = CONSOLE_LOG_CONFIG.usageInitialLines || 120;
+    const maxLines = CONSOLE_LOG_CONFIG.initialLines || CONSOLE_LOG_CONFIG.maxLines || 2000;
+    const usageLogs = (await getRecentLogs(usageLimit)).reverse().map(formatUsageLine);
+    const logs = dedupeLines([...usageLogs, ...getConsoleLogs()]).slice(-maxLines);
     return NextResponse.json({ success: true, logs, dataStore: "sqlite" });
   } catch (error) {
     console.error("Error getting console logs:", error);

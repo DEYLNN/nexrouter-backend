@@ -267,6 +267,12 @@ export const PROVIDER_MODELS = {
   "freemodel-dev": [
     { id: "gpt-5.5", name: "GPT-5.5" },
   ],
+  kimchi: [
+    { id: "kimi-k2.6", name: "Kimi K2.6" },
+    { id: "kimi-k2.5", name: "Kimi K2.5" },
+    { id: "minimax-m2.7", name: "MiniMax M2.7" },
+    { id: "nemotron-3-super-fp4", name: "Nemotron 3 Super FP4" },
+  ],
   bai: [
     { id: "glm-5.1", name: "GLM 5.1" },
     { id: "minimax-m2.7", name: "MiniMax M2.7" },
@@ -276,6 +282,12 @@ export const PROVIDER_MODELS = {
     { id: "deepseek-v4-flash", name: "DeepSeek V4 Flash" },
     { id: "deepseek-v4-pro", name: "DeepSeek V4 Pro" },
     { id: "deepseek-v3.2", name: "DeepSeek V3.2" },
+  ],
+  tokenrouter: [
+    { id: "MiniMax-M3", name: "MiniMax M3" },
+  ],
+  tr: [
+    { id: "MiniMax-M3", name: "MiniMax M3" },
   ],
   qiniu: [
     { id: "deepseek-v3", name: "DeepSeek V3" },
@@ -766,6 +778,7 @@ export const PROVIDER_MODELS = {
     { id: "qwen3-coder", name: "Qwen3 Coder" },
   ],
   "xiaomi-mimo": [
+    { id: "mimo-v2.5-pro-ultraspeed", name: "MiMo V2.5 Pro UltraSpeed" },
     { id: "mimo-v2.5-pro", name: "MiMo V2.5 Pro" },
     { id: "mimo-v2.5", name: "MiMo V2.5" },
     { id: "mimo-v2-omni", name: "MiMo V2 Omni" },
@@ -994,6 +1007,7 @@ const OAUTH_ALIASES = {
   canopywave: "cwv",
   "xiaomi-mimo-plan-sgp": "mimo-sgp",
   swiftrouter: "sr",
+  tokenrouter: "tr",
   freebuff: "fb",
 };
 

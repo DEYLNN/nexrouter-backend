@@ -1,5 +1,25 @@
 # Changelog
 
+## [0.4.69] - 2026-06-11
+
+### Added
+- Added TokenRouter API-key provider (`tokenrouter` / `tr`) with `MiniMax-M3` model, OpenAI-compatible endpoint, validation/test probe, and downloaded local icon asset.
+
+## [0.4.68] - 2026-06-11
+
+### Fixed
+- Include failed request status codes and sanitized upstream error summaries in request logs so provider failures show actionable details instead of a bare ERROR label.
+
+## [0.4.67] - 2026-06-11
+
+### Fixed
+- Add Kimchi API-key validation/test probes with Kimchi-compatible chat request headers so the provider test button no longer reports unsupported validation or Cloudflare probe errors.
+
+## [0.4.66] - 2026-06-11
+
+### Fixed
+- Embed the FreeBuff/freebuff2api-compatible free-mode flow directly in the backend FreeBuff executor so OAuth FreeBuff connections work without the separate local freebuff2api proxy service.
+
 ## [0.4.65] - 2026-06-06
 
 ### Fixed

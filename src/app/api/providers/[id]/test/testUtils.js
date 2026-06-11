@@ -574,11 +574,34 @@ async function testApiKeyConnection(connection, effectiveProxy = null) {
         const valid = res.status !== 401 && res.status !== 403;
         return { valid, error: valid ? null : "Invalid API key" };
       }
+      case "kimchi": {
+        const res = await fetchWithConnectionProxy("https://llm.kimchi.dev/openai/v1/chat/completions", {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${connection.apiKey}`,
+            "content-type": "application/json",
+            "User-Agent": "OpenAI/JS 4.0",
+          },
+          body: JSON.stringify({ model: "minimax-m2.7", messages: [{ role: "user", content: "test" }], max_tokens: 1, stream: false }),
+        }, effectiveProxy);
+        const valid = res.status !== 401 && res.status !== 403;
+        return { valid, error: valid ? null : "Invalid API key or Kimchi blocked the probe" };
+      }
       case "bai": {
         const res = await fetchWithConnectionProxy("https://api.b.ai/v1/chat/completions", {
           method: "POST",
           headers: { Authorization: `Bearer ${connection.apiKey}`, "content-type": "application/json" },
           body: JSON.stringify({ model: "deepseek-v3.2", messages: [{ role: "user", content: "test" }], max_tokens: 1, stream: false }),
+        }, effectiveProxy);
+        const valid = res.status !== 401 && res.status !== 403;
+        return { valid, error: valid ? null : "Invalid API key" };
+      }
+      case "tokenrouter":
+      case "tr": {
+        const res = await fetchWithConnectionProxy("https://api.tokenrouter.com/v1/chat/completions", {
+          method: "POST",
+          headers: { Authorization: `Bearer ${connection.apiKey}`, "content-type": "application/json" },
+          body: JSON.stringify({ model: "MiniMax-M3", messages: [{ role: "user", content: "test" }], max_tokens: 1, stream: false }),
         }, effectiveProxy);
         const valid = res.status !== 401 && res.status !== 403;
         return { valid, error: valid ? null : "Invalid API key" };

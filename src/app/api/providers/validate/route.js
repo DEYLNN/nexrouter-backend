@@ -355,7 +355,10 @@ export async function POST(request) {
         case "freemodel-dev":
         case "fmd":
         case "aimux":
+        case "kimchi":
         case "bai":
+        case "tokenrouter":
+        case "tr":
         case "qiniu":
         case "groq":
         case "xai":
@@ -449,11 +452,46 @@ export async function POST(request) {
               url: "https://aimux.id/v1/models",
               method: "GET",
             },
+            kimchi: {
+              url: "https://llm.kimchi.dev/openai/v1/chat/completions",
+              method: "POST",
+              headers: {
+                "Authorization": `Bearer ${apiKey}`,
+                "Content-Type": "application/json",
+                "User-Agent": "OpenAI/JS 4.0",
+              },
+              body: {
+                model: "minimax-m2.7",
+                messages: [{ role: "user", content: "test" }],
+                max_tokens: 1,
+                stream: false,
+              },
+            },
             bai: {
               url: "https://api.b.ai/v1/chat/completions",
               method: "POST",
               body: {
                 model: "deepseek-v3.2",
+                messages: [{ role: "user", content: "test" }],
+                max_tokens: 1,
+                stream: false,
+              },
+            },
+            tokenrouter: {
+              url: "https://api.tokenrouter.com/v1/chat/completions",
+              method: "POST",
+              body: {
+                model: "MiniMax-M3",
+                messages: [{ role: "user", content: "test" }],
+                max_tokens: 1,
+                stream: false,
+              },
+            },
+            tr: {
+              url: "https://api.tokenrouter.com/v1/chat/completions",
+              method: "POST",
+              body: {
+                model: "MiniMax-M3",
                 messages: [{ role: "user", content: "test" }],
                 max_tokens: 1,
                 stream: false,

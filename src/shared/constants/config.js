@@ -54,7 +54,11 @@ export const API_ENDPOINTS = {
 };
 
 export const CONSOLE_LOG_CONFIG = {
-  maxLines: 200,
+  // Runtime console buffer shown in Console Log page.
+  // Keeps UI/SSE light; PM2 file logs are rotated separately.
+  maxLines: Number(process.env.CONSOLE_LOG_MAX_LINES || 1000),
+  initialLines: Number(process.env.CONSOLE_LOG_INITIAL_LINES || 1000),
+  usageInitialLines: Number(process.env.CONSOLE_USAGE_INITIAL_LINES || 120),
   pollIntervalMs: 1000,
 };
 
@@ -69,6 +73,8 @@ export const PROVIDER_ENDPOINTS = {
   am: "https://aimux.id/v1/chat/completions",
   aimux: "https://aimux.id/v1/chat/completions",
   bai: "https://api.b.ai/v1/chat/completions",
+  tokenrouter: "https://api.tokenrouter.com/v1/chat/completions",
+  tr: "https://api.tokenrouter.com/v1/chat/completions",
   qiniu: "https://api.qnaigc.com/v1/chat/completions",
   morph: "https://api.morphllm.com/v1/chat/completions",
   gmi: "https://api.gmi-serving.com/v1/chat/completions",

@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.4.70] - 2026-06-13
+
+### Added
+- Add MiMo Code Free no-auth provider (`mimo-free` / `mmf`) with the upstream MiMo Free executor, `mimo-auto` model registration, provider aliasing, validation/model-list sync, and OpenSSE routing.
+- Add Ambient API-key provider validation/model probe wiring and model-list handling.
+
 ## [0.4.69] - 2026-06-11
 
 ### Added

@@ -547,6 +547,15 @@ async function testApiKeyConnection(connection, effectiveProxy = null) {
         const valid = res.status !== 401 && res.status !== 403;
         return { valid, error: valid ? null : "Invalid API key" };
       }
+      case "ambient": {
+        // Ambient key test: fetch /models only; do not probe chat/model IDs.
+        const res = await fetchWithConnectionProxy("https://api.ambient.xyz/v1/models", {
+          method: "GET",
+          headers: { Authorization: `Bearer ${connection.apiKey}`, "content-type": "application/json" },
+        }, effectiveProxy);
+        const valid = res.status !== 401 && res.status !== 403;
+        return { valid, error: valid ? null : "Invalid API key" };
+      }
       case "canopywave": {
         // CanopyWave keys can be scoped to different model tags (Kimi-only, MiMo-only, etc.).
         // Test only the API key itself via /models; do not probe a specific chat model here.

@@ -388,6 +388,7 @@ export async function POST(request) {
         case "ocenza":
         case "anuma":
         case "routeway":
+        case "ambient":
         case "morph": {
           const validationConfigs = {
             "xiaomi-mimo-plan-sgp": {
@@ -514,6 +515,10 @@ export async function POST(request) {
             },
             "cline-apikey": {
               url: "https://api.cline.bot/api/v1/users/me",
+              method: "GET",
+            },
+            ambient: {
+              url: "https://api.ambient.xyz/v1/models",
               method: "GET",
             },
             morph: {

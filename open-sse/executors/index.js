@@ -16,6 +16,7 @@ import { PerplexityWebExecutor } from "./perplexity-web.js";
 import { OllamaLocalExecutor } from "./ollama-local.js";
 import { CommandCodeExecutor } from "./commandcode.js";
 import { FreeBuffExecutor } from "./freebuff.js";
+import { MimoFreeExecutor } from "./mimo-free.js";
 import { DefaultExecutor } from "./default.js";
 
 const executors = {
@@ -40,6 +41,8 @@ const executors = {
   commandcode: new CommandCodeExecutor(),
   freebuff: new FreeBuffExecutor(),
   fb: new FreeBuffExecutor(),
+  "mimo-free": new MimoFreeExecutor(),
+  mmf: new MimoFreeExecutor(),
 };
 
 const defaultCache = new Map();
@@ -74,3 +77,4 @@ export { PerplexityWebExecutor } from "./perplexity-web.js";
 export { OllamaLocalExecutor } from "./ollama-local.js";
 export { CommandCodeExecutor } from "./commandcode.js";
 export { FreeBuffExecutor } from "./freebuff.js";
+export { MimoFreeExecutor } from "./mimo-free.js";

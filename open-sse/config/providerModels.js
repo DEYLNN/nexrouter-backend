@@ -205,6 +205,10 @@ export const PROVIDER_MODELS = {
     // { id: "minimax-m2.5-free", name: "MiniMax M2.5", targetFormat: "claude" },
     // { id: "trinity-large-preview-free", name: "Trinity Large Preview" },
   ],
+  mmf: [  // MiMo Free — free channel only serves mimo-auto
+    { id: "mimo-auto", name: "MiMo Auto" },
+  ],
+
 
   cl: [  // Cline — free/low-cost working models only
     { id: "minimax/minimax-m2.5", name: "MiniMax M2.5" },
@@ -260,6 +264,10 @@ export const PROVIDER_MODELS = {
     { id: "xiaomi/mimo-v2.5-pro", name: "Xiaomi: MiMo-V2.5-Pro" },
     { id: "xiaomi/mimo-v2.5", name: "Xiaomi: MiMo-V2.5" },
     { id: "xiaomi/mimo-v2-flash", name: "Xiaomi: MiMo-V2-Flash" },
+  ],
+  amb: [
+    { id: "zai-org/GLM-5.1-FP8", name: "GLM 5.1" },
+    { id: "ambient/large", name: "GLM 5.1" },
   ],
   fmd: [
     { id: "gpt-5.5", name: "GPT-5.5" },
@@ -1000,11 +1008,13 @@ const OAUTH_ALIASES = {
   kilocode: "kc",
   cline: "cl",
   opencode: "oc",
+  "mimo-free": "mmf",
   gitlawb: "glb",
   "gitlawb-mimo": "glb-mimo",
   vertex: "vertex",
   "vertex-partner": "vertex-partner",
   canopywave: "cwv",
+  ambient: "amb",
   "xiaomi-mimo-plan-sgp": "mimo-sgp",
   swiftrouter: "sr",
   tokenrouter: "tr",

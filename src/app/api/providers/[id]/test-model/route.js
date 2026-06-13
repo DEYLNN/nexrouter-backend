@@ -19,7 +19,7 @@ export async function POST(request, { params }) {
     if (!connection) {
       return NextResponse.json({ error: "Connection not found" }, { status: 404 });
     }
-    const supportedProviders = new Set(["kiro", "husada", "anuma"]);
+    const supportedProviders = new Set(["kiro", "husada", "anuma", "ambient"]);
     if (!supportedProviders.has(connection.provider)) {
       return NextResponse.json({ error: "Model probe is only enabled for supported live-test providers" }, { status: 400 });
     }
@@ -31,6 +31,28 @@ export async function POST(request, { params }) {
     const allowedModels = getAllowedModelIds(connection.provider);
     if (!allowedModels.has(modelId)) {
       return NextResponse.json({ error: `Unknown ${connection.provider} model: ${modelId}` }, { status: 400 });
+    }
+
+    if (connection.provider === "ambient") {
+      const start = Date.now();
+      const res = await fetch("https://api.ambient.xyz/v1/models", {
+        headers: { "Authorization": `Bearer ${connection.apiKey}` },
+        signal: AbortSignal.timeout(15000),
+      });
+      const latencyMs = Date.now() - start;
+      const text = await res.text().catch(() => "");
+      let data = null;
+      try { data = text ? JSON.parse(text) : null; } catch { /* keep raw */ }
+      const liveModels = Array.isArray(data?.data) ? data.data : [];
+      const exists = liveModels.some((m) => m?.id === modelId);
+      return NextResponse.json({
+        ok: res.ok && exists,
+        status: res.status,
+        model: modelId,
+        latencyMs,
+        content: res.ok && exists ? "model available" : "",
+        error: res.ok ? (exists ? null : `Model not found in Ambient /models: ${modelId}`) : (data?.error?.message || data?.error || text.slice(0, 500) || `HTTP ${res.status}`),
+      }, { status: 200 });
     }
 
     const alias = PROVIDER_ID_TO_ALIAS[connection.provider] || connection.provider;

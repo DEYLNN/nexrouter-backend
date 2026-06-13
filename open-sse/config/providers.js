@@ -186,6 +186,16 @@ export const PROVIDERS = {
     format: "openai",
     noAuth: true
   },
+  "mimo-free": {
+    baseUrl: "https://api.xiaomimimo.com/api/free-ai/openai/chat",
+    format: "openai",
+    noAuth: true
+  },
+  mmf: {
+    baseUrl: "https://api.xiaomimimo.com/api/free-ai/openai/chat",
+    format: "openai",
+    noAuth: true
+  },
   kimchi: {
     baseUrl: "https://llm.kimchi.dev/openai/v1/chat/completions",
     format: "openai"
@@ -520,6 +530,10 @@ export const PROVIDERS = {
   },
   "xiaomi-mimo": {
     baseUrl: "https://api.xiaomimimo.com/v1/chat/completions",
+    format: "openai"
+  },
+  ambient: {
+    baseUrl: "https://api.ambient.xyz/v1/chat/completions",
     format: "openai"
   },
   "xiaomi-mimo-plan-sgp": {

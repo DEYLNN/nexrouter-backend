@@ -9,6 +9,7 @@ export const FREE_PROVIDERS = {
   qoder: { id: "qoder", alias: "qd", name: "Qoder", icon: "/providers/qoder.png", color: "#EC4899", textIcon: "QD", website: "https://qoder.com", notice: { signupUrl: "https://qoder.com", text: "Qoder device-flow OAuth provider. Token lasts ~30 days; re-login if expired." }, serviceKinds: ["llm"] },
   iflow: { id: "iflow", alias: "if", name: "iFlow AI", icon: "water_drop", color: "#6366F1", website: "https://iflow.cn", notice: { signupUrl: "https://iflow.cn" } },
   opencode: { id: "opencode", alias: "oc", name: "OpenCode Free", icon: "terminal", color: "#E87040", textIcon: "OC", noAuth: true, passthroughModels: true, modelsFetcher: { url: "https://opencode.ai/zen/v1/models", type: "opencode-free" } },
+  "mimo-free": { id: "mimo-free", alias: "mmf", name: "MiMo Code Free", icon: "smart_toy", color: "#FF6900", textIcon: "MF", noAuth: true, passthroughModels: true, modelsFetcher: { url: "https://models.dev/api.json", type: "mimo-free" }, serviceKinds: ["llm"] },
 
   pollinations: { id: "pollinations", alias: "pollinations", name: "Pollinations", icon: "/provider-icons/pollinations.png", color: "#22C55E", textIcon: "PO", website: "https://pollinations.ai", noAuth: true, notice: { text: "Anonymous OpenAI-compatible text endpoint." }, serviceKinds: ["llm"] },
 };
@@ -62,6 +63,7 @@ export const OAUTH_PROVIDERS = {
 };
 
 export const APIKEY_PROVIDERS = {
+  ambient: { id: "ambient", alias: "amb", name: "Ambient", icon: "/providers/ambient.png", color: "#111827", textIcon: "AM", website: "https://ambient.xyz", notice: { text: "OpenAI-compatible Ambient endpoint. Add your Ambient API key.", apiKeyUrl: "https://ambient.xyz" }, serviceKinds: ["llm"], models: [{ id: "zai-org/GLM-5.1-FP8", name: "GLM 5.1" }, { id: "ambient/large", name: "GLM 5.1" }], modelsFetcher: { url: "https://api.ambient.xyz/v1/models", type: "openai" } },
   "freemodel-dev": { id: "freemodel-dev", alias: "fmd", name: "Free Model Dev", icon: "/provider-icons/freemodel-dev.png", color: "#10B981", textIcon: "FM", website: "https://api.freemodel.dev", notice: { apiKeyUrl: "https://api.freemodel.dev" }, serviceKinds: ["llm"] },
   kimchi: { id: "kimchi", alias: "kimchi", name: "Kimchi", icon: "/providers/kimchi.jpg", color: "#FF5A3D", textIcon: "KC", website: "https://llm.kimchi.dev", notice: { text: "OpenAI-compatible Kimchi endpoint. Add your Kimchi/CastAI API key.", apiKeyUrl: "https://llm.kimchi.dev" }, serviceKinds: ["llm"] },
   bai: { id: "bai", alias: "bai", name: "B.AI", icon: "smart_toy", color: "#000000", textIcon: "B", website: "https://b.ai", notice: { apiKeyUrl: "https://b.ai" }, serviceKinds: ["llm"] },

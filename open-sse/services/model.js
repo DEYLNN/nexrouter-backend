@@ -16,6 +16,8 @@ const ALIAS_TO_PROVIDER_ID = {
   "cl-ak": "cline-apikey",
   oc: "opencode",
   ocg: "opencode-go",
+  mmf: "mimo-free",
+  "mimo-free": "mimo-free",
   // TTS providers
   el: "elevenlabs",
   // LLM API Key providers
@@ -88,6 +90,8 @@ const ALIAS_TO_PROVIDER_ID = {
   cloudflare: "cloudflare-ai",
   cwv: "canopywave",
   canopywave: "canopywave",
+  amb: "ambient",
+  ambient: "ambient",
   // Image/video providers
   fal: "fal-ai",
   "fal-ai": "fal-ai",

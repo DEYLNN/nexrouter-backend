@@ -277,7 +277,7 @@ export async function buildModelsList(kindFilter, options = {}) {
           if (modelId.startsWith(`${staticAlias}/`)) {
             return modelId.slice(staticAlias.length + 1);
           }
-          if (modelId.startsWith(`${providerId}/`)) {
+          if (providerId !== "ambient" && modelId.startsWith(`${providerId}/`)) {
             return modelId.slice(providerId.length + 1);
           }
           return modelId;

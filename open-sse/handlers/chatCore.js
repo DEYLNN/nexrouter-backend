@@ -58,9 +58,7 @@ export async function handleChatCore({ body, modelInfo, credentials, log, onCred
 
   const clientRequestedStreaming = body.stream === true || sourceFormat === FORMATS.ANTIGRAVITY || sourceFormat === FORMATS.GEMINI || sourceFormat === FORMATS.GEMINI_CLI;
   const providerRequiresStreaming = provider === "openai" || provider === "codex" || provider === "commandcode";
-  // Some OpenAI-compatible providers have flaky SSE (finish without content).
-  // Use upstream non-stream JSON, then synthesize OpenAI SSE for streaming clients.
-  const fakeStreamProvider = provider === "gmi-cloud" || provider === "zyloo";
+  const fakeStreamProvider = provider === "gmi-cloud";
   let stream = fakeStreamProvider ? false : (providerRequiresStreaming ? true : (body.stream !== false));
 
   // Check client Accept header preference for non-streaming requests

@@ -241,13 +241,12 @@ export async function handleNonStreamingResponse({ providerResponse, provider, m
       choice.finish_reason = "tool_calls";
     }
 
-    if (provider === "anuma" || provider === "zyloo") {
+    if (provider === "anuma") {
       const content = typeof msg?.content === "string" ? msg.content.trim() : "";
       const finish = choice.finish_reason || "stop";
       if (!content && !hasToolCalls && finish !== "length") {
         appendLog({ status: `FAILED ${HTTP_STATUS.BAD_GATEWAY}` });
-        const label = provider === "zyloo" ? "Zyloo" : "Anuma";
-        return createErrorResult(HTTP_STATUS.BAD_GATEWAY, `${label} returned empty assistant content; retry/fallback instead of treating this as a successful no-reply.`);
+        return createErrorResult(HTTP_STATUS.BAD_GATEWAY, "Anuma returned empty assistant content; retry with another Anuma model or inspect upstream response.");
       }
     }
   }

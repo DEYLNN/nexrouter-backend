@@ -294,6 +294,11 @@ export const PROVIDER_MODELS = {
   tokenrouter: [
     { id: "MiniMax-M3", name: "MiniMax M3" },
   ],
+  zyloo: [
+    { id: "claude-opus-4-6", name: "Claude Opus 4.6" },
+    { id: "gpt-5.4", name: "GPT 5.4" },
+    { id: "deepseek-r1", name: "DeepSeek R1" },
+  ],
   tr: [
     { id: "MiniMax-M3", name: "MiniMax M3" },
   ],
@@ -1018,6 +1023,7 @@ const OAUTH_ALIASES = {
   "xiaomi-mimo-plan-sgp": "mimo-sgp",
   swiftrouter: "sr",
   tokenrouter: "tr",
+  zyloo: "zyloo",
   freebuff: "fb",
 };
 

@@ -389,6 +389,7 @@ export async function POST(request) {
         case "anuma":
         case "routeway":
         case "ambient":
+        case "zyloo":
         case "morph": {
           const validationConfigs = {
             "xiaomi-mimo-plan-sgp": {
@@ -519,6 +520,10 @@ export async function POST(request) {
             },
             ambient: {
               url: "https://api.ambient.xyz/v1/models",
+              method: "GET",
+            },
+            zyloo: {
+              url: "https://zyloo.io/v1/models",
               method: "GET",
             },
             morph: {

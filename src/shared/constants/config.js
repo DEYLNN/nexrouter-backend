@@ -74,6 +74,7 @@ export const PROVIDER_ENDPOINTS = {
   aimux: "https://aimux.id/v1/chat/completions",
   bai: "https://api.b.ai/v1/chat/completions",
   tokenrouter: "https://api.tokenrouter.com/v1/chat/completions",
+  zyloo: "https://zyloo.io/v1/chat/completions",
   tr: "https://api.tokenrouter.com/v1/chat/completions",
   qiniu: "https://api.qnaigc.com/v1/chat/completions",
   morph: "https://api.morphllm.com/v1/chat/completions",

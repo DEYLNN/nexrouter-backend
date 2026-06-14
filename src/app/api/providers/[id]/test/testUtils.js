@@ -556,6 +556,15 @@ async function testApiKeyConnection(connection, effectiveProxy = null) {
         const valid = res.status !== 401 && res.status !== 403;
         return { valid, error: valid ? null : "Invalid API key" };
       }
+      case "zyloo": {
+        // Zyloo exposes a reliable /models endpoint; avoid probing chat models because free/paid model scopes may differ.
+        const res = await fetchWithConnectionProxy("https://zyloo.io/v1/models", {
+          method: "GET",
+          headers: { Authorization: `Bearer ${connection.apiKey}`, "content-type": "application/json" },
+        }, effectiveProxy);
+        const valid = res.status !== 401 && res.status !== 403;
+        return { valid, error: valid ? null : "Invalid API key" };
+      }
       case "canopywave": {
         // CanopyWave keys can be scoped to different model tags (Kimi-only, MiMo-only, etc.).
         // Test only the API key itself via /models; do not probe a specific chat model here.

@@ -624,6 +624,16 @@ async function testApiKeyConnection(connection, effectiveProxy = null) {
         const valid = res.status !== 401 && res.status !== 403;
         return { valid, error: valid ? null : "Invalid API key" };
       }
+      case "zerog":
+      case "0g": {
+        const res = await fetchWithConnectionProxy("https://router-api.0g.ai/v1/chat/completions", {
+          method: "POST",
+          headers: { Authorization: `Bearer ${connection.apiKey}`, "content-type": "application/json" },
+          body: JSON.stringify({ model: "minimax-m3", messages: [{ role: "user", content: "test" }], max_tokens: 1, stream: false }),
+        }, effectiveProxy);
+        const valid = res.status !== 401 && res.status !== 403;
+        return { valid, error: valid ? null : "Invalid API key" };
+      }
       case "freemodel-dev":
       case "fmd": {
         const res = await fetchWithConnectionProxy("https://api.freemodel.dev/v1/chat/completions", {

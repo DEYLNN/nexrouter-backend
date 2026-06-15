@@ -359,6 +359,8 @@ export async function POST(request) {
         case "bai":
         case "tokenrouter":
         case "tr":
+        case "zerog":
+        case "0g":
         case "qiniu":
         case "groq":
         case "xai":
@@ -494,6 +496,26 @@ export async function POST(request) {
               method: "POST",
               body: {
                 model: "MiniMax-M3",
+                messages: [{ role: "user", content: "test" }],
+                max_tokens: 1,
+                stream: false,
+              },
+            },
+            zerog: {
+              url: "https://router-api.0g.ai/v1/chat/completions",
+              method: "POST",
+              body: {
+                model: "minimax-m3",
+                messages: [{ role: "user", content: "test" }],
+                max_tokens: 1,
+                stream: false,
+              },
+            },
+            "0g": {
+              url: "https://router-api.0g.ai/v1/chat/completions",
+              method: "POST",
+              body: {
+                model: "minimax-m3",
                 messages: [{ role: "user", content: "test" }],
                 max_tokens: 1,
                 stream: false,

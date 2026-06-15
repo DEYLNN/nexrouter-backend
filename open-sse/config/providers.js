@@ -212,6 +212,14 @@ export const PROVIDERS = {
     baseUrl: "https://api.tokenrouter.com/v1/chat/completions",
     format: "openai"
   },
+  zerog: {
+    baseUrl: "https://router-api.0g.ai/v1/chat/completions",
+    format: "openai"
+  },
+  "0g": {
+    baseUrl: "https://router-api.0g.ai/v1/chat/completions",
+    format: "openai"
+  },
   tr: {
     baseUrl: "https://api.tokenrouter.com/v1/chat/completions",
     format: "openai"

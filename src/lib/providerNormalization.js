@@ -10,7 +10,7 @@ export function normalizeProviderId(provider) {
   if (AI_PROVIDERS[slug]) return slug;
 
   const providerByName = Object.values(AI_PROVIDERS).find(
-    (entry) => entry.name?.toLowerCase() === trimmed.toLowerCase()
+    (entry) => entry.name?.toLowerCase() === trimmed.toLowerCase() || entry.alias?.toLowerCase() === trimmed.toLowerCase()
   );
   return providerByName?.id || trimmed;
 }

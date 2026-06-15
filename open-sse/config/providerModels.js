@@ -297,6 +297,9 @@ export const PROVIDER_MODELS = {
   zerog: [
     { id: "minimax-m3", name: "MiniMax M3" },
   ],
+  "0g": [
+    { id: "minimax-m3", name: "MiniMax M3" },
+  ],
   zyloo: [
     { id: "claude-opus-4-6", name: "Claude Opus 4.6 (Free)" },
     { id: "gpt-5.4", name: "GPT 5.4 (Free)" },

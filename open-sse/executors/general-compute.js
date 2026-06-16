@@ -17,7 +17,19 @@ function textContent(value) {
   }
   return JSON.stringify(value);
 }
-function toolInstructions(tools = []) {
+function hasRecentToolResult(messages = []) {
+  return messages.slice(-10).some((message) => {
+    const text = typeof message?.content === "string" ? message.content : JSON.stringify(message?.content || "");
+    return message?.role === "tool" || message?.role === "function" || /^\[[^\]]+ result\]/i.test(text.trim());
+  });
+}
+function toolInstructions(tools = [], messages = []) {
+  if (hasRecentToolResult(messages)) {
+    return {
+      role: "system",
+      content: "A tool result is already present in the recent conversation. Do NOT call tools again unless the user explicitly asks for another action. Use the tool result to provide the final answer now.",
+    };
+  }
   if (!Array.isArray(tools) || tools.length === 0) return null;
   const lines = tools.map((tool) => {
     const fn = tool?.function || tool;
@@ -28,7 +40,7 @@ function toolInstructions(tools = []) {
   }).join("\n");
   return {
     role: "system",
-    content: `You are behind an OpenAI-compatible API for an agentic client. Tools are available, but this upstream model cannot call tools natively. When a tool is needed, respond ONLY with JSON in this exact shape: {"tool_call":{"name":"tool_name","arguments":{...}}}. Do not wrap in markdown. If no tool is needed, answer normally. Available tools:\n${lines}`.slice(0, 20000),
+    content: `You are behind an OpenAI-compatible API for an agentic client. Tools are available, but this upstream model cannot call tools natively. When a tool is needed for the CURRENT user request, respond ONLY with JSON in this exact shape: {"tool_call":{"name":"tool_name","arguments":{...}}}. Do not wrap in markdown. After a tool result appears, answer normally with the final result and do not call the same tool again. Available tools:\n${lines}`.slice(0, 20000),
   };
 }
 function normalizeMessages(messages = [], tools = []) {
@@ -49,7 +61,7 @@ function normalizeMessages(messages = [], tools = []) {
     }
     return { role, content: content.slice(0, 12000) };
   }).filter((m) => m.content.trim()).slice(-80);
-  const inst = toolInstructions(tools);
+  const inst = toolInstructions(tools, messages);
   return inst ? [inst, ...normalized] : normalized;
 }
 function splitGeneralComputeIds(psd = {}) {

@@ -112,7 +112,11 @@ export class GeneralComputeExecutor extends BaseExecutor {
       hint = data?.error?.message || data?.message || hint;
     } catch {
       if (String(bodyText || "").trim().startsWith("{")) hint = "Invalid upstream JSON error";
-      else if (String(bodyText || "").toLowerCase().includes("<!doctype html") || String(bodyText || "").toLowerCase().includes("<html")) hint = "Upstream returned HTML error page";
+      else if (String(bodyText || "").toLowerCase().includes("<!doctype html") || String(bodyText || "").toLowerCase().includes("<html")) {
+        hint = response.status === 403
+          ? "General Compute session/auth was rejected by upstream (HTML 403). Refresh or replace the General Compute cookie/session; retry after the short account cooldown."
+          : "Upstream returned HTML error page";
+      }
     }
     return { status: response.status, message: `General Compute HTTP ${response.status}: ${hint}` };
   }

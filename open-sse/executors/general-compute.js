@@ -17,8 +17,22 @@ function textContent(value) {
   }
   return JSON.stringify(value);
 }
-function normalizeMessages(messages = []) {
-  return messages.map((message) => {
+function toolInstructions(tools = []) {
+  if (!Array.isArray(tools) || tools.length === 0) return null;
+  const lines = tools.map((tool) => {
+    const fn = tool?.function || tool;
+    const name = fn?.name || tool?.name || "unknown_tool";
+    const desc = fn?.description || tool?.description || "";
+    const schema = fn?.parameters || tool?.input_schema || tool?.schema || {};
+    return `- ${name}: ${desc}\n  parameters: ${JSON.stringify(schema)}`;
+  }).join("\n");
+  return {
+    role: "system",
+    content: `You are behind an OpenAI-compatible API for an agentic client. Tools are available, but this upstream model cannot call tools natively. When a tool is needed, respond ONLY with JSON in this exact shape: {"tool_call":{"name":"tool_name","arguments":{...}}}. Do not wrap in markdown. If no tool is needed, answer normally. Available tools:\n${lines}`.slice(0, 20000),
+  };
+}
+function normalizeMessages(messages = [], tools = []) {
+  const normalized = messages.map((message) => {
     const role = message?.role === "assistant" ? "assistant" : (message?.role === "system" ? "system" : "user");
     let content = textContent(message?.content);
     if (message?.role === "tool" || message?.role === "function") {
@@ -35,6 +49,8 @@ function normalizeMessages(messages = []) {
     }
     return { role, content: content.slice(0, 12000) };
   }).filter((m) => m.content.trim()).slice(-80);
+  const inst = toolInstructions(tools);
+  return inst ? [inst, ...normalized] : normalized;
 }
 function splitGeneralComputeIds(psd = {}) {
   const combined = `${psd.sessionId || psd.session_id || ""} ${psd.organizationId || psd.organization_id || ""}`;
@@ -82,7 +98,7 @@ export class GeneralComputeExecutor extends BaseExecutor {
     if (!ALLOWED_MODELS.has(model)) throw new Error(`Unsupported General Compute model: ${model}`);
     return {
       model,
-      messages: normalizeMessages(body.messages || []),
+      messages: normalizeMessages(body.messages || [], body.tools || []),
       temperature: body.temperature ?? 0,
       top_p: body.top_p ?? 0,
       presence_penalty: body.presence_penalty ?? 0,

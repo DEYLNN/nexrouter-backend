@@ -79,7 +79,7 @@ function normalizeAnumaTextToolCall(completion) {
   }
 
   if (!name) {
-    const shellish = cleaned.match(/^(?:`{0,3}(?:bash|sh)?\s*)?((?:ls|find|cat|sed|grep|rg|pwd|tree|git|npm|node|python3?|pm2|du|df|tail|head)\b[\s\S]{0,1000})`{0,3}\s*$/i);
+    const shellish = cleaned.match(/^(?:`{0,3}(?:bash|sh)?\s*)?((?:ls|find|cat|sed|grep|rg|pwd|tree|git|npm|node|python3?|pm2|du|df|tail|head|ps|kill|pkill|pgrep|curl|wget|echo|sleep|which|whereis|netstat|ss|lsof|systemctl|service|docker|docker-compose|chmod|chown|mkdir|cp|mv|trash|rm)\b[\s\S]{0,1000})`{0,3}\s*$/i);
     if (shellish) {
       name = "terminal";
       args = { command: shellish[1].trim(), timeout: 30 };

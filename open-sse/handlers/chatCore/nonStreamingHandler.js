@@ -9,6 +9,46 @@ import { buildRequestDetail, extractRequestConfig, extractUsageFromResponse, sav
 import { appendRequestLog, saveRequestDetail } from "@/lib/usageDb.js";
 import { decloakToolNames } from "../../utils/claudeCloaking.js";
 
+
+function normalizeOpenAITextToolCall(completion) {
+  const choice = completion?.choices?.[0];
+  const msg = choice?.message;
+  const content = typeof msg?.content === "string" ? msg.content.trim() : "";
+  if (!content || msg?.tool_calls?.length) return completion;
+  const cleaned = content.replace(/^```(?:json)?\s*/i, "").replace(/\s*```$/i, "");
+  const extractFirstJsonObject = (text) => {
+    const start = text.indexOf("{");
+    if (start < 0) return null;
+    let depth = 0, inString = false, escape = false;
+    for (let i = start; i < text.length; i++) {
+      const ch = text[i];
+      if (escape) { escape = false; continue; }
+      if (ch === "\\") { escape = true; continue; }
+      if (ch === '"') { inString = !inString; continue; }
+      if (inString) continue;
+      if (ch === "{") depth++;
+      if (ch === "}") depth--;
+      if (depth === 0) return text.slice(start, i + 1);
+    }
+    return null;
+  };
+  let parsed = null;
+  try { parsed = JSON.parse(cleaned); } catch {}
+  if (!parsed) { const firstJson = extractFirstJsonObject(cleaned); if (firstJson) { try { parsed = JSON.parse(firstJson); } catch {} } }
+  let call = parsed?.tool_call || parsed?.toolCall || parsed?.function_call || parsed?.functionCall;
+  let name = call?.name || call?.function?.name;
+  let args = call?.arguments ?? call?.args ?? call?.function?.arguments ?? {};
+  if (!name) {
+    const textCall = cleaned.match(/(?:Requested tool calls?:\s*)?-\s*([A-Za-z_][\w.-]*)\s*\((\{[\s\S]*\})\)\s*$/i) || cleaned.match(/^([A-Za-z_][\w.-]*)\s*\((\{[\s\S]*\})\)\s*$/i);
+    if (textCall) { name = textCall[1]; args = textCall[2]; }
+  }
+  if (!name) return completion;
+  msg.content = null;
+  msg.tool_calls = [{ id: `call_${name}_${Date.now()}`, type: "function", function: { name, arguments: typeof args === "string" ? args : JSON.stringify(args || {}) } }];
+  choice.finish_reason = "tool_calls";
+  return completion;
+}
+
 /**
  * Translate non-streaming response body from provider format → OpenAI format.
  */
@@ -217,6 +257,7 @@ export async function handleNonStreamingResponse({ providerResponse, provider, m
     responseBody = responseBody.data;
   }
   if (provider === "anuma") responseBody = normalizeAnumaResponsesJson(responseBody);
+  if (provider === "general-compute") responseBody = normalizeOpenAITextToolCall(responseBody);
 
   reqLogger.logProviderResponse(providerResponse.status, providerResponse.statusText, providerResponse.headers, responseBody);
   if (onRequestSuccess) await onRequestSuccess();

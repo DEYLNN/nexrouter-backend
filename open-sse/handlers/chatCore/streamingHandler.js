@@ -140,8 +140,8 @@ export async function handleFakeStreamingFromJson({ providerResponse, provider, 
     appendLog({ status: `FAILED 502` });
     return { success: false, response: new Response(JSON.stringify({ error: { message: `Invalid JSON response from ${provider}` } }), { status: 502, headers: { "Content-Type": "application/json" } }) };
   }
-  if (provider === "anuma") {
-    responseBody = normalizeAnumaTextToolCall(normalizeAnumaResponsesJson(responseBody));
+  if (provider === "anuma" || provider === "general-compute") {
+    responseBody = normalizeAnumaTextToolCall(provider === "anuma" ? normalizeAnumaResponsesJson(responseBody) : responseBody);
     const choice = responseBody?.choices?.[0];
     const msg = choice?.message;
     const content = typeof msg?.content === "string" ? msg.content.trim() : "";
@@ -323,7 +323,7 @@ export function handleAnumaResponsesStreaming({ providerResponse, provider, mode
         send(controller, {}, sawTool ? "tool_calls" : "stop", usage);
         controller.enqueue(encoder.encode("data: [DONE]\n\n"));
         appendLog({ tokens: usage || { prompt_tokens: 0, completion_tokens: 0 }, status: "200 OK" });
-        saveUsageStats({ provider, model, tokens: usage || { prompt_tokens: 0, completion_tokens: 0 }, connectionId, apiKey, endpoint: clientRawRequest?.endpoint, label: "ANUMA STREAM USAGE" });
+        saveUsageStats({ provider, model, tokens: usage || { prompt_tokens: 0, completion_tokens: 0 }, connectionId, apiKey, endpoint: clientRawRequest?.endpoint, label: provider === "general-compute" ? "GENERAL-COMPUTE STREAM USAGE" : "ANUMA STREAM USAGE" });
         controller.close();
       } catch (err) {
         streamController?.handleError?.(err);
@@ -335,7 +335,7 @@ export function handleAnumaResponsesStreaming({ providerResponse, provider, mode
 }
 
 export function handleStreamingResponse({ providerResponse, provider, model, sourceFormat, targetFormat, userAgent, body, stream, translatedBody, finalBody, requestStartTime, connectionId, apiKey, clientRawRequest, onRequestSuccess, reqLogger, toolNameMap, streamController, onStreamComplete }) {
-  if (provider === "anuma") {
+  if (provider === "anuma" || provider === "general-compute") {
     return handleAnumaResponsesStreaming({ providerResponse, provider, model, requestStartTime, connectionId, apiKey, clientRawRequest, body, translatedBody, finalBody, onRequestSuccess, trackDone: () => {}, appendLog: () => {}, streamController });
   }
   if (onRequestSuccess) onRequestSuccess();

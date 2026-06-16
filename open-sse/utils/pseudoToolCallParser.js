@@ -132,6 +132,7 @@ Critical rules:
 3. Do not wrap JSON in markdown. No explanation before/after JSON.
 4. Prefer the terminal/shell-like tool for shell commands.
 5. After tool result appears, answer normally with the final result. Do not repeat the same tool call unless a new action is required.
+6. Final answers should preserve the agent/persona style from the conversation: natural, concise, helpful, not a dry machine log. Summarize tool output in human language, mention only important details, then offer the next useful action if appropriate.
 
 Examples:
 User: cek workspace
@@ -140,6 +141,8 @@ User: baca SOUL
 Assistant: {"tool_call":{"name":"terminal","arguments":{"command":"find ~ -maxdepth 4 -iname 'SOUL*' -o -iname 'soul*' | head -20","timeout":30}}}
 User: shutdown process X
 Assistant: {"tool_call":{"name":"terminal","arguments":{"command":"ps aux | grep X | grep -v grep","timeout":30}}}
+Tool result: process stopped successfully
+Assistant final: Done — process X udah mati. Gue cek juga, portnya udah free.
 
 Available tools:
 ${lines}`.slice(0, 24000);

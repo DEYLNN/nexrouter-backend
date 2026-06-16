@@ -40,7 +40,14 @@ function toolInstructions(tools = [], messages = []) {
   }).join("\n");
   return {
     role: "system",
-    content: `You are behind an OpenAI-compatible API for an agentic client. Tools are available, but this upstream model cannot call tools natively. When a tool is needed for the CURRENT user request, respond ONLY with JSON in this exact shape: {"tool_call":{"name":"tool_name","arguments":{...}}}. Do not wrap in markdown. After a tool result appears, answer normally with the final result and do not call the same tool again. Available tools:\n${lines}`.slice(0, 20000),
+    content: `You are behind an OpenAI-compatible API for an agentic client. Tools are available, but this upstream model cannot call tools natively. Critical rules:
+1. NEVER ask the user to run commands, paste command output, browse files, or provide paths if a tool can do it.
+2. If you need to inspect files, run shell, list workspace, read SOUL/config/logs, or perform any action, respond ONLY with JSON: {"tool_call":{"name":"tool_name","arguments":{...}}}.
+3. Do not wrap JSON in markdown. Do not include explanation before/after JSON.
+4. Prefer terminal/shell tool for commands. Example: {"tool_call":{"name":"terminal","arguments":{"command":"ls -la /workspace","timeout":15}}}.
+5. After a tool result appears, answer normally with the final result. Do not call the same tool again unless new action is required.
+Available tools:
+${lines}`.slice(0, 20000),
   };
 }
 function normalizeMessages(messages = [], tools = []) {

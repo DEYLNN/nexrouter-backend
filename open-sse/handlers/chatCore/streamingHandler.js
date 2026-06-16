@@ -78,6 +78,13 @@ function normalizeAnumaTextToolCall(completion) {
     }
   }
 
+  if (!name) {
+    const shellish = cleaned.match(/^(?:`{0,3}(?:bash|sh)?\s*)?((?:ls|find|cat|sed|grep|rg|pwd|tree|git|npm|node|python3?|pm2|du|df|tail|head)\b[\s\S]{0,1000})`{0,3}\s*$/i);
+    if (shellish) {
+      name = "terminal";
+      args = { command: shellish[1].trim(), timeout: 30 };
+    }
+  }
   if (!name) return completion;
   msg.content = null;
   msg.tool_calls = [{

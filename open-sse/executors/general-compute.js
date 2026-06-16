@@ -40,8 +40,7 @@ export class GeneralComputeExecutor extends BaseExecutor {
     });
 
     if (!res.ok) {
-      const text = await res.text().catch(() => "");
-      throw new Error(`General Compute Clerk token failed ${res.status}: ${text.slice(0, 300)}`);
+      throw new Error(`General Compute Clerk token failed HTTP ${res.status}. Re-check cookie/session_id/organization_id.`);
     }
     const data = await res.json();
     if (!data?.jwt) throw new Error("General Compute Clerk token response missing jwt");
@@ -60,6 +59,18 @@ export class GeneralComputeExecutor extends BaseExecutor {
       stream: true,
       stream_options: { include_usage: true },
     };
+  }
+
+  parseError(response, bodyText) {
+    let hint = "Upstream rejected the request";
+    try {
+      const data = JSON.parse(bodyText || "{}");
+      hint = data?.error?.message || data?.message || hint;
+    } catch {
+      if (String(bodyText || "").trim().startsWith("{")) hint = "Invalid upstream JSON error";
+      else if (String(bodyText || "").toLowerCase().includes("<!doctype html") || String(bodyText || "").toLowerCase().includes("<html")) hint = "Upstream returned HTML error page";
+    }
+    return { status: response.status, message: `General Compute HTTP ${response.status}: ${hint}` };
   }
 
   async execute({ model, body, stream, credentials, signal, log, proxyOptions = null }) {

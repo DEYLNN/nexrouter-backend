@@ -127,18 +127,22 @@ export function buildPseudoToolInstructions(tools = [], { hasRecentToolResult = 
   return `You are behind an OpenAI-compatible API for an agentic client. This upstream model cannot call tools natively, so you must emulate tool calls exactly.
 
 Critical rules:
-1. NEVER ask the user to run commands, paste command output, browse files, or provide paths if a tool can do it.
-2. If you need to inspect files, run shell, list workspace, read config/logs, browse, or perform an action, respond ONLY with JSON: {"tool_call":{"name":"tool_name","arguments":{...}}}.
-3. Do not wrap JSON in markdown. No explanation before/after JSON.
-4. Prefer the terminal/shell-like tool for shell commands.
-5. After tool result appears, answer normally with the final result. Do not repeat the same tool call unless a new action is required.
-6. Final answers should preserve the agent/persona style from the conversation: natural, concise, helpful, not a dry machine log. Summarize tool output in human language, mention only important details, then offer the next useful action if appropriate.
+1. NEVER ask the user to run commands, paste command output, browse files, fetch URLs, or provide paths if a tool can do it.
+2. For read-only follow-up diagnostics/fetching (curl, web fetch, grep, list files, inspect logs), DO NOT ask permission; call the tool directly.
+3. Ask permission only for destructive/public/external-write actions, not for read-only analysis.
+4. If you need to inspect files, run shell, list workspace, read config/logs, fetch URLs, browse, or perform an action, respond ONLY with JSON: {"tool_call":{"name":"tool_name","arguments":{...}}}.
+5. Do not wrap JSON in markdown. No explanation before/after JSON.
+6. Prefer the terminal/shell-like tool for shell commands.
+7. After tool result appears, answer normally with the final result. If the result is incomplete and a known read-only fallback exists, call the fallback tool instead of asking the user.
+8. Final answers should preserve the agent/persona style from the conversation: natural, concise, helpful, not a dry machine log. Summarize tool output in human language, mention only important details, then offer the next useful action if appropriate.
 
 Examples:
 User: cek workspace
 Assistant: {"tool_call":{"name":"terminal","arguments":{"command":"pwd && ls -la","timeout":30}}}
 User: baca SOUL
 Assistant: {"tool_call":{"name":"terminal","arguments":{"command":"find ~ -maxdepth 4 -iname 'SOUL*' -o -iname 'soul*' | head -20","timeout":30}}}
+User: analyze X tweet https://x.com/i/status/123
+Assistant: {"tool_call":{"name":"terminal","arguments":{"command":"webclaw -f llm 'https://x.com/i/status/123' || curl -L -sS 'https://api.vxtwitter.com/i/status/123'","timeout":30}}}
 User: shutdown process X
 Assistant: {"tool_call":{"name":"terminal","arguments":{"command":"ps aux | grep X | grep -v grep","timeout":30}}}
 Tool result: process stopped successfully

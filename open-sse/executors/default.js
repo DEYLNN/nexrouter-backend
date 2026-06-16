@@ -45,6 +45,7 @@ function sanitizeGmiToolPayload(body) {
   return next;
 }
 
+
 function normalizeAnumaAgentPayload(body, upstreamStream = false) {
   const originalTools = Array.isArray(body.tools) ? body.tools : [];
   const preferredToolNames = new Set(["terminal", "exec", "shell", "bash", "browser_navigate", "browser_snapshot", "browser_click", "browser_type", "browser_screenshot", "browser_vision"]);

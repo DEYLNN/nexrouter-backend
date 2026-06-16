@@ -105,6 +105,16 @@ export const PROVIDERS = {
     format: "openai",
     headers: {},
   },
+  "general-compute": {
+    baseUrl: "https://api.generalcompute.com/dashboard/playground/chat/completions",
+    format: "openai",
+    headers: {
+      "Accept": "text/event-stream",
+      "Origin": "https://app.generalcompute.com",
+      "Referer": "https://app.generalcompute.com/",
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36"
+    },
+  },
   antigravity: {
     baseUrls: [
       "https://daily-cloudcode-pa.googleapis.com",

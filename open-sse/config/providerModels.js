@@ -1081,6 +1081,7 @@ const OAUTH_ALIASES = {
   zerog: "0g",
   zyloo: "zyloo",
   freebuff: "fb",
+  "general-compute": "gcx",
 };
 
 // Derived from PROVIDERS — no need to maintain manually

@@ -17,6 +17,7 @@ import { OllamaLocalExecutor } from "./ollama-local.js";
 import { CommandCodeExecutor } from "./commandcode.js";
 import { FreeBuffExecutor } from "./freebuff.js";
 import { MimoFreeExecutor } from "./mimo-free.js";
+import { GeneralComputeExecutor } from "./general-compute.js";
 import { DefaultExecutor } from "./default.js";
 
 const executors = {
@@ -43,6 +44,8 @@ const executors = {
   fb: new FreeBuffExecutor(),
   "mimo-free": new MimoFreeExecutor(),
   mmf: new MimoFreeExecutor(),
+  "general-compute": new GeneralComputeExecutor(),
+  gcx: new GeneralComputeExecutor(),
 };
 
 const defaultCache = new Map();
@@ -78,3 +81,4 @@ export { OllamaLocalExecutor } from "./ollama-local.js";
 export { CommandCodeExecutor } from "./commandcode.js";
 export { FreeBuffExecutor } from "./freebuff.js";
 export { MimoFreeExecutor } from "./mimo-free.js";
+export { GeneralComputeExecutor } from "./general-compute.js";

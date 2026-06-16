@@ -5,6 +5,37 @@ import { proxyAwareFetch } from "../utils/proxyFetch.js";
 const ALLOWED_MODELS = new Set(["deepseek-v3.2", "deepseek-v3.1", "minimax-m2.7"]);
 
 function str(v) { return String(v || "").trim(); }
+function textContent(value) {
+  if (value == null) return "";
+  if (typeof value === "string") return value;
+  if (Array.isArray(value)) {
+    return value.map((part) => {
+      if (typeof part === "string") return part;
+      if (part?.type === "text") return part.text || "";
+      return JSON.stringify(part ?? "");
+    }).filter(Boolean).join("\n");
+  }
+  return JSON.stringify(value);
+}
+function normalizeMessages(messages = []) {
+  return messages.map((message) => {
+    const role = message?.role === "assistant" ? "assistant" : (message?.role === "system" ? "system" : "user");
+    let content = textContent(message?.content);
+    if (message?.role === "tool" || message?.role === "function") {
+      const label = message.name || message.tool_call_id || "tool";
+      return { role: "user", content: `[${label} result]\n${content}`.slice(0, 8000) };
+    }
+    if (Array.isArray(message?.tool_calls) && message.tool_calls.length > 0) {
+      const calls = message.tool_calls.map((call) => {
+        const name = call?.function?.name || call?.name || call?.id || "tool";
+        const args = call?.function?.arguments || call?.arguments || "{}";
+        return `- ${name}(${args})`;
+      }).join("\n");
+      content = `${content || "Requested tool calls:"}\n${calls}`;
+    }
+    return { role, content: content.slice(0, 12000) };
+  }).filter((m) => m.content.trim()).slice(-80);
+}
 function splitGeneralComputeIds(psd = {}) {
   const combined = `${psd.sessionId || psd.session_id || ""} ${psd.organizationId || psd.organization_id || ""}`;
   return {
@@ -51,7 +82,7 @@ export class GeneralComputeExecutor extends BaseExecutor {
     if (!ALLOWED_MODELS.has(model)) throw new Error(`Unsupported General Compute model: ${model}`);
     return {
       model,
-      messages: body.messages || [],
+      messages: normalizeMessages(body.messages || []),
       temperature: body.temperature ?? 0,
       top_p: body.top_p ?? 0,
       presence_penalty: body.presence_penalty ?? 0,

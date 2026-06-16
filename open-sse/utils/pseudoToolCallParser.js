@@ -65,6 +65,20 @@ function parseShellCommand(cleaned, preferredTool = "terminal") {
   return { name: preferredTool, arguments: JSON.stringify({ command: m[1].trim(), timeout: 30 }) };
 }
 
+function parseEmbeddedShellCommand(cleaned, preferredTool = "terminal") {
+  const lines = String(cleaned || "").split(/\r?\n/).map((line) => line.trim()).filter(Boolean);
+  const cmdLines = [];
+  for (const line of lines) {
+    const stripped = line.replace(/^[-*•>]\s*/, "").replace(/^`|`$/g, "").trim();
+    const m = stripped.match(SHELL_COMMAND_RE);
+    if (m) cmdLines.push(m[1].trim());
+  }
+  if (cmdLines.length === 0) return null;
+  // When model writes alternatives, execute safe read-only alternatives as fallback chain.
+  const command = cmdLines.slice(0, 4).join(" || ");
+  return { name: preferredTool, arguments: JSON.stringify({ command, timeout: 45 }) };
+}
+
 function toolExists(name, tools = []) {
   if (!Array.isArray(tools) || tools.length === 0) return true;
   return tools.some((tool) => {
@@ -86,6 +100,7 @@ export function extractPseudoToolCall(text, tools = []) {
     parseJsonToolCall(cleaned),
     parseTextToolCall(cleaned),
     parseShellCommand(cleaned, terminalTool),
+    parseEmbeddedShellCommand(cleaned, terminalTool),
   ].filter(Boolean);
   for (const c of candidates) {
     if (toolExists(c.name, tools)) return c;

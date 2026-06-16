@@ -154,7 +154,26 @@ export const APIKEY_PROVIDERS = {
 
 // Custom Providers (non-API-key / non-OAuth integrations)
 export const CUSTOM_PROVIDERS = {
-  "general-compute": { id: "general-compute", alias: "gcx", name: "General Compute", icon: "/providers/general-compute.png", color: "#111827", textIcon: "GC", website: "https://generalcompute.com", authType: "custom", hasProviderSpecificData: true, notice: { text: "Requires Clerk session credentials: cookie, session_id, and organization_id. Not a standard API-key/OAuth provider." }, serviceKinds: ["llm"], models: [{ id: "deepseek-v3.2", name: "DeepSeek V3.2" }, { id: "deepseek-v3.1", name: "DeepSeek V3.1" }, { id: "minimax-m2.7", name: "MiniMax M2.7" }] },
+  "general-compute": {
+    id: "general-compute",
+    alias: "gcx",
+    name: "General Compute",
+    icon: "/providers/general-compute.png",
+    color: "#111827",
+    textIcon: "GC",
+    website: "https://generalcompute.com",
+    authType: "custom",
+    authLabel: "Clerk Session",
+    hasProviderSpecificData: true,
+    authHint: "Paste Clerk cookie, session_id, and organization_id from a logged-in General Compute session.",
+    notice: { text: "Requires Clerk session credentials: cookie, session_id, and organization_id. Not a standard API-key/OAuth provider." },
+    serviceKinds: ["llm"],
+    models: [
+      { id: "deepseek-v3.2", name: "DeepSeek V3.2" },
+      { id: "deepseek-v3.1", name: "DeepSeek V3.1" },
+      { id: "minimax-m2.7", name: "MiniMax M2.7" },
+    ],
+  },
 };
 
 // Web Cookie Providers (use browser session cookie instead of API key)

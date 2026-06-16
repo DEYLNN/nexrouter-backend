@@ -152,6 +152,11 @@ export const APIKEY_PROVIDERS = {
   "jina-reader": { id: "jina-reader", alias: "jina", name: "Jina Reader", icon: "menu_book", color: "#000000", textIcon: "JR", website: "https://jina.ai/reader", notice: { apiKeyUrl: "https://jina.ai/?sui=apikey" }, serviceKinds: ["webFetch"], fetchConfig: { baseUrl: "https://r.jina.ai", method: "GET", authType: "apikey", authHeader: "bearer", costPerQuery: 0, freeMonthlyQuota: 1000000, formats: ["markdown", "text", "html"], maxCharacters: 200000, timeoutMs: 30000 } },
 };
 
+// Custom Providers (non-API-key / non-OAuth integrations)
+export const CUSTOM_PROVIDERS = {
+  "general-compute": { id: "general-compute", alias: "gcx", name: "General Compute", icon: "/providers/general-compute.png", color: "#111827", textIcon: "GC", website: "https://generalcompute.com", authType: "custom", hasProviderSpecificData: true, notice: { text: "Requires Clerk session credentials: cookie, session_id, and organization_id. Not a standard API-key/OAuth provider." }, serviceKinds: ["llm"], models: [{ id: "deepseek-v3.2", name: "DeepSeek V3.2" }, { id: "deepseek-v3.1", name: "DeepSeek V3.1" }, { id: "minimax-m2.7", name: "MiniMax M2.7" }] },
+};
+
 // Web Cookie Providers (use browser session cookie instead of API key)
 export const WEB_COOKIE_PROVIDERS = {
   "grok-web": { id: "grok-web", alias: "gw", name: "Grok Web (Subscription)", icon: "auto_awesome", color: "#1DA1F2", textIcon: "GW", website: "https://grok.com", authType: "cookie", authHint: "Paste your sso= cookie value from grok.com", passthroughModels: true, serviceKinds: ["llm"] },
@@ -177,7 +182,7 @@ export function isCustomEmbeddingProvider(providerId) {
 }
 
 // All providers (combined)
-export const AI_PROVIDERS = { ...FREE_PROVIDERS, ...FREE_TIER_PROVIDERS, ...OAUTH_PROVIDERS, ...APIKEY_PROVIDERS, ...WEB_COOKIE_PROVIDERS };
+export const AI_PROVIDERS = { ...FREE_PROVIDERS, ...FREE_TIER_PROVIDERS, ...CUSTOM_PROVIDERS, ...OAUTH_PROVIDERS, ...APIKEY_PROVIDERS, ...WEB_COOKIE_PROVIDERS };
 
 // Auth methods
 export const AUTH_METHODS = {

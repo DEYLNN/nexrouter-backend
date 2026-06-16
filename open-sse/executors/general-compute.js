@@ -106,7 +106,7 @@ export class GeneralComputeExecutor extends BaseExecutor {
     return data.jwt;
   }
 
-  transformRequest(model, body) {
+  transformRequest(model, body, stream = true) {
     if (!ALLOWED_MODELS.has(model)) throw new Error(`Unsupported General Compute model: ${model}`);
     return {
       model,
@@ -115,8 +115,8 @@ export class GeneralComputeExecutor extends BaseExecutor {
       top_p: body.top_p ?? 0,
       presence_penalty: body.presence_penalty ?? 0,
       frequency_penalty: body.frequency_penalty ?? 0,
-      stream: true,
-      stream_options: { include_usage: true },
+      stream,
+      ...(stream ? { stream_options: { include_usage: true } } : {}),
     };
   }
 
@@ -135,10 +135,10 @@ export class GeneralComputeExecutor extends BaseExecutor {
   async execute({ model, body, stream, credentials, signal, log, proxyOptions = null }) {
     const jwt = await this.resolveJwt(credentials);
     const url = this.config.baseUrl;
-    const transformedBody = this.transformRequest(model, body, true, credentials);
+    const transformedBody = this.transformRequest(model, body, stream);
     const headers = {
       "Content-Type": "application/json",
-      "Accept": "text/event-stream",
+      "Accept": stream ? "text/event-stream" : "application/json",
       "Authorization": `Bearer ${jwt}`,
       ...this.config.headers,
     };

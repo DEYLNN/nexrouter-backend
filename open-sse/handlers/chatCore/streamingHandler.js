@@ -4,6 +4,7 @@ import { createSSETransformStreamWithLogger, createPassthroughStreamWithLogger }
 import { pipeWithDisconnect } from "../../utils/streamHandler.js";
 import { buildRequestDetail, extractRequestConfig, saveUsageStats } from "./requestDetail.js";
 import { saveRequestDetail } from "@/lib/usageDb.js";
+import { normalizeCompletionPseudoToolCalls } from "../../utils/pseudoToolCallParser.js";
 
 const SSE_HEADERS = {
   "Content-Type": "text/event-stream",
@@ -148,7 +149,7 @@ export async function handleFakeStreamingFromJson({ providerResponse, provider, 
     return { success: false, response: new Response(JSON.stringify({ error: { message: `Invalid JSON response from ${provider}` } }), { status: 502, headers: { "Content-Type": "application/json" } }) };
   }
   if (provider === "anuma" || provider === "general-compute") {
-    responseBody = normalizeAnumaTextToolCall(provider === "anuma" ? normalizeAnumaResponsesJson(responseBody) : responseBody);
+    responseBody = provider === "anuma" ? normalizeAnumaTextToolCall(normalizeAnumaResponsesJson(responseBody)) : normalizeCompletionPseudoToolCalls(responseBody, { provider, tools: body.tools || [] });
     const choice = responseBody?.choices?.[0];
     const msg = choice?.message;
     const content = typeof msg?.content === "string" ? msg.content.trim() : "";

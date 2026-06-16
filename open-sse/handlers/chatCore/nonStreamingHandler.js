@@ -8,6 +8,7 @@ import { parseSSEToOpenAIResponse } from "./sseToJsonHandler.js";
 import { buildRequestDetail, extractRequestConfig, extractUsageFromResponse, saveUsageStats } from "./requestDetail.js";
 import { appendRequestLog, saveRequestDetail } from "@/lib/usageDb.js";
 import { decloakToolNames } from "../../utils/claudeCloaking.js";
+import { normalizeCompletionPseudoToolCalls } from "../../utils/pseudoToolCallParser.js";
 
 
 function normalizeOpenAITextToolCall(completion) {
@@ -265,7 +266,7 @@ export async function handleNonStreamingResponse({ providerResponse, provider, m
     responseBody = responseBody.data;
   }
   if (provider === "anuma") responseBody = normalizeAnumaResponsesJson(responseBody);
-  if (provider === "general-compute") responseBody = normalizeOpenAITextToolCall(responseBody);
+  if (provider === "general-compute") responseBody = normalizeCompletionPseudoToolCalls(responseBody, { provider, tools: body.tools || [] });
 
   reqLogger.logProviderResponse(providerResponse.status, providerResponse.statusText, providerResponse.headers, responseBody);
   if (onRequestSuccess) await onRequestSuccess();

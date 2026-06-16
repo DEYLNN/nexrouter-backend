@@ -1,6 +1,7 @@
 import { BaseExecutor } from "./base.js";
 import { PROVIDERS } from "../config/providers.js";
 import { proxyAwareFetch } from "../utils/proxyFetch.js";
+import { buildPseudoToolInstructions } from "../utils/pseudoToolCallParser.js";
 
 const ALLOWED_MODELS = new Set(["deepseek-v3.2", "deepseek-v3.1", "minimax-m2.7"]);
 
@@ -24,31 +25,8 @@ function hasRecentToolResult(messages = []) {
   });
 }
 function toolInstructions(tools = [], messages = []) {
-  if (hasRecentToolResult(messages)) {
-    return {
-      role: "system",
-      content: "A tool result is already present in the recent conversation. Do NOT call tools again unless the user explicitly asks for another action. Use the tool result to provide the final answer now.",
-    };
-  }
-  if (!Array.isArray(tools) || tools.length === 0) return null;
-  const lines = tools.map((tool) => {
-    const fn = tool?.function || tool;
-    const name = fn?.name || tool?.name || "unknown_tool";
-    const desc = fn?.description || tool?.description || "";
-    const schema = fn?.parameters || tool?.input_schema || tool?.schema || {};
-    return `- ${name}: ${desc}\n  parameters: ${JSON.stringify(schema)}`;
-  }).join("\n");
-  return {
-    role: "system",
-    content: `You are behind an OpenAI-compatible API for an agentic client. Tools are available, but this upstream model cannot call tools natively. Critical rules:
-1. NEVER ask the user to run commands, paste command output, browse files, or provide paths if a tool can do it.
-2. If you need to inspect files, run shell, list workspace, read SOUL/config/logs, or perform any action, respond ONLY with JSON: {"tool_call":{"name":"tool_name","arguments":{...}}}.
-3. Do not wrap JSON in markdown. Do not include explanation before/after JSON.
-4. Prefer terminal/shell tool for commands. Example: {"tool_call":{"name":"terminal","arguments":{"command":"ls -la /workspace","timeout":15}}}.
-5. After a tool result appears, answer normally with the final result. Do not call the same tool again unless new action is required.
-Available tools:
-${lines}`.slice(0, 20000),
-  };
+  const content = buildPseudoToolInstructions(tools, { hasRecentToolResult: hasRecentToolResult(messages) });
+  return content ? { role: "system", content } : null;
 }
 function normalizeMessages(messages = [], tools = []) {
   const normalized = messages.map((message) => {

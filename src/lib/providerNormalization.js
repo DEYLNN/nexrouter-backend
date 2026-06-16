@@ -1,5 +1,13 @@
 import { AI_PROVIDERS } from "../shared/constants/providers.js";
 
+function normalizeGeneralComputeSpecificData(next = {}, body = {}) {
+  const combined = `${next.sessionId || next.session_id || body.sessionId || body.session_id || ""} ${next.organizationId || next.organization_id || body.organizationId || body.organization_id || ""}`;
+  const sessionId = combined.match(/sess_[A-Za-z0-9]+/)?.[0] || String(next.sessionId || next.session_id || body.sessionId || body.session_id || "").trim();
+  const organizationId = combined.match(/org_[A-Za-z0-9]+/)?.[0] || String(next.organizationId || next.organization_id || body.organizationId || body.organization_id || "").trim();
+  const cookie = String(next.cookie || body.cookie || "").trim();
+  return { cookie, sessionId, organizationId };
+}
+
 export function normalizeProviderId(provider) {
   if (typeof provider !== "string") return provider;
 
@@ -19,6 +27,10 @@ export function normalizeProviderSpecificData(provider, body = {}, providerSpeci
   const next = providerSpecificData && typeof providerSpecificData === "object"
     ? { ...providerSpecificData }
     : {};
+
+  if (provider === "general-compute") {
+    Object.assign(next, normalizeGeneralComputeSpecificData(next, body));
+  }
 
   if (provider === "ollama-local") {
     const baseUrl = (

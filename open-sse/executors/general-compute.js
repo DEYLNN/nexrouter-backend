@@ -5,6 +5,13 @@ import { proxyAwareFetch } from "../utils/proxyFetch.js";
 const ALLOWED_MODELS = new Set(["deepseek-v3.2", "deepseek-v3.1", "minimax-m2.7"]);
 
 function str(v) { return String(v || "").trim(); }
+function splitGeneralComputeIds(psd = {}) {
+  const combined = `${psd.sessionId || psd.session_id || ""} ${psd.organizationId || psd.organization_id || ""}`;
+  return {
+    sessionId: combined.match(/sess_[A-Za-z0-9]+/)?.[0] || str(psd.sessionId || psd.session_id),
+    organizationId: combined.match(/org_[A-Za-z0-9]+/)?.[0] || str(psd.organizationId || psd.organization_id),
+  };
+}
 
 export class GeneralComputeExecutor extends BaseExecutor {
   constructor() {
@@ -14,8 +21,7 @@ export class GeneralComputeExecutor extends BaseExecutor {
   async resolveJwt(credentials) {
     const psd = credentials?.providerSpecificData || {};
     const cookie = str(psd.cookie);
-    const sessionId = str(psd.sessionId || psd.session_id);
-    const organizationId = str(psd.organizationId || psd.organization_id);
+    const { sessionId, organizationId } = splitGeneralComputeIds(psd);
     if (!cookie || !sessionId || !organizationId) {
       throw new Error("General Compute requires cookie, sessionId, and organizationId");
     }

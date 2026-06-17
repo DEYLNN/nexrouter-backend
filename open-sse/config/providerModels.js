@@ -772,6 +772,10 @@ export const PROVIDER_MODELS = {
     { id: "minimax/minimax-m2.5", name: "MiniMax M2.5" },
     { id: "zai/glm-5.1", name: "GLM 5.1" },
   ],
+  ftstoresz: [
+    { id: "qwen3.7-max", name: "Qwen3.7 Max" },
+    { id: "claude-opus-4.7", name: "Claude Opus 4.7" },
+  ],
   am: [
     { id: "am/claude-opus-4.7", name: "Claude Opus 4.7" },
     { id: "am/claude-opus-4.8", name: "Claude Opus 4.8" },
@@ -1074,6 +1078,7 @@ const OAUTH_ALIASES = {
   vertex: "vertex",
   "vertex-partner": "vertex-partner",
   canopywave: "cwv",
+  ftstoresz: "ftstoresz",
   ambient: "amb",
   "xiaomi-mimo-plan-sgp": "mimo-sgp",
   swiftrouter: "sr",

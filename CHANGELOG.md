@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.4.71] - 2026-06-17
+
+### Added
+- Add ftstoresz API-key provider (`ftstoresz`) with OpenAI-compatible endpoint and constant models `qwen3.7-max` and `claude-opus-4.7`.
+
 ## [0.4.70] - 2026-06-13
 
 ### Added

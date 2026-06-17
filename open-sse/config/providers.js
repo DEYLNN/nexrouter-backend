@@ -129,6 +129,10 @@ export const PROVIDERS = {
     baseUrl: "https://inference.canopywave.io/v1/chat/completions",
     format: "openai"
   },
+  ftstoresz: {
+    baseUrl: "https://api-ai.ftstoresz.com/v1/chat/completions",
+    format: "openai"
+  },
   zyloo: {
     baseUrl: "https://zyloo.io/v1/chat/completions",
     format: "openai"

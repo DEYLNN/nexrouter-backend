@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.4.72] - 2026-06-17
+
+### Fixed
+- Register ftstoresz in backend dashboard provider constants and API-key validation so adding ftstoresz keys works from the UI.
+
 ## [0.4.71] - 2026-06-17
 
 ### Added

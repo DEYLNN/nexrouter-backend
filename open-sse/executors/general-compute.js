@@ -1,7 +1,6 @@
 import { BaseExecutor } from "./base.js";
 import { PROVIDERS } from "../config/providers.js";
 import { proxyAwareFetch } from "../utils/proxyFetch.js";
-import { buildPseudoToolInstructions } from "../utils/pseudoToolCallParser.js";
 
 const ALLOWED_MODELS = new Set(["deepseek-v3.2", "deepseek-v3.1", "minimax-m2.7"]);
 
@@ -17,16 +16,6 @@ function textContent(value) {
     }).filter(Boolean).join("\n");
   }
   return JSON.stringify(value);
-}
-function hasRecentToolResult(messages = []) {
-  return messages.slice(-10).some((message) => {
-    const text = typeof message?.content === "string" ? message.content : JSON.stringify(message?.content || "");
-    return message?.role === "tool" || message?.role === "function" || /^\[[^\]]+ result\]/i.test(text.trim());
-  });
-}
-function toolInstructions(tools = [], messages = []) {
-  const content = buildPseudoToolInstructions(tools, { hasRecentToolResult: hasRecentToolResult(messages) });
-  return content ? { role: "system", content } : null;
 }
 function normalizeMessages(messages = [], tools = []) {
   const normalized = messages.map((message) => {
@@ -46,8 +35,7 @@ function normalizeMessages(messages = [], tools = []) {
     }
     return { role, content: content.slice(0, 12000) };
   }).filter((m) => m.content.trim()).slice(-80);
-  const inst = toolInstructions(tools, messages);
-  return inst ? [inst, ...normalized] : normalized;
+  return normalized;
 }
 function splitGeneralComputeIds(psd = {}) {
   const combined = `${psd.sessionId || psd.session_id || ""} ${psd.organizationId || psd.organization_id || ""}`;

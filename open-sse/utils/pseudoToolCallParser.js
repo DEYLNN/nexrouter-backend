@@ -1,4 +1,4 @@
-const SHELL_COMMAND_RE = /^(?:`{0,3}(?:bash|sh)?\s*)?((?:ls|find|cat|sed|grep|rg|pwd|tree|git|npm|node|python3?|pm2|du|df|tail|head|ps|kill|pkill|pgrep|curl|wget|webclaw|obscura|echo|sleep|which|whereis|netstat|ss|lsof|systemctl|service|docker|docker-compose|chmod|chown|mkdir|cp|mv|trash|rm)\b[\s\S]{0,1600})`{0,3}\s*$/i;
+const SHELL_COMMAND_RE = /^(?:`{0,3}(?:bash|sh)?\s*)?((?:ls|find|cat|sed|grep|rg|pwd|tree|git|npm|node|python3?|pm2|du|df|tail|head|ps|kill|pkill|pgrep|curl|wget|echo|sleep|which|whereis|netstat|ss|lsof|systemctl|service|docker|docker-compose|chmod|chown|mkdir|cp|mv|trash|rm)\b[\s\S]{0,1600})`{0,3}\s*$/i;
 
 function stripFences(text) {
   return String(text || "").trim().replace(/^```(?:json|javascript|js|bash|sh)?\s*/i, "").replace(/\s*```$/i, "").trim();
@@ -130,13 +130,12 @@ Critical rules:
 1. NEVER ask the user to run commands, paste command output, browse files, fetch URLs, or provide paths if a tool can do it.
 2. For read-only follow-up diagnostics/fetching (curl, web fetch, grep, list files, inspect logs, GitHub API, clone-less repo inspection), DO NOT ask permission; call the tool directly.
 3. If the user asks to analyze/check/read/inspect a URL, tweet, repo, project, file, logs, or workspace, continue read-only steps until you have enough substance for an answer. Do not stop at metadata and ask “want me to inspect/clone/fetch more?”
-4. Use an autonomous read-only ladder when blocked: direct curl/API → webclaw rendered/LLM extract → known alternate APIs/frontends (vxtwitter/fxtwitter/nitter/GitHub API/raw) → search query → headers/sitemap/README. Chain these without asking.
-5. Ask permission only for destructive/public/external-write actions, credentials/secrets exposure, installs, service restarts, file writes, sudo/elevated commands, package manager installs, or deleting/killing/stopping processes.
+4. Ask permission only for destructive/public/external-write actions, credentials/secrets exposure, installs, service restarts, or writes.
 5. If you need to inspect files, run shell, list workspace, read config/logs, fetch URLs, browse, or perform an action, respond ONLY with JSON: {"tool_call":{"name":"tool_name","arguments":{...}}}.
 5. Do not wrap JSON in markdown. No explanation before/after JSON.
 6. Prefer the terminal/shell-like tool for shell commands.
-9. After tool result appears, answer normally with the final result only when the original user intent is satisfied. If the result is only metadata/partial and obvious read-only next steps exist, call the next tool instead of asking the user.
-10. Final answers should preserve the agent/persona style from the conversation: natural, concise, helpful, not a dry machine log. Summarize tool output in human language, mention only important details, then offer the next useful action if appropriate.
+8. After tool result appears, answer normally with the final result only when the original user intent is satisfied. If the result is only metadata/partial and obvious read-only next steps exist, call the next tool instead of asking the user.
+9. Final answers should preserve the agent/persona style from the conversation: natural, concise, helpful, not a dry machine log. Summarize tool output in human language, mention only important details, then offer the next useful action if appropriate.
 
 Examples:
 User: cek workspace
@@ -147,10 +146,6 @@ User: analyze X tweet https://x.com/i/status/123
 Assistant: {"tool_call":{"name":"terminal","arguments":{"command":"webclaw -f llm 'https://x.com/i/status/123' || curl -L -sS 'https://api.vxtwitter.com/i/status/123'","timeout":30}}}
 Tool result: tweet references github.com/org/repo
 Assistant: {"tool_call":{"name":"terminal","arguments":{"command":"tmp=$(mktemp -d); cd $tmp && curl -L -sS https://api.github.com/repos/org/repo && curl -L -sS https://api.github.com/repos/org/repo/contents && curl -L -sS https://raw.githubusercontent.com/org/repo/HEAD/README.md | head -200","timeout":30}}}
-User: link di tweet/image itu isinya apa?
-Assistant: {"tool_call":{"name":"terminal","arguments":{"command":"webclaw -f llm 'https://x.com/i/status/123' || curl -L -sS 'https://api.vxtwitter.com/i/status/123'; webclaw -f llm 'https://www.google.com/search?q=quoted+product+name+official+link' | head -120","timeout":45}}}
-Tool result: only metadata, link still unclear
-Assistant: {"tool_call":{"name":"terminal","arguments":{"command":"curl -L -sSI 'https://candidate.example/path' | head -20; webclaw -f llm 'https://candidate.example/path' | head -160","timeout":45}}}
 User: shutdown process X
 Assistant: {"tool_call":{"name":"terminal","arguments":{"command":"ps aux | grep X | grep -v grep","timeout":30}}}
 Tool result: process stopped successfully

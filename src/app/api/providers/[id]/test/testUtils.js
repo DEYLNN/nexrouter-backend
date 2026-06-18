@@ -605,6 +605,22 @@ async function testApiKeyConnection(connection, effectiveProxy = null) {
         const valid = res.status !== 401 && res.status !== 403;
         return { valid, error: valid ? null : "Invalid API key or Kimchi blocked the probe" };
       }
+      case "opencode-go": {
+        const res = await fetchWithConnectionProxy("https://opencode.ai/zen/go/v1/chat/completions", {
+          method: "POST",
+          headers: { Authorization: `Bearer ${connection.apiKey}`, "content-type": "application/json" },
+          body: JSON.stringify({ model: "kimi-k2.7-code", messages: [{ role: "user", content: "test" }], max_tokens: 1, stream: false }),
+        }, effectiveProxy);
+        const valid = res.status !== 401 && res.status !== 403;
+        if (valid) return { valid: true, error: null };
+        let detail = "Invalid OpenCode Go API key";
+        try {
+          const text = await res.text();
+          const data = text ? JSON.parse(text) : null;
+          detail = data?.error?.message || data?.message || detail;
+        } catch { }
+        return { valid: false, error: detail };
+      }
       case "bai": {
         const res = await fetchWithConnectionProxy("https://api.b.ai/v1/chat/completions", {
           method: "POST",

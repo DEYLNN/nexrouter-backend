@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.4.76] - 2026-06-18
+
+### Added
+- Add new OpenCode Go models: `kimi-k2.7-code`, `minimax-m3`, `glm-5.2`, `deepseek-v4-pro`, `deepseek-v4-flash`, `mimo-v2.5`, `mimo-v2.5-pro`.
+- Add new Command Code models: `moonshotai/Kimi-K2.7-Code`, `zai-org/GLM-5.2`, `MiniMaxAI/MiniMax-M3`, `xiaomi/mimo-v2.5`, `xiaomi/mimo-v2.5-pro`, `nvidia/nemotron-3-ultra-550b-a55b`.
+
 ## [0.4.75] - 2026-06-18
 
 ### Added

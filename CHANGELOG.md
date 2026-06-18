@@ -1,9 +1,9 @@
 # Changelog
 
-## [0.4.73] - 2026-06-18
+## [0.4.74] - 2026-06-18
 
-### Added
-- Add ZCode OAuth provider flow with Z.AI API-key exchange and Anthropic Messages routing.
+### Removed
+- Remove unfinished ZCode OAuth provider integration while captcha verification remains unresolved.
 
 ## [0.4.72] - 2026-06-17
 

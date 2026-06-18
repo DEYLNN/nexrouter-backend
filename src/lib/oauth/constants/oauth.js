@@ -76,17 +76,6 @@ export const QWEN_CONFIG = {
   codeChallengeMethod: "S256",
 };
 
-
-// ZCode / Z.AI OAuth Configuration (CLI polling flow)
-export const ZCODE_CONFIG = {
-  apiBaseUrl: "https://zcode.z.ai/api/v1",
-  initUrl: "https://zcode.z.ai/api/v1/oauth/cli/init",
-  pollUrlBase: "https://zcode.z.ai/api/v1/oauth/cli/poll",
-  zaiLoginUrl: "https://api.z.ai/api/auth/z/login",
-  customerInfoUrl: "https://api.z.ai/api/biz/customer/getCustomerInfo",
-  apiKeyName: "zcode-api-key",
-};
-
 // Qoder OAuth Configuration (Device Token Flow)
 export const QODER_CONFIG = {
   openApiBaseUrl: "https://openapi.qoder.sh",

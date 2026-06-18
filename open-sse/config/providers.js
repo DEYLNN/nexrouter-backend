@@ -105,28 +105,6 @@ export const PROVIDERS = {
     format: "openai",
     headers: {},
   },
-  zcode: {
-    baseUrl: "https://zcode.z.ai/api/v1/zcode-plan/anthropic/v1/messages",
-    format: "claude",
-    headers: {
-      "anthropic-version": "2023-06-01",
-      "User-Agent": "zcode2api/1.0 NexRouter",
-      "X-ZCode-App-Version": "3.0.1",
-      "X-ZCode-Agent": "glm",
-      "HTTP-Referer": "https://zcode.z.ai/",
-    },
-  },
-  zc: {
-    baseUrl: "https://zcode.z.ai/api/v1/zcode-plan/anthropic/v1/messages",
-    format: "claude",
-    headers: {
-      "anthropic-version": "2023-06-01",
-      "User-Agent": "zcode2api/1.0 NexRouter",
-      "X-ZCode-App-Version": "3.0.1",
-      "X-ZCode-Agent": "glm",
-      "HTTP-Referer": "https://zcode.z.ai/",
-    },
-  },
   "general-compute": {
     baseUrl: "https://api.generalcompute.com/dashboard/playground/chat/completions",
     format: "openai",

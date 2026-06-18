@@ -263,6 +263,7 @@ export class DefaultExecutor extends BaseExecutor {
         Object.assign(headers, buildKimiHeaders());
         break;
       case "zcode":
+      case "zc":
         headers["Authorization"] = `Bearer ${credentials.accessToken || credentials.apiKey}`;
         headers["anthropic-version"] = headers["anthropic-version"] || "2023-06-01";
         headers["X-ZCode-App-Version"] = headers["X-ZCode-App-Version"] || "3.0.1";

@@ -559,6 +559,10 @@ export async function POST(request) {
               url: "https://zyloo.io/v1/models",
               method: "GET",
             },
+            zenmux: {
+              url: "https://zenmux.ai/api/v1/models",
+              method: "GET",
+            },
             morph: {
               url: "https://api.morphllm.com/v1/chat/completions",
               method: "POST",
@@ -615,7 +619,8 @@ export async function POST(request) {
             gitlawb: "https://opengateway.gitlawb.com/v1/models",
             glb: "https://opengateway.gitlawb.com/v1/models",
             husada: "https://husada.net/v1/models",
-            routeway: "https://api.routeway.ai/v1/models"
+            routeway: "https://api.routeway.ai/v1/models",
+            zenmux: "https://zenmux.ai/api/v1/models"
           };
           const headers = {};
           if (apiKey) headers["Authorization"] = `Bearer ${apiKey}`;

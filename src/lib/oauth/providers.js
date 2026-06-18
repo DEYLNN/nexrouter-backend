@@ -24,6 +24,7 @@ import {
   CLINE_CONFIG,
   GITLAB_CONFIG,
   CODEBUDDY_CONFIG,
+  ZCODE_CONFIG,
   XAI_CONFIG,
 } from "./constants/oauth";
 import { requestNousDeviceCode, pollNousToken, buildNousInvokeJwtData } from "./nous.js";
@@ -68,6 +69,8 @@ export function extractCodexAccountInfo(idToken) {
     chatgptPlanType: chatgpt.chatgpt_plan_type,
   };
 }
+
+
 
 // Provider configurations
 const PROVIDERS = {
@@ -1273,6 +1276,57 @@ const PROVIDERS = {
       refreshToken: tokens.refresh_token,
       expiresIn: 86400,
       providerSpecificData: {},
+    }),
+  },
+
+  zcode: {
+    config: ZCODE_CONFIG,
+    flowType: "device_code",
+    requestDeviceCode: async (config) => {
+      const pollToken = (globalThis.crypto?.randomUUID?.() || `${Date.now()}-${Math.random()}`).replace(/-/g, "") + (globalThis.crypto?.randomUUID?.() || "").replace(/-/g, "");
+      const res = await fetch(config.initUrl, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${pollToken}`,
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        body: JSON.stringify({ provider: "zai" }),
+      });
+      if (!res.ok) throw new Error(`ZCode OAuth init failed: ${await res.text()}`);
+      const data = (await res.json())?.data || {};
+      if (!data.flow_id || !data.authorize_url) throw new Error("ZCode OAuth init response incomplete");
+      return {
+        device_code: data.flow_id,
+        user_code: data.flow_id.slice(0, 8).toUpperCase(),
+        verification_uri: data.authorize_url,
+        verification_uri_complete: data.authorize_url,
+        expires_in: 300,
+        interval: 2,
+        _zcodePollToken: pollToken,
+      };
+    },
+    pollToken: async (config, deviceCode, _codeVerifier, extraData) => {
+      const pollToken = extraData?._zcodePollToken;
+      if (!pollToken) return { ok: false, data: { error: "invalid_request", error_description: "Missing ZCode poll token" } };
+      const res = await fetch(`${config.pollUrlBase}/${deviceCode}`, {
+        headers: { Authorization: `Bearer ${pollToken}`, Accept: "application/json" },
+      });
+      if (!res.ok) return { ok: false, data: { error: "poll_failed", error_description: await res.text() } };
+      const data = (await res.json())?.data || {};
+      if (data.status === "pending") return { ok: false, data: { error: "authorization_pending" } };
+      if (data.status === "failed") return { ok: false, data: { error: "access_denied", error_description: "ZCode authorization failed" } };
+      if (data.status !== "ready") return { ok: false, data: { error: "authorization_pending" } };
+      const accessToken = data?.zai?.access_token;
+      if (!accessToken) return { ok: false, data: { error: "invalid_response", error_description: "ZCode access token missing" } };
+      return { ok: true, data: { access_token: accessToken, expires_in: 30 * 24 * 60 * 60 } };
+    },
+    mapTokens: (tokens) => ({
+      accessToken: tokens.access_token,
+      expiresIn: tokens.expires_in || 2592000,
+      email: extractEmailFromAccessToken(tokens.access_token) || "zcode-oauth",
+      displayName: "ZCode Coding Plan",
+      providerSpecificData: { authMethod: "zai-oauth-coding-plan", quotaSource: "coding-plan" },
     }),
   },
 

@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.4.73] - 2026-06-18
+
+### Added
+- Add ZCode OAuth provider flow with Z.AI API-key exchange and Anthropic Messages routing.
+
 ## [0.4.72] - 2026-06-17
 
 ### Fixed

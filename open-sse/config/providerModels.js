@@ -58,6 +58,10 @@ export const PROVIDER_MODELS = {
     { id: "gemini-3-flash-preview", name: "Gemini 3 Flash Preview" },
     { id: "gemini-3-pro-preview", name: "Gemini 3 Pro Preview" },
   ],
+  zc: [  // ZCode / Z.AI OAuth
+    { id: "GLM-5.2", name: "GLM 5.2" },
+    { id: "GLM-5-Turbo", name: "GLM 5 Turbo" },
+  ],
   gcx: [  // General Compute
     { id: "deepseek-v3.2", name: "DeepSeek V3.2" },
     { id: "deepseek-v3.1", name: "DeepSeek V3.1" },
@@ -1086,6 +1090,7 @@ const OAUTH_ALIASES = {
   zerog: "0g",
   zyloo: "zyloo",
   freebuff: "fb",
+  zcode: "zc",
   "general-compute": "gcx",
 };
 

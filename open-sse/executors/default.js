@@ -262,6 +262,14 @@ export class DefaultExecutor extends BaseExecutor {
         headers["Authorization"] = `Bearer ${credentials.accessToken}`;
         Object.assign(headers, buildKimiHeaders());
         break;
+      case "zcode":
+        headers["Authorization"] = `Bearer ${credentials.accessToken || credentials.apiKey}`;
+        headers["anthropic-version"] = headers["anthropic-version"] || "2023-06-01";
+        headers["X-ZCode-App-Version"] = headers["X-ZCode-App-Version"] || "3.0.1";
+        headers["X-ZCode-Agent"] = headers["X-ZCode-Agent"] || "glm";
+        headers["HTTP-Referer"] = headers["HTTP-Referer"] || "https://zcode.z.ai/";
+        delete headers["x-api-key"];
+        break;
       default:
         if (this.provider === "nous-portal") {
           // Nous/Hermes free OAuth now uses the access JWT (inference:invoke)

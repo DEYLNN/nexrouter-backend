@@ -48,6 +48,7 @@ export const THINKING_CONFIG = {
 
 // OAuth Providers
 export const OAUTH_PROVIDERS = {
+  zcode: { id: "zcode", alias: "zc", name: "ZCode", icon: "code", color: "#2563EB", textIcon: "ZC", website: "https://zcode.z.ai", authType: "oauth", notice: { signupUrl: "https://zcode.z.ai", text: "Z.AI/ZCode OAuth. NexRouter uses the OAuth JWT against ZCode Coding Plan quota via the Anthropic Messages endpoint." }, serviceKinds: ["llm"], models: [{ id: "GLM-5.2", name: "GLM 5.2" }, { id: "GLM-5-Turbo", name: "GLM 5 Turbo" }] },
   freebuff: { id: "freebuff", alias: "fb", name: "FreeBuff", icon: "/provider-icons/freebuff.png", color: "#4F7CFF", textIcon: "FB", website: "https://freebuff.com", authType: "oauth", notice: { signupUrl: "https://freebuff.com", text: "Sign in with your FreeBuff/Codebuff account to add a managed connection. FreeBuff supports multiple Codebuff free/premium model queues." }, serviceKinds: ["llm"] },
   claude: { id: "claude", alias: "cc", name: "Claude Code", icon: "smart_toy", color: "#D97757", website: "https://claude.ai", notice: { signupUrl: "https://claude.ai" } },
   antigravity: { id: "antigravity", alias: "ag", name: "Antigravity", icon: "rocket_launch", color: "#F59E0B", deprecated: true, deprecationNotice: "AG is designed exclusively for Antigravity IDE. Using it with other tools (OpenClaw, Claude, Codex...) may result in account restrictions or bans.", website: "https://antigravity.google", notice: { signupUrl: "https://antigravity.google" } },

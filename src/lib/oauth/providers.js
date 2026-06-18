@@ -1317,9 +1317,9 @@ const PROVIDERS = {
       if (data.status === "pending") return { ok: false, data: { error: "authorization_pending" } };
       if (data.status === "failed") return { ok: false, data: { error: "access_denied", error_description: "ZCode authorization failed" } };
       if (data.status !== "ready") return { ok: false, data: { error: "authorization_pending" } };
-      const accessToken = data?.zai?.access_token;
-      if (!accessToken) return { ok: false, data: { error: "invalid_response", error_description: "ZCode access token missing" } };
-      return { ok: true, data: { access_token: accessToken, expires_in: 30 * 24 * 60 * 60 } };
+      const codingPlanJwt = data?.token;
+      if (!codingPlanJwt) return { ok: false, data: { error: "invalid_response", error_description: "ZCode Coding Plan JWT missing" } };
+      return { ok: true, data: { access_token: codingPlanJwt, expires_in: 30 * 24 * 60 * 60 } };
     },
     mapTokens: (tokens) => ({
       accessToken: tokens.access_token,

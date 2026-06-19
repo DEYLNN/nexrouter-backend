@@ -56,6 +56,8 @@ const ALIAS_TO_PROVIDER_ID = {
   morph: "morph",
   gmi: "gmi-cloud",
   "gmi-cloud": "gmi-cloud",
+  zmx: "zenmux",
+  zenmux: "zenmux",
   routeway: "routeway",
   husada: "husada",
   "mimo-sgp": "xiaomi-mimo-plan-sgp",

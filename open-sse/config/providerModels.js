@@ -809,10 +809,16 @@ export const PROVIDER_MODELS = {
     { id: "ag/gemini-3-flash", name: "Gemini 3 Flash" },
   ],
   zmx: [
+    { id: "moonshotai/kimi-k2.7-code-free", name: "Kimi K2.7 Code Free" },
+    { id: "stepfun/step-3.7-flash-free", name: "Step 3.7 Flash Free" },
+    { id: "z-ai/glm-5.2-free", name: "GLM 5.2 Free" },
     { id: "z-ai/glm-4.7-flash-free", name: "GLM 4.7 Flash Free" },
     { id: "z-ai/glm-4.6v-flash-free", name: "GLM 4.6V Flash Free" },
   ],
   zenmux: [
+    { id: "moonshotai/kimi-k2.7-code-free", name: "Kimi K2.7 Code Free" },
+    { id: "stepfun/step-3.7-flash-free", name: "Step 3.7 Flash Free" },
+    { id: "z-ai/glm-5.2-free", name: "GLM 5.2 Free" },
     { id: "z-ai/glm-4.7-flash-free", name: "GLM 4.7 Flash Free" },
     { id: "z-ai/glm-4.6v-flash-free", name: "GLM 4.6V Flash Free" },
   ],

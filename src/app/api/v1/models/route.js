@@ -388,8 +388,25 @@ export async function buildModelsList(kindFilter, options = {}) {
     } catch (e) {
       console.log("Could not fetch public models");
     }
+
     const allow = new Set(publicIds);
-    return dedupedModels.filter((model) => allow.has(model.id));
+    const aliasToProviderId = Object.fromEntries(
+      Object.entries(PROVIDER_ID_TO_ALIAS).map(([providerId, alias]) => [alias, providerId])
+    );
+    const publicIdMatches = (modelId) => {
+      if (allow.has(modelId)) return true;
+      if (typeof modelId !== "string" || !modelId.includes("/")) return false;
+
+      const slashIndex = modelId.indexOf("/");
+      const prefix = modelId.slice(0, slashIndex);
+      const rest = modelId.slice(slashIndex + 1);
+      const providerId = aliasToProviderId[prefix];
+      if (!providerId) return false;
+
+      return allow.has(`${providerId}/${rest}`);
+    };
+
+    return dedupedModels.filter((model) => publicIdMatches(model.id));
   }
 
   return dedupedModels;

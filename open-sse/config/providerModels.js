@@ -135,18 +135,8 @@ export const PROVIDER_MODELS = {
     { id: "text-embedding-3-small", name: "Text Embedding 3 Small (GitHub)", type: "embedding" },
     { id: "text-embedding-3-large", name: "Text Embedding 3 Large (GitHub)", type: "embedding" },
   ],
-  qd: [  // Qoder - tier + frontier models (server-published catalog)
-    { id: "auto", name: "Qoder Auto" },
-    { id: "ultimate", name: "Qoder Ultimate" },
-    { id: "performance", name: "Qoder Performance" },
-    { id: "efficient", name: "Qoder Efficient" },
-    { id: "lite", name: "Qoder Lite" },
-    { id: "qmodel", name: "Qwen 3.6 Plus (Qoder)" },
-    { id: "dmodel", name: "DeepSeek V4 Pro (Qoder)" },
-    { id: "dfmodel", name: "DeepSeek V4 Flash (Qoder)" },
-    { id: "gm51model", name: "GLM 5.1 (Qoder)" },
-    { id: "kmodel", name: "Kimi K2.6 (Qoder)" },
-    { id: "mmodel", name: "MiniMax M2.7 (Qoder)" },
+  qd: [  // Qoder - live server-published catalog (2026-06: OAuth userinfo works; chat protocol currently degraded)
+    { id: "qmodel_latest", name: "Qwen3.7-Max (Qoder)" },
   ],
   kr: [  // Kiro AI
     // { id: "claude-opus-4.5", name: "Claude Opus 4.5" },

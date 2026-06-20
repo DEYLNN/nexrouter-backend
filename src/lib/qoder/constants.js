@@ -37,20 +37,13 @@ export const QODER_MACHINE_TYPE = "5";
 
 // Canonical model identifiers. Identity map — keep as a map so callers can
 // cheaply test "is this a known qoder model?" before sending the request.
+// 2026-06 update: Qoder's authenticated live catalog now publishes only
+// qmodel_latest (Qwen3.7-Max) for current accounts. Legacy tier/frontier ids
+// (auto/ultimate/performance/efficient/lite/qmodel/dmodel/dfmodel/...) are
+// intentionally removed from the static public list until the new IDE/CLI chat
+// protocol is re-diffed.
 export const QODER_MODEL_MAP = {
-  // Tier models
-  auto: "auto",
-  ultimate: "ultimate",
-  performance: "performance",
-  efficient: "efficient",
-  lite: "lite",
-  // Frontier models
-  qmodel: "qmodel",
-  dmodel: "dmodel",
-  dfmodel: "dfmodel",
-  gm51model: "gm51model",
-  kmodel: "kmodel",
-  mmodel: "mmodel",
+  qmodel_latest: "qmodel_latest",
 };
 
 // RSA public key for COSY encryption (extracted from Qoder IDE v0.9).

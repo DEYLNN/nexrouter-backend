@@ -584,6 +584,33 @@ async function testApiKeyConnection(connection, effectiveProxy = null) {
         const valid = res.status !== 401 && res.status !== 403;
         return { valid, error: valid ? null : "Invalid API key" };
       }
+      case "openmodal":
+      case "om": {
+        // OpenModal exposes Anthropic-compatible /v1/messages; /models is not reliable for validation.
+        const res = await fetchWithConnectionProxy("https://api.openmodel.ai/v1/messages", {
+          method: "POST",
+          headers: {
+            "Authorization": `Bearer ${connection.apiKey}`,
+            "x-api-key": connection.apiKey,
+            "anthropic-version": "2023-06-01",
+            "content-type": "application/json",
+          },
+          body: JSON.stringify({
+            model: "deepseek-v4-flash",
+            max_tokens: 1,
+            messages: [{ role: "user", content: "test" }],
+          }),
+        }, effectiveProxy);
+        const valid = res.status !== 401 && res.status !== 403;
+        if (valid) return { valid: true, error: null };
+        let detail = "Invalid API key";
+        try {
+          const text = await res.text();
+          const data = text ? JSON.parse(text) : null;
+          detail = data?.error?.message || data?.message || detail;
+        } catch { }
+        return { valid: false, error: detail };
+      }
       case "aimux": {
         const res = await fetchWithConnectionProxy("https://aimux.id/v1/models", {
           method: "GET",

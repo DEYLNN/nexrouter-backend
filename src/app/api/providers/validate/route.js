@@ -383,6 +383,8 @@ export async function POST(request) {
         case "xiaomi-mimo":
         case "xiaomi-mimo-plan-sgp":
         case "canopywave":
+        case "openmodal":
+        case "om":
         case "ftstoresz":
         case "swiftrouter":
         case "gitlawb":
@@ -402,6 +404,36 @@ export async function POST(request) {
             canopywave: {
               url: "https://inference.canopywave.io/v1/models",
               method: "GET",
+            },
+            openmodal: {
+              url: "https://api.openmodel.ai/v1/messages",
+              method: "POST",
+              headers: {
+                "Authorization": `Bearer ${apiKey}`,
+                "x-api-key": apiKey,
+                "anthropic-version": "2023-06-01",
+                "content-type": "application/json",
+              },
+              body: {
+                model: "deepseek-v4-flash",
+                max_tokens: 1,
+                messages: [{ role: "user", content: "test" }],
+              },
+            },
+            om: {
+              url: "https://api.openmodel.ai/v1/messages",
+              method: "POST",
+              headers: {
+                "Authorization": `Bearer ${apiKey}`,
+                "x-api-key": apiKey,
+                "anthropic-version": "2023-06-01",
+                "content-type": "application/json",
+              },
+              body: {
+                model: "deepseek-v4-flash",
+                max_tokens: 1,
+                messages: [{ role: "user", content: "test" }],
+              },
             },
             swiftrouter: {
               url: "https://api.swiftrouter.com/v1/models",

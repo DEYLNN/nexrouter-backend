@@ -129,6 +129,16 @@ export const PROVIDERS = {
     baseUrl: "https://inference.canopywave.io/v1/chat/completions",
     format: "openai"
   },
+  openmodal: {
+    baseUrl: "https://api.openmodel.ai/v1/messages",
+    format: "claude",
+    headers: { ...CLAUDE_API_HEADERS }
+  },
+  om: {
+    baseUrl: "https://api.openmodel.ai/v1/messages",
+    format: "claude",
+    headers: { ...CLAUDE_API_HEADERS }
+  },
   ftstoresz: {
     baseUrl: "https://api-ai.ftstoresz.com/v1/chat/completions",
     format: "openai"

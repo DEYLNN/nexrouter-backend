@@ -776,6 +776,9 @@ export const PROVIDER_MODELS = {
     { id: "minimax/minimax-m2.5", name: "MiniMax M2.5" },
     { id: "zai/glm-5.1", name: "GLM 5.1" },
   ],
+  om: [
+    { id: "deepseek-v4-flash", name: "DeepSeek V4 Flash", targetFormat: "claude" },
+  ],
   ftstoresz: [
     { id: "qwen3.7-max", name: "Qwen3.7 Max" },
     { id: "claude-opus-4.7", name: "Claude Opus 4.7" },
@@ -1092,6 +1095,7 @@ const OAUTH_ALIASES = {
   vertex: "vertex",
   "vertex-partner": "vertex-partner",
   canopywave: "cwv",
+  openmodal: "om",
   ftstoresz: "ftstoresz",
   ambient: "amb",
   "xiaomi-mimo-plan-sgp": "mimo-sgp",

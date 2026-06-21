@@ -73,6 +73,8 @@ export const PROVIDER_ENDPOINTS = {
   am: "https://aimux.id/v1/chat/completions",
   aimux: "https://aimux.id/v1/chat/completions",
   bai: "https://api.b.ai/v1/chat/completions",
+  openmodal: "https://api.openmodel.ai/v1/messages",
+  om: "https://api.openmodel.ai/v1/messages",
   ftstoresz: "https://api-ai.ftstoresz.com/v1/chat/completions",
   tokenrouter: "https://api.tokenrouter.com/v1/chat/completions",
   zerog: "https://router-api.0g.ai/v1/chat/completions",

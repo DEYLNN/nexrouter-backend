@@ -28,6 +28,7 @@ const PROVIDER_ALIAS_TO_CANONICAL = {
   freebuff: "freebuff",
   cwv: "canopywave",
   canopywave: "canopywave",
+  btl: "badtheory-labs",
   cf: "cloudflare-ai",
   cloudflare: "cloudflare-ai",
   "cloudflare-ai": "cloudflare-ai",

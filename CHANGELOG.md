@@ -1,6 +1,6 @@
 # Changelog
 
-## [0.4.80] - 2026-06-22
+## [0.4.81] - 2026-06-22
 
 ### Added
 - Add Badtheory Labs provider (alias `btl`) with `deepseek-v4-flash` and `deepseek-v4-pro` models.
@@ -10,6 +10,7 @@
 - Add `badtheory-labs` / `btl` case to test key console (`testApiKeyConnection`) so key validation returns proper result instead of "Provider test not supported".
 - Sanitize tool payload (`tool` role → `user`) in DefaultExecutor for `badtheory-labs`/`btl` to prevent DeepSeek 400 error on unpaired `tool` messages.
 - Enable pseudo-tool calling for `btl` providers: inject tool schemas into system prompt, force fake-streaming (non-stream upstream), parse `{"tool_call":...}` text response into native `tool_calls` for Hermes agent compatibility.
+- Register `btl` alias in `ALIAS_TO_PROVIDER_ID` (services/model.js) and `PROVIDER_ALIAS_TO_CANONICAL` (chat.js) so provider resolution returns `"badtheory-labs"` and DefaultExecutor sanitization + pseudo-tool flow runs correctly.
 
 ## [0.4.77] - 2026-06-22
 

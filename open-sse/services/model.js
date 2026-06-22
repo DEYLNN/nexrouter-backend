@@ -3,6 +3,7 @@ const ALIAS_TO_PROVIDER_ID = {
   cc: "claude",
   cx: "codex",
   gc: "gemini-cli",
+  btl: "badtheory-labs",
   gcx: "general-compute",
   qw: "qwen",
   if: "iflow",

@@ -167,6 +167,9 @@ export class DefaultExecutor extends BaseExecutor {
     if (this.provider === "gmi-cloud") {
       transformed = sanitizeGmiToolPayload(transformed);
     }
+    if (this.provider === "badtheory-labs" || this.provider === "btl") {
+      transformed = sanitizeGmiToolPayload(transformed);
+    }
     if (this.provider === "anuma") {
       transformed = normalizeAnumaAgentPayload(transformed, stream);
     }

@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.4.78] - 2026-06-22
+
+### Added
+- Add Badtheory Labs provider (alias `btl`) with `deepseek-v4-flash` and `deepseek-v4-pro` models.
+  - Base URL: `https://api.badtheorylabs.com/v1`
+
+### Fixed
+- Add `badtheory-labs` / `btl` case to test key console (`testApiKeyConnection`) so key validation returns proper result instead of "Provider test not supported".
+
 ## [0.4.77] - 2026-06-22
 
 ### Added

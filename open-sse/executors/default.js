@@ -5,6 +5,7 @@ import { buildClineHeaders } from "../../src/shared/utils/clineAuth.js";
 import { getCachedClaudeHeaders } from "../utils/claudeHeaderCache.js";
 import { proxyAwareFetch } from "../utils/proxyFetch.js";
 import { injectReasoningContent } from "../utils/reasoningContentInjector.js";
+import { buildPseudoToolInstructions } from "../utils/pseudoToolCallParser.js";
 
 function textContent(value) {
   if (value == null) return "";
@@ -168,7 +169,19 @@ export class DefaultExecutor extends BaseExecutor {
       transformed = sanitizeGmiToolPayload(transformed);
     }
     if (this.provider === "badtheory-labs" || this.provider === "btl") {
+      const tools = Array.isArray(transformed.tools) ? transformed.tools : [];
       transformed = sanitizeGmiToolPayload(transformed);
+      if (tools.length > 0) {
+        const hasRecentToolResult = (transformed.messages || []).slice(-8).some(m => m.role === "user" && typeof m.content === "string" && /^\[.*result\]/.test(m.content.trim()));
+        const instruction = buildPseudoToolInstructions(tools, { hasRecentToolResult });
+        if (instruction && Array.isArray(transformed.messages)) {
+          if (transformed.messages[0]?.role === "system") {
+            transformed.messages[0] = { ...transformed.messages[0], content: instruction + "\n\n" + transformed.messages[0].content };
+          } else {
+            transformed.messages.unshift({ role: "system", content: instruction });
+          }
+        }
+      }
     }
     if (this.provider === "anuma") {
       transformed = normalizeAnumaAgentPayload(transformed, stream);

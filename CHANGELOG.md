@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.4.77] - 2026-06-22
+
+### Added
+- Add Badtheory Labs provider (alias `btl`) with `deepseek-v4-flash` and `deepseek-v4-pro` models.
+  - Base URL: `https://api.badtheorylabs.com/v1`
+
 ## [0.4.76] - 2026-06-18
 
 ### Added

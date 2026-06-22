@@ -385,6 +385,8 @@ export async function POST(request) {
         case "canopywave":
         case "openmodal":
         case "om":
+        case "badtheory-labs":
+        case "btl":
         case "ftstoresz":
         case "swiftrouter":
         case "gitlawb":
@@ -519,6 +521,26 @@ export async function POST(request) {
               method: "POST",
               body: {
                 model: "qwen3.7-max",
+                messages: [{ role: "user", content: "test" }],
+                max_tokens: 1,
+                stream: false,
+              },
+            },
+            "badtheory-labs": {
+              url: "https://api.badtheorylabs.com/v1/chat/completions",
+              method: "POST",
+              body: {
+                model: "deepseek-v4-flash",
+                messages: [{ role: "user", content: "test" }],
+                max_tokens: 1,
+                stream: false,
+              },
+            },
+            btl: {
+              url: "https://api.badtheorylabs.com/v1/chat/completions",
+              method: "POST",
+              body: {
+                model: "deepseek-v4-flash",
                 messages: [{ role: "user", content: "test" }],
                 max_tokens: 1,
                 stream: false,

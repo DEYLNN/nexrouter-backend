@@ -783,6 +783,10 @@ export const PROVIDER_MODELS = {
     { id: "qwen3.7-max", name: "Qwen3.7 Max" },
     { id: "claude-opus-4.7", name: "Claude Opus 4.7" },
   ],
+  btl: [  // Badtheory Labs
+    { id: "deepseek-v4-flash", name: "DeepSeek V4 Flash" },
+    { id: "deepseek-v4-pro", name: "DeepSeek V4 Pro" },
+  ],
   am: [
     { id: "am/claude-opus-4.7", name: "Claude Opus 4.7" },
     { id: "am/claude-opus-4.8", name: "Claude Opus 4.8" },
@@ -1097,6 +1101,7 @@ const OAUTH_ALIASES = {
   canopywave: "cwv",
   openmodal: "om",
   ftstoresz: "ftstoresz",
+  "badtheory-labs": "btl",
   ambient: "amb",
   "xiaomi-mimo-plan-sgp": "mimo-sgp",
   swiftrouter: "sr",

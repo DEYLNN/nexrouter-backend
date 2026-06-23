@@ -4,6 +4,59 @@ import { proxyAwareFetch } from "../utils/proxyFetch.js";
 /**
  * BaseExecutor - Base class for provider executors
  */
+function repairBtlAgenticPayload(body) {
+  if (!Array.isArray(body?.messages)) return body;
+
+  const repaired = [];
+  for (let i = 0; i < body.messages.length; i++) {
+    const message = body.messages[i];
+    if (!message) continue;
+
+    if (message.role === "tool") {
+      // Drop orphan tool messages. BTL/OpenAI-compatible validation requires
+      // tool results to directly answer the preceding assistant.tool_calls turn.
+      continue;
+    }
+
+    if (message.role === "assistant" && Array.isArray(message.tool_calls) && message.tool_calls.length > 0) {
+      const toolIds = message.tool_calls.map((call) => call?.id).filter(Boolean);
+      const followers = [];
+      let j = i + 1;
+      while (j < body.messages.length && body.messages[j]?.role === "tool") {
+        if (body.messages[j]?.tool_call_id && toolIds.includes(body.messages[j].tool_call_id)) {
+          followers.push(body.messages[j]);
+        }
+        j += 1;
+      }
+
+      if (followers.length === 0) {
+        // No paired tool results in the retained context window. Drop tool_calls
+        // so BTL does not reject the history; preserve content/reasoning.
+        const { tool_calls, ...withoutToolCalls } = message;
+        if (withoutToolCalls.content || withoutToolCalls.reasoning_content) repaired.push(withoutToolCalls);
+        continue;
+      }
+
+      const allowedIds = new Set(followers.map((tool) => tool.tool_call_id));
+      const safeMessage = {
+        ...message,
+        tool_calls: message.tool_calls.filter((call) => allowedIds.has(call?.id)),
+      };
+      if (typeof safeMessage.reasoning_content !== "string" || safeMessage.reasoning_content.length === 0) {
+        safeMessage.reasoning_content = " ";
+      }
+      repaired.push(safeMessage, ...followers);
+      i = j - 1;
+      continue;
+    }
+
+    repaired.push(message);
+  }
+
+  body.messages = repaired;
+  return body;
+}
+
 function debugProviderPayload(provider, body, model) {
   const envMap = {
     btl: "DEBUG_BTL_PAYLOAD",
@@ -149,7 +202,10 @@ export class BaseExecutor {
 
     for (let urlIndex = 0; urlIndex < fallbackCount; urlIndex++) {
       const url = this.buildUrl(model, stream, urlIndex, credentials);
-      const transformedBody = this.transformRequest(model, body, stream, credentials);
+      let transformedBody = this.transformRequest(model, body, stream, credentials);
+      if (this.provider === "btl" || this.provider === "badtheory-labs") {
+        transformedBody = repairBtlAgenticPayload(transformedBody);
+      }
       debugProviderPayload(this.provider, transformedBody, model);
       const headers = this.buildHeaders(credentials, stream);
 

@@ -19,6 +19,37 @@ import { detectClientTool, isNativePassthrough } from "../utils/clientDetector.j
 import { injectCaveman } from "../rtk/caveman.js";
 import { compressMessages, formatRtkLog } from "../rtk/index.js";
 
+function debugOpenModalPayload(body) {
+  if (process.env.DEBUG_OPENMODAL_PAYLOAD !== "1") return;
+
+  const messages = Array.isArray(body?.messages) ? body.messages : [];
+  const summary = messages.map((message, index) => {
+    const blocks = Array.isArray(message?.content) ? message.content : [];
+    const types = blocks.map((block) => block?.type || typeof block);
+    return {
+      index,
+      role: message?.role,
+      contentShape: Array.isArray(message?.content) ? "array" : typeof message?.content,
+      hasReasoningContent: typeof message?.reasoning_content === "string",
+      hasThinking: types.includes("thinking") || types.includes("redacted_thinking"),
+      hasToolUse: types.includes("tool_use"),
+      hasToolResult: types.includes("tool_result"),
+      types,
+    };
+  });
+
+  console.log("[OPENMODAL DEBUG]", JSON.stringify({
+    topKeys: Object.keys(body || {}).filter((key) => !/key|token|auth|secret|password/i.test(key)),
+    hasTopThinking: !!body?.thinking,
+    hasTopReasoning: !!body?.reasoning,
+    hasReasoningEffort: !!body?.reasoning_effort,
+    hasTools: Array.isArray(body?.tools) && body.tools.length > 0,
+    toolCount: Array.isArray(body?.tools) ? body.tools.length : 0,
+    messageCount: messages.length,
+    summary: summary.slice(-40),
+  }));
+}
+
 /**
  * Core chat handler - shared between SSE and Worker
  * @param {object} options.body - Request body
@@ -110,6 +141,8 @@ export async function handleChatCore({ body, modelInfo, credentials, log, onCred
     injectCaveman(translatedBody, finalFormat, cavemanLevel);
     log?.debug?.("CAVEMAN", `${cavemanLevel} | ${finalFormat}`);
   }
+
+  if (provider === "openmodal") debugOpenModalPayload(translatedBody);
 
   const executor = getExecutor(provider);
   trackPendingRequest(model, provider, connectionId, true);

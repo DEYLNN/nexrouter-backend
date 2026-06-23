@@ -12,6 +12,9 @@ const PROVIDER_RULES = {
   gitlawb: { scope: "all" },
   freebuff: { scope: "all" },
   fb: { scope: "all" },
+  // OpenModal/OpenModel rejects thinking-mode followups unless assistant
+  // messages echo reasoning_content. Match opencode-go behavior.
+  openmodal: { scope: "all" },
 };
 
 // Model-level rules: matched by predicate against model id

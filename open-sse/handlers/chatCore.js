@@ -42,27 +42,6 @@ export async function handleChatCore({ body, modelInfo, credentials, log, onCred
   const targetFormat = modelTargetFormat || getTargetFormat(provider);
   const stripList = getModelStrip(alias, model);
 
-  // OpenModal rejects thinking-mode conversations unless content[].thinking is replayed losslessly.
-  // Keep agentic/tool calling intact, but force-disable thinking/reasoning for this provider.
-  if (provider === "openmodal") {
-    const stripThinkingBlocks = (messages) => Array.isArray(messages) ? messages.map((msg) => {
-      if (!Array.isArray(msg?.content)) return msg;
-      return {
-        ...msg,
-        content: msg.content.filter((part) => part?.type !== "thinking" && part?.type !== "redacted_thinking" && !part?.thinking)
-      };
-    }) : messages;
-
-    body = {
-      ...body,
-      messages: stripThinkingBlocks(body.messages),
-      thinking: { type: "disabled" }
-    };
-    delete body.reasoning;
-    delete body.reasoning_effort;
-    delete body.enable_thinking;
-  }
-
   // Inject provider-level thinking config override (only if client hasn't set)
   // on/off → extended type (body.thinking), none/low/medium/high → effort type (body.reasoning_effort)
   if (providerThinking?.mode && providerThinking.mode !== "auto") {

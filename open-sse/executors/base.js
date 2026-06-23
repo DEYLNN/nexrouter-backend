@@ -9,6 +9,28 @@ function truncateText(value, maxLength) {
   return `${value.slice(0, maxLength)}\n...[truncated ${value.length - maxLength} chars]`;
 }
 
+function getToolName(tool) {
+  return tool?.function?.name || tool?.name || "";
+}
+
+function compactBtlTools(body) {
+  if (!Array.isArray(body?.tools) || body.tools.length <= 10) return body;
+  const preferred = /terminal|shell|bash|exec|command|read|write|edit|search|grep|find|glob|list|file/i;
+  const selected = body.tools.filter((tool) => preferred.test(getToolName(tool))).slice(0, 10);
+  const fallback = body.tools.slice(0, 8);
+  body.tools = (selected.length ? selected : fallback).map((tool) => {
+    if (!tool?.function) return tool;
+    return {
+      ...tool,
+      function: {
+        ...tool.function,
+        description: truncateText(tool.function.description || "", 400),
+      },
+    };
+  });
+  return body;
+}
+
 function repairBtlAgenticPayload(body) {
   if (!Array.isArray(body?.messages)) return body;
 
@@ -43,8 +65,15 @@ function repairBtlAgenticPayload(body) {
   const keepTail = body.messages.filter((message) => message.role !== "system" && message.role !== "developer").slice(-40);
   body.messages = [...keepHead, ...keepTail];
 
+  compactBtlTools(body);
+
+  body.messages.unshift({
+    role: "system",
+    content: "BTL adapter: continue the current agentic task instead of stopping early. Use available tools when needed. If more work remains, call a tool or state the next concrete step; do not end with a vague partial answer.",
+  });
+
   if (body.max_tokens === undefined && body.max_completion_tokens === undefined) {
-    body.max_tokens = 2048;
+    body.max_tokens = 4096;
   }
 
   return body;

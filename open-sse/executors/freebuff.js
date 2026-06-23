@@ -25,6 +25,18 @@ const FREEBUFF_OS = process.env.FREEBUFF_OS || "windows";
 const FREEBUFF_TIMEZONE = process.env.FREEBUFF_TIMEZONE || "Asia/Shanghai";
 const FREEBUFF_LOCALE = process.env.FREEBUFF_LOCALE || "zh-CN";
 
+function ensureFreebuffReasoningContent(body) {
+  const messages = Array.isArray(body?.messages) ? body.messages : [];
+  for (const message of messages) {
+    if (message?.role !== "assistant") continue;
+    if (!Array.isArray(message.tool_calls) || message.tool_calls.length === 0) continue;
+    if (typeof message.reasoning_content !== "string" || message.reasoning_content.length === 0) {
+      message.reasoning_content = " ";
+    }
+  }
+  return body;
+}
+
 function debugFreebuffPayload(body, backendModel) {
   if (process.env.DEBUG_FREEBUFF_PAYLOAD !== "1") return;
   const messages = Array.isArray(body?.messages) ? body.messages : [];
@@ -897,6 +909,7 @@ export class FreeBuffExecutor extends BaseExecutor {
     delete upstreamBody.reasoning_effort;
     delete upstreamBody.reasoning;
 
+    ensureFreebuffReasoningContent(upstreamBody);
     debugFreebuffPayload(upstreamBody, backendModel);
 
     try {

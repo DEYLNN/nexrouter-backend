@@ -7,53 +7,27 @@ import { proxyAwareFetch } from "../utils/proxyFetch.js";
 function repairBtlAgenticPayload(body) {
   if (!Array.isArray(body?.messages)) return body;
 
-  const repaired = [];
-  for (let i = 0; i < body.messages.length; i++) {
-    const message = body.messages[i];
-    if (!message) continue;
-
+  // BTL's upstream DeepSeek route rejects historical tool-role messages even
+  // when they look paired. Keep top-level tools enabled for the current turn,
+  // but flatten prior tool history to plain user context and strip old
+  // assistant.tool_calls. This makes BTL agentic-lite instead of full replay.
+  body.messages = body.messages.map((message) => {
+    if (!message) return message;
     if (message.role === "tool") {
-      // Drop orphan tool messages. BTL/OpenAI-compatible validation requires
-      // tool results to directly answer the preceding assistant.tool_calls turn.
-      continue;
-    }
-
-    if (message.role === "assistant" && Array.isArray(message.tool_calls) && message.tool_calls.length > 0) {
-      const toolIds = message.tool_calls.map((call) => call?.id).filter(Boolean);
-      const followers = [];
-      let j = i + 1;
-      while (j < body.messages.length && body.messages[j]?.role === "tool") {
-        if (body.messages[j]?.tool_call_id && toolIds.includes(body.messages[j].tool_call_id)) {
-          followers.push(body.messages[j]);
-        }
-        j += 1;
-      }
-
-      if (followers.length === 0) {
-        // No paired tool results in the retained context window. Drop tool_calls
-        // so BTL does not reject the history; preserve content/reasoning.
-        const { tool_calls, ...withoutToolCalls } = message;
-        if (withoutToolCalls.content || withoutToolCalls.reasoning_content) repaired.push(withoutToolCalls);
-        continue;
-      }
-
-      const allowedIds = new Set(followers.map((tool) => tool.tool_call_id));
-      const safeMessage = {
-        ...message,
-        tool_calls: message.tool_calls.filter((call) => allowedIds.has(call?.id)),
+      const content = typeof message.content === "string" ? message.content : JSON.stringify(message.content || "");
+      return {
+        role: "user",
+        content: `[Tool result${message.tool_call_id ? ` ${message.tool_call_id}` : ""}]\n${content}`,
       };
-      if (typeof safeMessage.reasoning_content !== "string" || safeMessage.reasoning_content.length === 0) {
-        safeMessage.reasoning_content = " ";
-      }
-      repaired.push(safeMessage, ...followers);
-      i = j - 1;
-      continue;
     }
+    if (message.role === "assistant" && Array.isArray(message.tool_calls) && message.tool_calls.length > 0) {
+      const { tool_calls, ...withoutToolCalls } = message;
+      if (!withoutToolCalls.content && withoutToolCalls.reasoning_content) withoutToolCalls.content = "[Assistant used a tool]";
+      return withoutToolCalls;
+    }
+    return message;
+  }).filter((message) => message && message.content !== "");
 
-    repaired.push(message);
-  }
-
-  body.messages = repaired;
   return body;
 }
 

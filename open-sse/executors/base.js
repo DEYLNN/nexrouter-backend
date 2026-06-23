@@ -4,6 +4,11 @@ import { proxyAwareFetch } from "../utils/proxyFetch.js";
 /**
  * BaseExecutor - Base class for provider executors
  */
+function truncateText(value, maxLength) {
+  if (typeof value !== "string" || value.length <= maxLength) return value;
+  return `${value.slice(0, maxLength)}\n...[truncated ${value.length - maxLength} chars]`;
+}
+
 function repairBtlAgenticPayload(body) {
   if (!Array.isArray(body?.messages)) return body;
 
@@ -17,21 +22,25 @@ function repairBtlAgenticPayload(body) {
       const content = typeof message.content === "string" ? message.content : JSON.stringify(message.content || "");
       return {
         role: "user",
-        content: `[Tool result${message.tool_call_id ? ` ${message.tool_call_id}` : ""}]\n${content}`,
+        content: `[Tool result${message.tool_call_id ? ` ${message.tool_call_id}` : ""}]\n${truncateText(content, 1200)}`,
       };
     }
-    if (message.role === "assistant" && Array.isArray(message.tool_calls) && message.tool_calls.length > 0) {
-      const { tool_calls, ...withoutToolCalls } = message;
-      if (!withoutToolCalls.content && withoutToolCalls.reasoning_content) withoutToolCalls.content = "[Assistant used a tool]";
-      return withoutToolCalls;
+    if (message.role === "assistant") {
+      const { tool_calls, reasoning_content, ...withoutAgenticNoise } = message;
+      if (!withoutAgenticNoise.content && (reasoning_content || tool_calls)) withoutAgenticNoise.content = "[Assistant used a tool]";
+      if (typeof withoutAgenticNoise.content === "string") withoutAgenticNoise.content = truncateText(withoutAgenticNoise.content, 1200);
+      return withoutAgenticNoise;
     }
+    if (typeof message.content === "string") return { ...message, content: truncateText(message.content, 1600) };
     return message;
   }).filter((message) => message && message.content !== "");
 
-  // BTL completes but tends to stop early with very large agent histories
-  // (~90k-130k input). Keep system/developer prompts plus recent context.
-  const keepHead = body.messages.filter((message) => message.role === "system" || message.role === "developer");
-  const keepTail = body.messages.filter((message) => message.role !== "system" && message.role !== "developer").slice(-96);
+  // BTL completes but tends to stop early with large flattened agent histories.
+  // Keep system/developer prompts plus compact recent context.
+  const keepHead = body.messages
+    .filter((message) => message.role === "system" || message.role === "developer")
+    .map((message) => ({ ...message, content: truncateText(message.content, 3000) }));
+  const keepTail = body.messages.filter((message) => message.role !== "system" && message.role !== "developer").slice(-40);
   body.messages = [...keepHead, ...keepTail];
 
   if (body.max_tokens === undefined && body.max_completion_tokens === undefined) {

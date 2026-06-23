@@ -4,6 +4,8 @@ import { adjustMaxTokens } from "./maxTokensHelper.js";
 import { applyCloaking } from "../../utils/claudeCloaking.js";
 import { deriveSessionId } from "../../utils/sessionManager.js";
 
+const THINKING_PLACEHOLDER_PROVIDERS = new Set(["openmodal"]);
+
 // Check if message has valid non-empty content
 export function hasValidContent(msg) {
   if (typeof msg.content === "string" && msg.content.trim()) return true;
@@ -155,8 +157,9 @@ export function prepareClaudeRequest(body, provider = null, apiKey = null, conne
           lastAssistantProcessed = true;
         }
 
-        // Handle thinking blocks for Anthropic endpoint only
-        if (provider === "claude" || provider?.startsWith("anthropic-compatible")) {
+        // Handle thinking blocks for Anthropic endpoint and Anthropic-compatible providers
+        // that require thinking replay during tool-use conversations (OpenModal/OpenModel).
+        if (provider === "claude" || provider?.startsWith("anthropic-compatible") || THINKING_PLACEHOLDER_PROVIDERS.has(provider)) {
           let hasToolUse = false;
           let hasThinking = false;
 

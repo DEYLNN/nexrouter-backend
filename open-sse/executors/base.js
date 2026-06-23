@@ -28,6 +28,16 @@ function repairBtlAgenticPayload(body) {
     return message;
   }).filter((message) => message && message.content !== "");
 
+  // BTL completes but tends to stop early with very large agent histories
+  // (~90k-130k input). Keep system/developer prompts plus recent context.
+  const keepHead = body.messages.filter((message) => message.role === "system" || message.role === "developer");
+  const keepTail = body.messages.filter((message) => message.role !== "system" && message.role !== "developer").slice(-96);
+  body.messages = [...keepHead, ...keepTail];
+
+  if (body.max_tokens === undefined && body.max_completion_tokens === undefined) {
+    body.max_tokens = 2048;
+  }
+
   return body;
 }
 

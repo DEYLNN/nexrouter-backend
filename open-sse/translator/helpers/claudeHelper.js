@@ -172,8 +172,10 @@ export function prepareClaudeRequest(body, provider = null, apiKey = null, conne
             if (block.type === "tool_use") hasToolUse = true;
           }
 
-          // Add thinking block if thinking enabled + has tool_use but no thinking
-          if (thinkingEnabled && !hasThinking && hasToolUse) {
+          // Add thinking block if thinking enabled + has tool_use but no thinking.
+          // OpenModal enters thinking mode upstream even when no top-level thinking flag is sent,
+          // so it needs the same placeholder on tool-use assistant messages.
+          if ((thinkingEnabled || THINKING_PLACEHOLDER_PROVIDERS.has(provider)) && !hasThinking && hasToolUse) {
             msg.content.unshift({
               type: "thinking",
               thinking: ".",

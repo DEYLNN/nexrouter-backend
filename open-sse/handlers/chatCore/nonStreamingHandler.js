@@ -8,7 +8,6 @@ import { parseSSEToOpenAIResponse } from "./sseToJsonHandler.js";
 import { buildRequestDetail, extractRequestConfig, extractUsageFromResponse, saveUsageStats } from "./requestDetail.js";
 import { appendRequestLog, saveRequestDetail } from "@/lib/usageDb.js";
 import { decloakToolNames } from "../../utils/claudeCloaking.js";
-import { normalizeCompletionPseudoToolCalls } from "../../utils/pseudoToolCallParser.js";
 
 
 function normalizeOpenAITextToolCall(completion) {
@@ -280,12 +279,6 @@ export async function handleNonStreamingResponse({ providerResponse, provider, m
   const translatedResponse = needsTranslation(targetFormat, sourceFormat)
     ? translateNonStreamingResponse(responseBody, targetFormat, sourceFormat)
     : responseBody;
-
-  // Parse pseudo-tool calls for providers without native tool support
-  if ((provider === "badtheory-labs" || provider === "btl") && translatedResponse?.choices?.[0]) {
-    const tools = (translatedBody?.tools || body?.tools || []);
-    normalizeCompletionPseudoToolCalls(translatedResponse, { provider, tools });
-  }
 
   // Fix finish_reason for tool_calls: some providers return non-standard values (e.g. "other")
   if (translatedResponse?.choices?.[0]) {

@@ -13,18 +13,35 @@ function getToolName(tool) {
   return tool?.function?.name || tool?.name || "";
 }
 
+function stripSchemaNoise(value, depth = 0) {
+  if (!value || typeof value !== "object" || depth > 6) return value;
+  if (Array.isArray(value)) return value.slice(0, 20).map((item) => stripSchemaNoise(item, depth + 1));
+  const out = {};
+  for (const [key, nested] of Object.entries(value)) {
+    if (key === "description") {
+      out[key] = truncateText(String(nested || ""), 120);
+    } else if (key === "examples" || key === "default") {
+      continue;
+    } else {
+      out[key] = stripSchemaNoise(nested, depth + 1);
+    }
+  }
+  return out;
+}
+
 function compactBtlTools(body) {
-  if (!Array.isArray(body?.tools) || body.tools.length <= 10) return body;
+  if (!Array.isArray(body?.tools)) return body;
   const preferred = /terminal|shell|bash|exec|command|read|write|edit|search|grep|find|glob|list|file/i;
-  const selected = body.tools.filter((tool) => preferred.test(getToolName(tool))).slice(0, 10);
-  const fallback = body.tools.slice(0, 8);
+  const selected = body.tools.filter((tool) => preferred.test(getToolName(tool))).slice(0, 4);
+  const fallback = body.tools.slice(0, 3);
   body.tools = (selected.length ? selected : fallback).map((tool) => {
     if (!tool?.function) return tool;
     return {
-      ...tool,
+      type: tool.type || "function",
       function: {
-        ...tool.function,
-        description: truncateText(tool.function.description || "", 400),
+        name: tool.function.name,
+        description: truncateText(tool.function.description || "", 180),
+        parameters: stripSchemaNoise(tool.function.parameters || { type: "object", properties: {} }),
       },
     };
   });
@@ -44,16 +61,16 @@ function repairBtlAgenticPayload(body) {
       const content = typeof message.content === "string" ? message.content : JSON.stringify(message.content || "");
       return {
         role: "user",
-        content: `[Tool result${message.tool_call_id ? ` ${message.tool_call_id}` : ""}]\n${truncateText(content, 1200)}`,
+        content: `[Tool result${message.tool_call_id ? ` ${message.tool_call_id}` : ""}]\n${truncateText(content, 600)}`,
       };
     }
     if (message.role === "assistant") {
       const { tool_calls, reasoning_content, ...withoutAgenticNoise } = message;
-      if (!withoutAgenticNoise.content && (reasoning_content || tool_calls)) withoutAgenticNoise.content = "[Assistant used a tool]";
-      if (typeof withoutAgenticNoise.content === "string") withoutAgenticNoise.content = truncateText(withoutAgenticNoise.content, 1200);
+      if (!withoutAgenticNoise.content) return null;
+      if (typeof withoutAgenticNoise.content === "string") withoutAgenticNoise.content = truncateText(withoutAgenticNoise.content, 800);
       return withoutAgenticNoise;
     }
-    if (typeof message.content === "string") return { ...message, content: truncateText(message.content, 1600) };
+    if (typeof message.content === "string") return { ...message, content: truncateText(message.content, 900) };
     return message;
   }).filter((message) => message && message.content !== "");
 
@@ -61,15 +78,16 @@ function repairBtlAgenticPayload(body) {
   // Keep system/developer prompts plus compact recent context.
   const keepHead = body.messages
     .filter((message) => message.role === "system" || message.role === "developer")
-    .map((message) => ({ ...message, content: truncateText(message.content, 3000) }));
-  const keepTail = body.messages.filter((message) => message.role !== "system" && message.role !== "developer").slice(-40);
+    .slice(-2)
+    .map((message) => ({ ...message, content: truncateText(message.content, 1200) }));
+  const keepTail = body.messages.filter((message) => message.role !== "system" && message.role !== "developer").slice(-16);
   body.messages = [...keepHead, ...keepTail];
 
   compactBtlTools(body);
 
   body.messages.unshift({
     role: "system",
-    content: "BTL adapter: continue the current agentic task instead of stopping early. Use available tools when needed. If more work remains, call a tool or state the next concrete step; do not end with a vague partial answer.",
+    content: "BTL adapter: continue the current agentic task. Use available tools when needed. Never output placeholder text like '[Assistant used a tool]'. If more work remains, call a tool or give the exact next step.",
   });
 
   if (body.max_tokens === undefined && body.max_completion_tokens === undefined) {

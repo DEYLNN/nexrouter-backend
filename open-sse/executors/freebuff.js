@@ -25,6 +25,31 @@ const FREEBUFF_OS = process.env.FREEBUFF_OS || "windows";
 const FREEBUFF_TIMEZONE = process.env.FREEBUFF_TIMEZONE || "Asia/Shanghai";
 const FREEBUFF_LOCALE = process.env.FREEBUFF_LOCALE || "zh-CN";
 
+function debugFreebuffPayload(body, backendModel) {
+  if (process.env.DEBUG_FREEBUFF_PAYLOAD !== "1") return;
+  const messages = Array.isArray(body?.messages) ? body.messages : [];
+  const summary = messages.map((message, index) => ({
+    index,
+    role: message?.role,
+    contentShape: Array.isArray(message?.content) ? "array" : typeof message?.content,
+    hasReasoningContent: typeof message?.reasoning_content === "string",
+    reasoningLength: typeof message?.reasoning_content === "string" ? message.reasoning_content.length : 0,
+    hasToolCalls: Array.isArray(message?.tool_calls) && message.tool_calls.length > 0,
+    toolCallCount: Array.isArray(message?.tool_calls) ? message.tool_calls.length : 0,
+    toolCallId: message?.tool_call_id || undefined,
+  }));
+  console.log("[FREEBUFF DEBUG]", JSON.stringify({
+    backendModel,
+    topKeys: Object.keys(body || {}).filter((key) => !/key|token|auth|secret|password/i.test(key)),
+    hasReasoningEffort: !!body?.reasoning_effort,
+    hasReasoning: !!body?.reasoning,
+    hasTools: Array.isArray(body?.tools) && body.tools.length > 0,
+    toolCount: Array.isArray(body?.tools) ? body.tools.length : 0,
+    messageCount: messages.length,
+    summary: summary.slice(-60),
+  }));
+}
+
 const MODEL_MAP = {
   "deepseek-v4-flash": "deepseek/deepseek-v4-flash",
   "fb/deepseek-v4-flash": "deepseek/deepseek-v4-flash",
@@ -871,6 +896,8 @@ export class FreeBuffExecutor extends BaseExecutor {
     delete upstreamBody.response_format;
     delete upstreamBody.reasoning_effort;
     delete upstreamBody.reasoning;
+
+    debugFreebuffPayload(upstreamBody, backendModel);
 
     try {
       await ensureFreeSession(account.authToken, session);

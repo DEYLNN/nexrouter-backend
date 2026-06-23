@@ -4,6 +4,39 @@ import { proxyAwareFetch } from "../utils/proxyFetch.js";
 /**
  * BaseExecutor - Base class for provider executors
  */
+function debugProviderPayload(provider, body, model) {
+  const envMap = {
+    btl: "DEBUG_BTL_PAYLOAD",
+    "badtheory-labs": "DEBUG_BTL_PAYLOAD",
+  };
+  const envName = envMap[provider];
+  if (!envName || process.env[envName] !== "1") return;
+
+  const messages = Array.isArray(body?.messages) ? body.messages : [];
+  const summary = messages.map((message, index) => ({
+    index,
+    role: message?.role,
+    contentShape: Array.isArray(message?.content) ? "array" : typeof message?.content,
+    hasReasoningContent: typeof message?.reasoning_content === "string",
+    reasoningLength: typeof message?.reasoning_content === "string" ? message.reasoning_content.length : 0,
+    hasToolCalls: Array.isArray(message?.tool_calls) && message.tool_calls.length > 0,
+    toolCallCount: Array.isArray(message?.tool_calls) ? message.tool_calls.length : 0,
+    toolCallId: message?.tool_call_id || undefined,
+  }));
+
+  console.log(`[${provider.toUpperCase()} DEBUG]`, JSON.stringify({
+    provider,
+    model,
+    topKeys: Object.keys(body || {}).filter((key) => !/key|token|auth|secret|password/i.test(key)),
+    hasReasoningEffort: !!body?.reasoning_effort,
+    hasReasoning: !!body?.reasoning,
+    hasTools: Array.isArray(body?.tools) && body.tools.length > 0,
+    toolCount: Array.isArray(body?.tools) ? body.tools.length : 0,
+    messageCount: messages.length,
+    summary: summary.slice(-60),
+  }));
+}
+
 export class BaseExecutor {
   constructor(provider, config) {
     this.provider = provider;
@@ -117,6 +150,7 @@ export class BaseExecutor {
     for (let urlIndex = 0; urlIndex < fallbackCount; urlIndex++) {
       const url = this.buildUrl(model, stream, urlIndex, credentials);
       const transformedBody = this.transformRequest(model, body, stream, credentials);
+      debugProviderPayload(this.provider, transformedBody, model);
       const headers = this.buildHeaders(credentials, stream);
 
       if (!retryAttemptsByUrl[urlIndex]) retryAttemptsByUrl[urlIndex] = 0;

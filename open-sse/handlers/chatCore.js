@@ -43,40 +43,24 @@ export async function handleChatCore({ body, modelInfo, credentials, log, onCred
   const stripList = getModelStrip(alias, model);
 
   // OpenModal rejects thinking-mode conversations unless content[].thinking is replayed losslessly.
-  // Keep agentic/tool calling intact, but remove thinking/reasoning controls for this provider.
-  const stripOpenModalThinking = (payload) => {
-    if (!payload || typeof payload !== "object") return payload;
-
-    const stripBlocks = (content) => {
-      if (!Array.isArray(content)) return content;
-      return content.filter((part) => (
-        part?.type !== "thinking" &&
-        part?.type !== "redacted_thinking" &&
-        part?.type !== "reasoning" &&
-        !part?.thinking &&
-        !part?.reasoning
-      ));
-    };
-
-    const stripMessages = (messages) => Array.isArray(messages) ? messages.map((msg) => {
-      if (!msg || typeof msg !== "object") return msg;
-      const next = { ...msg, content: stripBlocks(msg.content) };
-      delete next.reasoning_content;
-      delete next.thinking;
-      return next;
+  // Keep agentic/tool calling intact, but force-disable thinking/reasoning for this provider.
+  if (provider === "openmodal") {
+    const stripThinkingBlocks = (messages) => Array.isArray(messages) ? messages.map((msg) => {
+      if (!Array.isArray(msg?.content)) return msg;
+      return {
+        ...msg,
+        content: msg.content.filter((part) => part?.type !== "thinking" && part?.type !== "redacted_thinking" && !part?.thinking)
+      };
     }) : messages;
 
-    const next = { ...payload, messages: stripMessages(payload.messages) };
-    delete next.thinking;
-    delete next.reasoning;
-    delete next.reasoning_effort;
-    delete next.enable_thinking;
-    return next;
-  };
-
-  if (provider === "openmodal") {
-    body = stripOpenModalThinking(body);
-    providerThinking = null;
+    body = {
+      ...body,
+      messages: stripThinkingBlocks(body.messages),
+      thinking: { type: "disabled" }
+    };
+    delete body.reasoning;
+    delete body.reasoning_effort;
+    delete body.enable_thinking;
   }
 
   // Inject provider-level thinking config override (only if client hasn't set)
@@ -131,10 +115,6 @@ export async function handleChatCore({ body, modelInfo, credentials, log, onCred
     toolNameMap = translatedBody._toolNameMap;
     delete translatedBody._toolNameMap;
     translatedBody.model = upstreamModel;
-  }
-
-  if (provider === "openmodal") {
-    translatedBody = stripOpenModalThinking(translatedBody);
   }
 
   // Token savers: applied at the final body just before dispatch

@@ -4,6 +4,18 @@ import { PROVIDERS } from "../config/providers.js";
 // Models that use /zen/v1/messages (claude format)
 const MESSAGES_MODELS = new Set(["big-pickle"]);
 
+function ensureOpenCodeReasoningContent(body) {
+  const messages = Array.isArray(body?.messages) ? body.messages : [];
+  for (const message of messages) {
+    if (message?.role !== "assistant") continue;
+    if (!Array.isArray(message.tool_calls) || message.tool_calls.length === 0) continue;
+    if (typeof message.reasoning_content !== "string" || message.reasoning_content.length === 0) {
+      message.reasoning_content = " ";
+    }
+  }
+  return body;
+}
+
 function debugOpenCodePayload(body, model) {
   if (process.env.DEBUG_OPENCODE_PAYLOAD !== "1") return;
   const messages = Array.isArray(body?.messages) ? body.messages : [];
@@ -51,7 +63,8 @@ export class OpenCodeExecutor extends BaseExecutor {
   }
 
   transformRequest(model, body) {
-    debugOpenCodePayload(body, model);
-    return body;
+    const patchedBody = ensureOpenCodeReasoningContent(body);
+    debugOpenCodePayload(patchedBody, model);
+    return patchedBody;
   }
 }

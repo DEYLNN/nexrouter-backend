@@ -12,6 +12,9 @@ const PROVIDER_RULES = {
   gitlawb: { scope: "all" },
   freebuff: { scope: "all" },
   fb: { scope: "all" },
+  // BTL/Badtheory Labs uses DeepSeek thinking route; same as FreeBuff.
+  btl: { scope: "all" },
+  "badtheory-labs": { scope: "all" },
   // OpenModal/OpenModel rejects thinking-mode followups unless assistant
   // messages echo reasoning_content. Match opencode-go behavior.
   openmodal: { scope: "all" },

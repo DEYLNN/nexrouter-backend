@@ -79,7 +79,7 @@ export const PROVIDER_ENDPOINTS = {
   tokenrouter: "https://api.tokenrouter.com/v1/chat/completions",
   zerog: "https://router-api.0g.ai/v1/chat/completions",
   "0g": "https://router-api.0g.ai/v1/chat/completions",
-  zyloo: "https://zyloo.io/v1/chat/completions",
+  zyloo: "https://api.zyloo.io/v1/chat/completions",
   tr: "https://api.tokenrouter.com/v1/chat/completions",
   qiniu: "https://api.qnaigc.com/v1/chat/completions",
   morph: "https://api.morphllm.com/v1/chat/completions",

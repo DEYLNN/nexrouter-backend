@@ -170,6 +170,12 @@ export class DefaultExecutor extends BaseExecutor {
     if (this.provider === "anuma") {
       transformed = normalizeAnumaAgentPayload(transformed, stream);
     }
+    if (this.provider === "zyloo") {
+      // Zyloo API expects model ids with provider prefix, e.g. zyloo/gpt-5.4.
+      transformed.model = String(model || transformed.model || "").startsWith("zyloo/")
+        ? String(model || transformed.model)
+        : `zyloo/${model || transformed.model}`;
+    }
     return transformed;
   }
 
@@ -284,6 +290,9 @@ export class DefaultExecutor extends BaseExecutor {
         } else if (this.provider === "gitlab") {
           // GitLab Duo uses Bearer token (PAT with ai_features scope, or OAuth access token)
           headers["Authorization"] = `Bearer ${credentials.apiKey || credentials.accessToken}`;
+        } else if (this.provider === "zyloo") {
+          headers["Authorization"] = `Bearer ${credentials.apiKey || credentials.accessToken}`;
+          delete headers["x-api-key"];
         } else if (this.provider === "codebuddy") {
           headers["Authorization"] = `Bearer ${credentials.apiKey || credentials.accessToken}`;
         } else if (this.provider === "kilocode") {

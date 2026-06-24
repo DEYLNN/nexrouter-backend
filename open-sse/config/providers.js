@@ -152,7 +152,7 @@ export const PROVIDERS = {
     format: "openai"
   },
   zyloo: {
-    baseUrl: "https://zyloo.io/v1/chat/completions",
+    baseUrl: "https://api.zyloo.io/v1/chat/completions",
     format: "openai"
   },
   swiftrouter: {

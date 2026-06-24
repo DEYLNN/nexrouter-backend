@@ -385,8 +385,8 @@ export async function POST(request) {
         case "canopywave":
         case "openmodal":
         case "om":
-        case "badtheory-labs-2":
-        case "btl2":
+        case "badtheory-labs":
+        case "btl":
         case "ftstoresz":
         case "swiftrouter":
         case "gitlawb":
@@ -526,7 +526,7 @@ export async function POST(request) {
                 stream: false,
               },
             },
-            "badtheory-labs-2": {
+            "badtheory-labs": {
               url: "https://api.badtheorylabs.com/v1/chat/completions",
               method: "POST",
               body: {
@@ -536,7 +536,7 @@ export async function POST(request) {
                 stream: false,
               },
             },
-            btl2: {
+            btl: {
               url: "https://api.badtheorylabs.com/v1/chat/completions",
               method: "POST",
               body: {

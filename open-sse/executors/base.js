@@ -4,107 +4,11 @@ import { proxyAwareFetch } from "../utils/proxyFetch.js";
 /**
  * BaseExecutor - Base class for provider executors
  */
-function truncateText(value, maxLength) {
-  if (typeof value !== "string" || value.length <= maxLength) return value;
-  return `${value.slice(0, maxLength)}\n...[truncated ${value.length - maxLength} chars]`;
-}
-
-function getToolName(tool) {
-  return tool?.function?.name || tool?.name || "";
-}
-
-function stripSchemaNoise(value, depth = 0) {
-  if (!value || typeof value !== "object" || depth > 6) return value;
-  if (Array.isArray(value)) return value.slice(0, 20).map((item) => stripSchemaNoise(item, depth + 1));
-  const out = {};
-  for (const [key, nested] of Object.entries(value)) {
-    if (key === "description") {
-      out[key] = truncateText(String(nested || ""), 120);
-    } else if (key === "examples" || key === "default") {
-      continue;
-    } else {
-      out[key] = stripSchemaNoise(nested, depth + 1);
-    }
-  }
-  return out;
-}
-
-function compactBtlTools(body) {
-  if (!Array.isArray(body?.tools)) return body;
-  const preferred = /terminal|shell|bash|exec|command|read|write|edit|search|grep|find|glob|list|file/i;
-  const selected = body.tools.filter((tool) => preferred.test(getToolName(tool))).slice(0, 4);
-  const fallback = body.tools.slice(0, 3);
-  body.tools = (selected.length ? selected : fallback).map((tool) => {
-    if (!tool?.function) return tool;
-    return {
-      type: tool.type || "function",
-      function: {
-        name: tool.function.name,
-        description: truncateText(tool.function.description || "", 180),
-        parameters: stripSchemaNoise(tool.function.parameters || { type: "object", properties: {} }),
-      },
-    };
-  });
-  return body;
-}
-
-function repairBtlAgenticPayload(body) {
-  if (!Array.isArray(body?.messages)) return body;
-
-  // BTL's upstream DeepSeek route rejects historical tool-role messages even
-  // when they look paired. Keep top-level tools enabled for the current turn,
-  // but flatten prior tool history to plain user context and strip old
-  // assistant.tool_calls. This makes BTL agentic-lite instead of full replay.
-  body.messages = body.messages.map((message) => {
-    if (!message) return message;
-    if (message.role === "tool") {
-      const content = typeof message.content === "string" ? message.content : JSON.stringify(message.content || "");
-      return {
-        role: "user",
-        content: `[Tool result${message.tool_call_id ? ` ${message.tool_call_id}` : ""}]\n${truncateText(content, 600)}`,
-      };
-    }
-    if (message.role === "assistant") {
-      const { tool_calls, reasoning_content, ...withoutAgenticNoise } = message;
-      if (!withoutAgenticNoise.content) return null;
-      if (typeof withoutAgenticNoise.content === "string") withoutAgenticNoise.content = truncateText(withoutAgenticNoise.content, 800);
-      return withoutAgenticNoise;
-    }
-    if (typeof message.content === "string") return { ...message, content: truncateText(message.content, 900) };
-    return message;
-  }).filter((message) => message && message.content !== "");
-
-  // BTL completes but tends to stop early with large flattened agent histories.
-  // Keep system/developer prompts plus compact recent context.
-  const keepHead = body.messages
-    .filter((message) => message.role === "system" || message.role === "developer")
-    .slice(-2)
-    .map((message) => ({ ...message, content: truncateText(message.content, 1200) }));
-  const keepTail = body.messages.filter((message) => message.role !== "system" && message.role !== "developer").slice(-16);
-  body.messages = [...keepHead, ...keepTail];
-
-  compactBtlTools(body);
-
-  body.messages.unshift({
-    role: "system",
-    content: "BTL adapter: continue the current agentic task. Use available tools when needed. Never output placeholder text like '[Assistant used a tool]'. If more work remains, call a tool or give the exact next step.",
-  });
-
-  if (body.max_tokens === undefined && body.max_completion_tokens === undefined) {
-    body.max_tokens = 4096;
-  }
-
-  return body;
-}
 
 function debugProviderPayload(provider, body, model) {
-  const envMap = {
-    btl: "DEBUG_BTL_PAYLOAD",
-    "badtheory-labs": "DEBUG_BTL_PAYLOAD",
-  };
+  const envMap = {};
   const envName = envMap[provider];
   if (!envName || process.env[envName] !== "1") return;
-
   const messages = Array.isArray(body?.messages) ? body.messages : [];
   const summary = messages.map((message, index) => ({
     index,
@@ -116,7 +20,6 @@ function debugProviderPayload(provider, body, model) {
     toolCallCount: Array.isArray(message?.tool_calls) ? message.tool_calls.length : 0,
     toolCallId: message?.tool_call_id || undefined,
   }));
-
   console.log(`[${provider.toUpperCase()} DEBUG]`, JSON.stringify({
     provider,
     model,
@@ -172,7 +75,6 @@ export class BaseExecutor {
     };
 
     if (this.provider?.startsWith?.("anthropic-compatible-")) {
-      // Anthropic-compatible providers use x-api-key header
       if (credentials.apiKey) {
         headers["x-api-key"] = credentials.apiKey;
       } else if (credentials.accessToken) {
@@ -182,7 +84,6 @@ export class BaseExecutor {
         headers["anthropic-version"] = "2023-06-01";
       }
     } else {
-      // Standard Bearer token auth for other providers
       if (credentials.accessToken) {
         headers["Authorization"] = `Bearer ${credentials.accessToken}`;
       } else if (credentials.apiKey) {
@@ -197,7 +98,6 @@ export class BaseExecutor {
     return headers;
   }
 
-  // Override in subclass for provider-specific transformations
   transformRequest(model, body, stream, credentials) {
     return body;
   }
@@ -206,7 +106,6 @@ export class BaseExecutor {
     return status === HTTP_STATUS.RATE_LIMITED && urlIndex + 1 < this.getFallbackCount();
   }
 
-  // Override in subclass for provider-specific refresh
   async refreshCredentials(credentials, log, proxyOptions = null) {
     return null;
   }
@@ -227,10 +126,8 @@ export class BaseExecutor {
     let lastStatus = 0;
     const retryAttemptsByUrl = {};
 
-    // Merge default retry config with provider-specific config
     const retryConfig = { ...DEFAULT_RETRY_CONFIG, ...this.config.retry };
 
-    // Schedule retry via retryConfig[statusKey]. Returns true when caller should `urlIndex--; continue`
     const tryRetry = async (urlIndex, statusKey, reason) => {
       const { attempts, delayMs } = resolveRetryEntry(retryConfig[statusKey]);
       if (attempts <= 0 || retryAttemptsByUrl[urlIndex] >= attempts) return false;
@@ -243,9 +140,6 @@ export class BaseExecutor {
     for (let urlIndex = 0; urlIndex < fallbackCount; urlIndex++) {
       const url = this.buildUrl(model, stream, urlIndex, credentials);
       let transformedBody = this.transformRequest(model, body, stream, credentials);
-      if (this.provider === "btl" || this.provider === "badtheory-labs") {
-        transformedBody = repairBtlAgenticPayload(transformedBody);
-      }
       debugProviderPayload(this.provider, transformedBody, model);
       const headers = this.buildHeaders(credentials, stream);
 
@@ -272,7 +166,6 @@ export class BaseExecutor {
         lastError = error;
         if (error.name === "AbortError") throw error;
 
-        // Map network/fetch exceptions to 502 retry config
         if (await tryRetry(urlIndex, HTTP_STATUS.BAD_GATEWAY, `network "${error.message}"`)) { urlIndex--; continue; }
 
         if (urlIndex + 1 < fallbackCount) {

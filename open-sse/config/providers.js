@@ -143,14 +143,6 @@ export const PROVIDERS = {
     baseUrl: "https://api-ai.ftstoresz.com/v1/chat/completions",
     format: "openai"
   },
-  "badtheory-labs": {
-    baseUrl: "https://api.badtheorylabs.com/v1/chat/completions",
-    format: "openai"
-  },
-  btl: {
-    baseUrl: "https://api.badtheorylabs.com/v1/chat/completions",
-    format: "openai"
-  },
   "badtheory-labs-2": {
     baseUrl: "https://api.badtheorylabs.com/v1/chat/completions",
     format: "openai"

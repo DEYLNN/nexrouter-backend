@@ -898,7 +898,9 @@ async function testApiKeyConnection(connection, effectiveProxy = null) {
         return { valid, error: valid ? null : "Invalid API key" };
       }
       case "badtheory-labs":
-      case "btl": {
+      case "btl":
+      case "badtheory-labs-2":
+      case "btl2": {
         const res = await fetchWithConnectionProxy("https://api.badtheorylabs.com/v1/chat/completions", {
           method: "POST",
           headers: { Authorization: `Bearer ${connection.apiKey}`, "Content-Type": "application/json" },

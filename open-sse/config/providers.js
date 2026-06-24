@@ -151,6 +151,14 @@ export const PROVIDERS = {
     baseUrl: "https://api.badtheorylabs.com/v1/chat/completions",
     format: "openai"
   },
+  "badtheory-labs-2": {
+    baseUrl: "https://api.badtheorylabs.com/v1/chat/completions",
+    format: "openai"
+  },
+  btl2: {
+    baseUrl: "https://api.badtheorylabs.com/v1/chat/completions",
+    format: "openai"
+  },
   zyloo: {
     baseUrl: "https://api.zyloo.io/v1/chat/completions",
     format: "openai"

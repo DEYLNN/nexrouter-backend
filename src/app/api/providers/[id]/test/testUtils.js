@@ -63,6 +63,11 @@ const OAUTH_TEST_CONFIG = {
   },
   qwen: { checkExpiry: true, refreshable: true },
   kiro: { checkExpiry: true, refreshable: true },
+  freebuff: {
+    // FreeBuff/Codebuff uses accessToken as session identifier.
+    // No public API endpoint to validate; token existence = valid.
+    tokenExists: true
+  },
   qoder: {
     url: "https://openapi.qoder.sh/api/v1/userinfo",
     method: "GET",

@@ -81,6 +81,7 @@ export const PROVIDER_ENDPOINTS = {
   "0g": "https://router-api.0g.ai/v1/chat/completions",
   zyloo: "https://api.zyloo.io/v1/chat/completions",
   longcat: "https://api.longcat.chat/openai/v1/chat/completions",
+  "naraya-ai": "https://router.bynara.id/v1/chat/completions",
   tr: "https://api.tokenrouter.com/v1/chat/completions",
   qiniu: "https://api.qnaigc.com/v1/chat/completions",
   morph: "https://api.morphllm.com/v1/chat/completions",

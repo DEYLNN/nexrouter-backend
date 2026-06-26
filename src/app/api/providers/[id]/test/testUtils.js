@@ -662,6 +662,15 @@ async function testApiKeyConnection(connection, effectiveProxy = null) {
         } catch { }
         return { valid: false, error: detail };
       }
+      case "naraya-ai":
+      case "nry": {
+        const res = await fetchWithConnectionProxy("https://router.bynara.id/v1/models", {
+          method: "GET",
+          headers: { Authorization: `Bearer ${connection.apiKey}`, "content-type": "application/json" },
+        }, effectiveProxy);
+        const valid = res.status !== 401 && res.status !== 403;
+        return { valid, error: valid ? null : "Invalid API key" };
+      }
       case "longcat":
       case "lc": {
         const res = await fetchWithConnectionProxy("https://api.longcat.chat/openai/v1/models", {

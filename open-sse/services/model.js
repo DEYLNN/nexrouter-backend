@@ -63,6 +63,8 @@ const ALIAS_TO_PROVIDER_ID = {
   routeway: "routeway",
   lc: "longcat",
   longcat: "longcat",
+  nry: "naraya-ai",
+  "naraya-ai": "naraya-ai",
   zyl: "zyloo",
   zyloo: "zyloo",
   hus: "husada",

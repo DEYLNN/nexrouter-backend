@@ -270,6 +270,12 @@ export const PROVIDER_MODELS = {
   lc: [
     { id: "LongCat-2.0-Preview", name: "LongCat 2.0 Preview" },
   ],
+  nry: [
+    { id: "mistral-medium-3-5", name: "Mistral Medium 3.5" },
+    { id: "mistral-large", name: "Mistral Large" },
+    { id: "mimo-v2.5-pro-free", name: "MiMo V2.5 Pro Free" },
+    { id: "mimo-v2.5-free", name: "MiMo V2.5 Free" },
+  ],
   evo: [
     { id: "evomap-gemini-3.1-pro-preview", name: "Gemini 3.1 Pro Preview" },
     { id: "evomap-deepseek-v4-flash", name: "DeepSeek V4 Flash" },
@@ -1072,6 +1078,7 @@ const OAUTH_ALIASES = {
   openmodal: "om",
   ftstoresz: "ftstoresz",
   "badtheory-labs": "btl",
+  "naraya-ai": "nry",
   longcat: "lc",
   evomap: "evo",
   ambient: "amb",

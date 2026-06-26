@@ -399,6 +399,8 @@ export async function POST(request) {
         case "zyloo":
         case "longcat":
         case "lc":
+        case "naraya-ai":
+        case "nry":
         case "evomap":
         case "evo":
         case "morph": {
@@ -627,6 +629,10 @@ export async function POST(request) {
             },
             longcat: {
               url: "https://api.longcat.chat/openai/v1/models",
+              method: "GET",
+            },
+            "naraya-ai": {
+              url: "https://router.bynara.id/v1/models",
               method: "GET",
             },
             morph: {

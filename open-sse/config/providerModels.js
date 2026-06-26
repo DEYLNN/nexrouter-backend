@@ -267,6 +267,17 @@ export const PROVIDER_MODELS = {
     { id: "xiaomi/mimo-v2.5", name: "Xiaomi: MiMo-V2.5" },
     { id: "xiaomi/mimo-v2-flash", name: "Xiaomi: MiMo-V2-Flash" },
   ],
+  lc: [
+    { id: "LongCat-2.0-Preview", name: "LongCat 2.0 Preview" },
+  ],
+  evo: [
+    { id: "evomap-gemini-3.1-pro-preview", name: "Gemini 3.1 Pro Preview" },
+    { id: "evomap-deepseek-v4-flash", name: "DeepSeek V4 Flash" },
+    { id: "evomap-claude-opus-4-7", name: "Claude Opus 4.7" },
+    { id: "evomap-glm-5.1", name: "GLM 5.1" },
+    { id: "evomap-gpt-5.5", name: "GPT 5.5" },
+    { id: "evomap-kimi-k2.6", name: "Kimi K2.6" },
+  ],
   amb: [
     { id: "zai-org/GLM-5.1-FP8", name: "GLM 5.1" },
     { id: "ambient/large", name: "GLM 5.1" },
@@ -282,6 +293,7 @@ export const PROVIDER_MODELS = {
     { id: "kimi-k2.5", name: "Kimi K2.5" },
     { id: "minimax-m2.7", name: "MiniMax M2.7" },
     { id: "nemotron-3-super-fp4", name: "Nemotron 3 Super FP4" },
+    { id: "minimax-m3", name: "MiniMax M3" },
   ],
   bai: [
     { id: "glm-5.1", name: "GLM 5.1" },
@@ -304,9 +316,9 @@ export const PROVIDER_MODELS = {
     { id: "minimax-m3", name: "MiniMax M3" },
   ],
   zyloo: [
-    { id: "zyloo/claude-sonnet-4-6", name: "Claude Sonnet 4.6" },
-    { id: "zyloo/gpt-5.4", name: "GPT 5.4" },
-    { id: "zyloo/deepseek-v4-flash", name: "DeepSeek V4 Flash" },
+    { id: "claude-sonnet-4-6", name: "Claude Sonnet 4.6" },
+    { id: "gpt-5.4", name: "GPT 5.4" },
+    { id: "deepseek-v4-flash", name: "DeepSeek V4 Flash" },
   ],
   tr: [
     { id: "MiniMax-M3", name: "MiniMax M3" },
@@ -756,12 +768,12 @@ export const PROVIDER_MODELS = {
     { id: "am/glm-5", name: "GLM 5" },
   ],
   husada: [
-    { id: "ag/gemini-3.5-flash-extra-low", name: "Gemini 3.5 Flash Extra Low" },
-    { id: "ag/gemini-3-flash-agent", name: "Gemini 3 Flash Agent" },
-    { id: "ag/gemini-3.5-flash-low", name: "Gemini 3.5 Flash Low" },
-    { id: "ag/gemini-pro-agent", name: "Gemini Pro Agent" },
-    { id: "ag/gemini-3.1-pro-low", name: "Gemini 3.1 Pro Low" },
-    { id: "ag/gemini-3-flash", name: "Gemini 3 Flash" },
+    { id: "gemini-3.5-flash-extra-low", name: "Gemini 3.5 Flash Extra Low" },
+    { id: "gemini-3-flash-agent", name: "Gemini 3 Flash Agent" },
+    { id: "gemini-3.5-flash-low", name: "Gemini 3.5 Flash Low" },
+    { id: "gemini-pro-agent", name: "Gemini Pro Agent" },
+    { id: "gemini-3.1-pro-low", name: "Gemini 3.1 Pro Low" },
+    { id: "gemini-3-flash", name: "Gemini 3 Flash" },
   ],
   zmx: [
     { id: "moonshotai/kimi-k2.7-code-free", name: "Kimi K2.7 Code Free" },
@@ -1060,6 +1072,8 @@ const OAUTH_ALIASES = {
   openmodal: "om",
   ftstoresz: "ftstoresz",
   "badtheory-labs": "btl",
+  longcat: "lc",
+  evomap: "evo",
   ambient: "amb",
   "xiaomi-mimo-plan-sgp": "mimo-sgp",
   swiftrouter: "sr",

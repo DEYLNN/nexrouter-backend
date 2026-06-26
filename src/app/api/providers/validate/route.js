@@ -397,6 +397,10 @@ export async function POST(request) {
         case "routeway":
         case "ambient":
         case "zyloo":
+        case "longcat":
+        case "lc":
+        case "evomap":
+        case "evo":
         case "morph": {
           const validationConfigs = {
             "xiaomi-mimo-plan-sgp": {
@@ -615,6 +619,14 @@ export async function POST(request) {
             },
             zenmux: {
               url: "https://zenmux.ai/api/v1/models",
+              method: "GET",
+            },
+            evomap: {
+              url: "https://api.evomap.ai/v1/models",
+              method: "GET",
+            },
+            longcat: {
+              url: "https://api.longcat.chat/openai/v1/models",
               method: "GET",
             },
             morph: {

@@ -576,6 +576,14 @@ export const PROVIDERS = {
     baseUrl: "https://api.xiaomimimo.com/v1/chat/completions",
     format: "openai"
   },
+  evomap: {
+    baseUrl: "https://api.evomap.ai/v1/chat/completions",
+    format: "openai"
+  },
+  longcat: {
+    baseUrl: "https://api.longcat.chat/openai/v1/chat/completions",
+    format: "openai"
+  },
   ambient: {
     baseUrl: "https://api.ambient.xyz/v1/chat/completions",
     format: "openai"

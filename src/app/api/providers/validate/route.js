@@ -387,7 +387,6 @@ export async function POST(request) {
         case "om":
         case "badtheory-labs":
         case "btl":
-        case "ftstoresz":
         case "swiftrouter":
         case "gitlawb":
         case "glb":
@@ -517,16 +516,6 @@ export async function POST(request) {
               method: "POST",
               body: {
                 model: "deepseek-v3.2",
-                messages: [{ role: "user", content: "test" }],
-                max_tokens: 1,
-                stream: false,
-              },
-            },
-            ftstoresz: {
-              url: "https://api-ai.ftstoresz.com/v1/chat/completions",
-              method: "POST",
-              body: {
-                model: "qwen3.7-max",
                 messages: [{ role: "user", content: "test" }],
                 max_tokens: 1,
                 stream: false,

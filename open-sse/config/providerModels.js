@@ -752,10 +752,6 @@ export const PROVIDER_MODELS = {
   om: [
     { id: "deepseek-v4-flash", name: "DeepSeek V4 Flash", targetFormat: "claude" },
   ],
-  ftstoresz: [
-    { id: "qwen3.7-max", name: "Qwen3.7 Max" },
-    { id: "claude-opus-4.7", name: "Claude Opus 4.7" },
-  ],
   btl: [
     { id: "gpt-5-5", name: "GPT 5.5" },
     { id: "gpt-5.4", name: "GPT 5.4" },
@@ -1076,7 +1072,6 @@ const OAUTH_ALIASES = {
   "vertex-partner": "vertex-partner",
   canopywave: "cwv",
   openmodal: "om",
-  ftstoresz: "ftstoresz",
   "badtheory-labs": "btl",
   "naraya-ai": "nry",
   longcat: "lc",

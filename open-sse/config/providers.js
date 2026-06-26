@@ -139,10 +139,6 @@ export const PROVIDERS = {
     format: "claude",
     headers: { ...CLAUDE_API_HEADERS }
   },
-  ftstoresz: {
-    baseUrl: "https://api-ai.ftstoresz.com/v1/chat/completions",
-    format: "openai"
-  },
   "badtheory-labs": {
     baseUrl: "https://api.badtheorylabs.com/v1/chat/completions",
     format: "openai"

@@ -19,33 +19,6 @@ function textContent(value) {
   return JSON.stringify(value);
 }
 
-function sanitizeGmiToolPayload(body) {
-  const next = { ...body };
-  delete next.tools;
-  delete next.tool_choice;
-  delete next.parallel_tool_calls;
-
-  if (Array.isArray(next.messages)) {
-    next.messages = next.messages.map((message) => {
-      const clean = { ...message };
-      delete clean.tool_calls;
-      delete clean.function_call;
-      delete clean.tool_call_id;
-      delete clean.name;
-
-      if (message.role === "tool" || message.role === "function") {
-        const label = message.name || message.tool_call_id || "tool";
-        return { role: "user", content: `[${label} result]\n${textContent(message.content)}` };
-      }
-
-      return clean;
-    });
-  }
-
-  return next;
-}
-
-
 function normalizeAnumaAgentPayload(body, upstreamStream = false) {
   const originalTools = Array.isArray(body.tools) ? body.tools : [];
   const preferredToolNames = new Set(["terminal", "exec", "shell", "bash", "browser_navigate", "browser_snapshot", "browser_click", "browser_type", "browser_screenshot", "browser_vision"]);
@@ -164,9 +137,7 @@ export class DefaultExecutor extends BaseExecutor {
       if (!extra.tags) extra.tags = ["product=hermes-agent"];
       transformed.extra_body = extra;
     }
-    if (this.provider === "gmi-cloud") {
-      transformed = sanitizeGmiToolPayload(transformed);
-    }
+    // GMI Cloud now supports native tools — no stripping needed.
     if (this.provider === "anuma") {
       transformed = normalizeAnumaAgentPayload(transformed, stream);
     }

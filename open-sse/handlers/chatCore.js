@@ -89,7 +89,7 @@ export async function handleChatCore({ body, modelInfo, credentials, log, onCred
 
   const clientRequestedStreaming = body.stream === true || sourceFormat === FORMATS.ANTIGRAVITY || sourceFormat === FORMATS.GEMINI || sourceFormat === FORMATS.GEMINI_CLI;
   const providerRequiresStreaming = provider === "openai" || provider === "codex" || provider === "commandcode";
-  const fakeStreamProvider = provider === "gmi-cloud" || (provider === "general-compute" && Array.isArray(body.tools) && body.tools.length > 0 && body.stream === true);
+  const fakeStreamProvider = provider === "general-compute" && Array.isArray(body.tools) && body.tools.length > 0 && body.stream === true;
   let stream = fakeStreamProvider ? false : (providerRequiresStreaming ? true : (body.stream !== false));
 
   // Check client Accept header preference for non-streaming requests

@@ -388,6 +388,48 @@ export const PROVIDER_MODELS = {
   vikey: [
     { id: "vikey/vclaw", name: "Vikey VCLaw" },
   ],
+  "qwen-cloud": [
+    // Flagship
+    { id: "qwen3.7-max", name: "Qwen3.7 Max" },
+    { id: "qwen3.7-plus", name: "Qwen3.7 Plus" },
+    { id: "qwen3.6-max-preview", name: "Qwen3.6 Max Preview" },
+    { id: "qwen3.6-plus", name: "Qwen3.6 Plus" },
+    { id: "qwen3.6-flash", name: "Qwen3.6 Flash" },
+    { id: "qwen3.6-27b", name: "Qwen3.6 27B" },
+    { id: "qwen3.6-35b-a3b", name: "Qwen3.6 35B A3B" },
+    // Qwen3.5
+    { id: "qwen3.5-397b-a17b", name: "Qwen3.5 397B A17B" },
+    { id: "qwen3.5-122b-a10b", name: "Qwen3.5 122B A10B" },
+    { id: "qwen3.5-27b", name: "Qwen3.5 27B" },
+    { id: "qwen3.5-35b-a3b", name: "Qwen3.5 35B A3B" },
+    { id: "qwen3.5-flash", name: "Qwen3.5 Flash" },
+    { id: "qwen3.5-plus", name: "Qwen3.5 Plus" },
+    // Qwen3
+    { id: "qwen3-max", name: "Qwen3 Max" },
+    { id: "qwen3-235b-a22b", name: "Qwen3 235B A22B" },
+    { id: "qwen3-32b", name: "Qwen3 32B" },
+    { id: "qwen3-30b-a3b", name: "Qwen3 30B A3B" },
+    { id: "qwen3-14b", name: "Qwen3 14B" },
+    { id: "qwen3-8b", name: "Qwen3 8B" },
+    { id: "qwen3-next-80b-a3b", name: "Qwen3 Next 80B A3B" },
+    // Coding
+    { id: "kimi-k2.7-code", name: "Kimi K2.7 Code" },
+    { id: "qwen3-coder-480b-a35b-instruct", name: "Qwen3 Coder 480B A35B" },
+    { id: "qwen3-coder-plus", name: "Qwen3 Coder Plus" },
+    { id: "qwen3-coder-next", name: "Qwen3 Coder Next" },
+    { id: "qwen3-coder-flash", name: "Qwen3 Coder Flash" },
+    { id: "qwen-coder-plus", name: "Qwen Coder Plus" },
+    // Reasoning
+    { id: "qwq-plus", name: "QWQ Plus" },
+    { id: "qvq-max", name: "QVQ Max" },
+    // Third-party
+    { id: "glm-5.2", name: "GLM 5.2" },
+    { id: "glm-5.1", name: "GLM 5.1" },
+    { id: "deepseek-v4-pro", name: "DeepSeek V4 Pro" },
+    { id: "deepseek-v4-flash", name: "DeepSeek V4 Flash" },
+    { id: "deepseek-v3.2", name: "DeepSeek V3.2" },
+    { id: "ccai-pro", name: "CCAI Pro" },
+  ],
   gmi: [
     { id: "gemini-3.1-flash-lite-preview", name: "Gemini 3.1 Flash Lite Preview", upstreamModelId: "google/gemini-3.1-flash-lite-preview" },
   ],

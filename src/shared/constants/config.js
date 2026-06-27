@@ -89,6 +89,7 @@ export const PROVIDER_ENDPOINTS = {
   zenmux: "https://zenmux.ai/api/v1/chat/completions",
   ocenza: "https://ocenza.com/v1/chat/completions",
   vikey: "https://api.vikey.ai/v1/chat/completions",
+  "qwen-cloud": "https://dashscope-intl.aliyuncs.com/compatible-mode/v1/chat/completions",
   "gmi-cloud": "https://api.gmi-serving.com/v1/chat/completions",
   gitlawb: "https://opengateway.gitlawb.com/v1/chat/completions",
   glb: "https://opengateway.gitlawb.com/v1/chat/completions",

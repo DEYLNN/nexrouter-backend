@@ -180,6 +180,10 @@ export const PROVIDERS = {
     baseUrl: "https://api.vikey.ai/v1/chat/completions",
     format: "openai"
   },
+  "qwen-cloud": {
+    baseUrl: "https://dashscope-intl.aliyuncs.com/compatible-mode/v1/chat/completions",
+    format: "openai"
+  },
   anuma: {
     baseUrl: "https://portal.anuma.ai/api/v1/chat/completions",
     format: "openai"

@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="48" height="48">
+  <defs>
+    <linearGradient id="vk" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#ef4444"/>
+      <stop offset="1" stop-color="#b91c1c"/>
+    </linearGradient>
+  </defs>
+  <rect width="48" height="48" rx="12" fill="url(#vk)"/>
+  <g fill="none" stroke="#ffffff" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round">
+    <!-- "V"-shaped key bow -->
+    <path d="M11 15 L23 24 L11 33"/>
+    <!-- shaft -->
+    <path d="M23 24 H38"/>
+    <!-- teeth -->
+    <path d="M31 24 V31"/>
+    <path d="M38 24 V30"/>
+  </g>
+</svg>

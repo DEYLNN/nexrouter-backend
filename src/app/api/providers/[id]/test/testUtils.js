@@ -910,6 +910,21 @@ async function testApiKeyConnection(connection, effectiveProxy = null) {
         const valid = res.status !== 401 && res.status !== 403;
         return { valid, error: valid ? null : "Invalid API key" };
       }
+      case "vikey":
+      case "vk": {
+        const res = await fetchWithConnectionProxy("https://api.vikey.ai/v1/chat/completions", {
+          method: "POST",
+          headers: { Authorization: `Bearer ${connection.apiKey}`, "Content-Type": "application/json" },
+          body: JSON.stringify({
+            model: "vikey/vclaw",
+            messages: [{ role: "user", content: "test" }],
+            max_tokens: 1,
+            stream: false,
+          }),
+        }, effectiveProxy);
+        const valid = res.status !== 401 && res.status !== 403;
+        return { valid, error: valid ? null : "Invalid API key" };
+      }
       case "morph": {
         const res = await fetchWithConnectionProxy("https://api.morphllm.com/v1/chat/completions", {
           method: "POST",

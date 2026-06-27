@@ -385,6 +385,9 @@ export const PROVIDER_MODELS = {
     { id: "claude-opus-4-20250514", name: "Claude Opus 4" },
     { id: "claude-3-5-sonnet-20241022", name: "Claude 3.5 Sonnet" },
   ],
+  vikey: [
+    { id: "vikey/vclaw", name: "Vikey VCLaw" },
+  ],
   gmi: [
     { id: "gemini-3.1-flash-lite-preview", name: "Gemini 3.1 Flash Lite Preview", upstreamModelId: "google/gemini-3.1-flash-lite-preview" },
   ],

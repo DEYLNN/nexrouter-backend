@@ -176,6 +176,10 @@ export const PROVIDERS = {
     baseUrl: "https://ocenza.com/v1/chat/completions",
     format: "openai"
   },
+  vikey: {
+    baseUrl: "https://api.vikey.ai/v1/chat/completions",
+    format: "openai"
+  },
   anuma: {
     baseUrl: "https://portal.anuma.ai/api/v1/chat/completions",
     format: "openai"

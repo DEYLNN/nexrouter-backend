@@ -67,6 +67,8 @@ const ALIAS_TO_PROVIDER_ID = {
   "naraya-ai": "naraya-ai",
   zyl: "zyloo",
   zyloo: "zyloo",
+  vk: "vikey",
+  vikey: "vikey",
   hus: "husada",
   husada: "husada",
   ocz: "ocenza",

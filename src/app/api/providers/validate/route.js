@@ -402,7 +402,9 @@ export async function POST(request) {
         case "nry":
         case "evomap":
         case "evo":
-        case "morph": {
+        case "morph":
+        case "babel-town":
+        case "bt": {
           const validationConfigs = {
             "xiaomi-mimo-plan-sgp": {
               url: "https://token-plan-sgp.xiaomimimo.com/v1/models",

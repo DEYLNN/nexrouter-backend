@@ -69,6 +69,8 @@ const ALIAS_TO_PROVIDER_ID = {
   zyloo: "zyloo",
   vk: "vikey",
   vikey: "vikey",
+  bt: "babel-town",
+  "babel-town": "babel-town",
   qc: "qwen-cloud",
   "qwen-cloud": "qwen-cloud",
   hus: "husada",

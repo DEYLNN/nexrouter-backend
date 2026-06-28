@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.4.79] - 2026-06-28
+
+### Added
+- Add Babel Town provider (alias `bt`) — OpenAI-compatible inference API.
+  - Base URL: `https://api.babel.town/v1`
+  - Models: `glm-5.2`
+
 ## [0.4.78] - 2026-06-22
 
 ### Added

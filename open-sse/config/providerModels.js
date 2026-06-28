@@ -388,6 +388,9 @@ export const PROVIDER_MODELS = {
   vikey: [
     { id: "vikey/vclaw", name: "Vikey VCLaw" },
   ],
+  "babel-town": [
+    { id: "glm-5.2", name: "GLM 5.2" },
+  ],
   "qwen-cloud": [
     // Flagship
     { id: "qwen3.7-max", name: "Qwen3.7 Max" },

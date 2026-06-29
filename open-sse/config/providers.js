@@ -180,6 +180,10 @@ export const PROVIDERS = {
     baseUrl: "https://api.vikey.ai/v1/chat/completions",
     format: "openai"
   },
+  unimodel: {
+    baseUrl: "https://www.unimodel.ai/v1/chat/completions",
+    format: "openai"
+  },
   "babel-town": {
     baseUrl: "https://api.babel.town/v1/chat/completions",
     format: "openai"

@@ -927,7 +927,7 @@ async function testApiKeyConnection(connection, effectiveProxy = null) {
       }
       case "unimodel":
       case "um": {
-        const res = await fetchWithConnectionProxy("https://unimodel.ai/v1/chat/completions", {
+        const res = await fetchWithConnectionProxy("https://www.unimodel.ai/v1/chat/completions", {
           method: "POST",
           headers: { Authorization: `Bearer ${connection.apiKey}`, "Content-Type": "application/json" },
           body: JSON.stringify({

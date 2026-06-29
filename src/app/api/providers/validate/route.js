@@ -625,7 +625,7 @@ export async function POST(request) {
               method: "GET",
             },
             unimodel: {
-              url: "https://unimodel.ai/v1/chat/completions",
+              url: "https://www.unimodel.ai/v1/chat/completions",
               method: "POST",
               body: {
                 model: "deepseek-v4-flash",
@@ -635,7 +635,7 @@ export async function POST(request) {
               },
             },
             um: {
-              url: "https://unimodel.ai/v1/chat/completions",
+              url: "https://www.unimodel.ai/v1/chat/completions",
               method: "POST",
               body: {
                 model: "deepseek-v4-flash",

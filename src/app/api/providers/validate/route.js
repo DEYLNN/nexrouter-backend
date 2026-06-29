@@ -407,6 +407,8 @@ export async function POST(request) {
         case "um":
         case "nabz-clan":
         case "nzc":
+        case "conduit":
+        case "co":
         case "babel-town":
         case "bt": {
           const validationConfigs = {
@@ -661,6 +663,26 @@ export async function POST(request) {
               method: "POST",
               body: {
                 model: "minimax-m3",
+                messages: [{ role: "user", content: "test" }],
+                max_tokens: 1,
+                stream: false,
+              },
+            },
+            conduit: {
+              url: "https://conduit.ozdoev.net/api/v1/chat/completions",
+              method: "POST",
+              body: {
+                model: "anthropic/claude-sonnet-4-6",
+                messages: [{ role: "user", content: "test" }],
+                max_tokens: 1,
+                stream: false,
+              },
+            },
+            co: {
+              url: "https://conduit.ozdoev.net/api/v1/chat/completions",
+              method: "POST",
+              body: {
+                model: "anthropic/claude-sonnet-4-6",
                 messages: [{ role: "user", content: "test" }],
                 max_tokens: 1,
                 stream: false,

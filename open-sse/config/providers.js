@@ -196,6 +196,14 @@ export const PROVIDERS = {
     baseUrl: "https://lumyx-ai.site/api/v1/chat/completions",
     format: "openai"
   },
+  conduit: {
+    baseUrl: "https://conduit.ozdoev.net/api/v1/chat/completions",
+    format: "openai"
+  },
+  co: {
+    baseUrl: "https://conduit.ozdoev.net/api/v1/chat/completions",
+    format: "openai"
+  },
   "babel-town": {
     baseUrl: "https://api.babel.town/v1/chat/completions",
     format: "openai"

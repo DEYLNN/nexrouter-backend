@@ -397,6 +397,10 @@ export const PROVIDER_MODELS = {
   "nabz-clan": [
     { id: "minimax-m3", name: "MiniMax M3" },
   ],
+  conduit: [
+    { id: "anthropic/claude-sonnet-4-6", name: "Claude Sonnet 4.6" },
+    { id: "google/gemini-3-pro", name: "Gemini 3 Pro" },
+  ],
   "babel-town": [
     { id: "glm-5.2", name: "GLM 5.2" },
   ],

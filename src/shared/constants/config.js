@@ -93,6 +93,8 @@ export const PROVIDER_ENDPOINTS = {
   um: "https://www.unimodel.ai/v1/chat/completions",
   "nabz-clan": "https://lumyx-ai.site/api/v1/chat/completions",
   nzc: "https://lumyx-ai.site/api/v1/chat/completions",
+  conduit: "https://conduit.ozdoev.net/api/v1/chat/completions",
+  co: "https://conduit.ozdoev.net/api/v1/chat/completions",
   "babel-town": "https://api.babel.town/v1/chat/completions",
   bt: "https://api.babel.town/v1/chat/completions",
   "qwen-cloud": "https://dashscope-intl.aliyuncs.com/compatible-mode/v1/chat/completions",

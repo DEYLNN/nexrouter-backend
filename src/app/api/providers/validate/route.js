@@ -403,6 +403,8 @@ export async function POST(request) {
         case "evomap":
         case "evo":
         case "morph":
+        case "unimodel":
+        case "um":
         case "babel-town":
         case "bt": {
           const validationConfigs = {
@@ -621,6 +623,26 @@ export async function POST(request) {
             longcat: {
               url: "https://api.longcat.chat/openai/v1/models",
               method: "GET",
+            },
+            unimodel: {
+              url: "https://unimodel.ai/v1/chat/completions",
+              method: "POST",
+              body: {
+                model: "deepseek-v4-flash",
+                messages: [{ role: "user", content: "test" }],
+                max_tokens: 1,
+                stream: false,
+              },
+            },
+            um: {
+              url: "https://unimodel.ai/v1/chat/completions",
+              method: "POST",
+              body: {
+                model: "deepseek-v4-flash",
+                messages: [{ role: "user", content: "test" }],
+                max_tokens: 1,
+                stream: false,
+              },
             },
             "naraya-ai": {
               url: "https://router.bynara.id/v1/models",

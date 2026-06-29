@@ -89,6 +89,8 @@ export const PROVIDER_ENDPOINTS = {
   zenmux: "https://zenmux.ai/api/v1/chat/completions",
   ocenza: "https://ocenza.com/v1/chat/completions",
   vikey: "https://api.vikey.ai/v1/chat/completions",
+  unimodel: "https://unimodel.ai/v1/chat/completions",
+  um: "https://unimodel.ai/v1/chat/completions",
   "babel-town": "https://api.babel.town/v1/chat/completions",
   bt: "https://api.babel.town/v1/chat/completions",
   "qwen-cloud": "https://dashscope-intl.aliyuncs.com/compatible-mode/v1/chat/completions",

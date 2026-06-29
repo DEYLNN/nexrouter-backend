@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.4.80] - 2026-06-29
+
+### Added
+- Add Unimodel provider (alias `um`) — OpenAI-compatible inference API via unimodel.ai/v1.
+  - Base URL: `https://unimodel.ai/v1`
+  - Dynamic model fetch via /v1/models
+
 ## [0.4.79] - 2026-06-28
 
 ### Added

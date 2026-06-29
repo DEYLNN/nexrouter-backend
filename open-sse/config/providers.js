@@ -184,6 +184,10 @@ export const PROVIDERS = {
     baseUrl: "https://www.unimodel.ai/v1/chat/completions",
     format: "openai"
   },
+  um: {
+    baseUrl: "https://www.unimodel.ai/v1/chat/completions",
+    format: "openai"
+  },
   "babel-town": {
     baseUrl: "https://api.babel.town/v1/chat/completions",
     format: "openai"

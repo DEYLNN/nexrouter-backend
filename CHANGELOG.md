@@ -2,6 +2,10 @@
 
 ## [0.4.82] - 2026-06-29
 
+### Fixes
+- Fix Unimodel base URL to www.unimodel.ai (non-www returns OpenAI proxy 401).
+- Add `um` alias to open-sse config/providers.js for executor routing.
+
 ### Added
 - Add API key validation and test support for Unimodel provider (alias `um`).
 

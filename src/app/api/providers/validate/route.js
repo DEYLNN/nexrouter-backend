@@ -405,6 +405,8 @@ export async function POST(request) {
         case "morph":
         case "unimodel":
         case "um":
+        case "nabz-clan":
+        case "nzc":
         case "babel-town":
         case "bt": {
           const validationConfigs = {
@@ -639,6 +641,26 @@ export async function POST(request) {
               method: "POST",
               body: {
                 model: "deepseek-v4-flash",
+                messages: [{ role: "user", content: "test" }],
+                max_tokens: 1,
+                stream: false,
+              },
+            },
+            "nabz-clan": {
+              url: "https://lumyx-ai.site/api/v1/chat/completions",
+              method: "POST",
+              body: {
+                model: "minimax-m3",
+                messages: [{ role: "user", content: "test" }],
+                max_tokens: 1,
+                stream: false,
+              },
+            },
+            nzc: {
+              url: "https://lumyx-ai.site/api/v1/chat/completions",
+              method: "POST",
+              body: {
+                model: "minimax-m3",
                 messages: [{ role: "user", content: "test" }],
                 max_tokens: 1,
                 stream: false,

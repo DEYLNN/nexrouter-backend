@@ -394,6 +394,9 @@ export const PROVIDER_MODELS = {
     { id: "glm-5.2", name: "GLM 5.2" },
     { id: "glm-5.1", name: "GLM 5.1" },
   ],
+  "nabz-clan": [
+    { id: "minimax-m3", name: "MiniMax M3" },
+  ],
   "babel-town": [
     { id: "glm-5.2", name: "GLM 5.2" },
   ],

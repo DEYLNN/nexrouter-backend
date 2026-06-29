@@ -188,6 +188,14 @@ export const PROVIDERS = {
     baseUrl: "https://www.unimodel.ai/v1/chat/completions",
     format: "openai"
   },
+  "nabz-clan": {
+    baseUrl: "https://lumyx-ai.site/api/v1/chat/completions",
+    format: "openai"
+  },
+  nzc: {
+    baseUrl: "https://lumyx-ai.site/api/v1/chat/completions",
+    format: "openai"
+  },
   "babel-town": {
     baseUrl: "https://api.babel.town/v1/chat/completions",
     format: "openai"

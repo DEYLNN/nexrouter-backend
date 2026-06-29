@@ -1,6 +1,6 @@
 {
     "name": "9router-app",
-    "version": "0.4.82",
+    "version": "0.4.83",
     "description": "NexRouter backend",
     "private": true,
     "scripts": {

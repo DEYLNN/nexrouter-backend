@@ -1,8 +1,12 @@
 # Changelog
 
-## [0.4.82] - 2026-06-29
+## [0.4.83] - 2026-06-29
 
-### Fixes
+### Added
+- Add Nabz Clan provider (alias `nzc`) — OpenAI-compatible inference API via lumyx-ai.site.
+  - Models: minimax-m3
+
+## [0.4.82] - 2026-06-29
 - Fix Unimodel base URL to www.unimodel.ai (non-www returns OpenAI proxy 401).
 - Add `um` alias to open-sse config/providers.js for executor routing.
 

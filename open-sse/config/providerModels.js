@@ -388,6 +388,12 @@ export const PROVIDER_MODELS = {
   vikey: [
     { id: "vikey/vclaw", name: "Vikey VCLaw" },
   ],
+  unimodel: [
+    { id: "deepseek-v4-pro", name: "DeepSeek V4 Pro" },
+    { id: "deepseek-v4-flash", name: "DeepSeek V4 Flash" },
+    { id: "glm-5.2", name: "GLM 5.2" },
+    { id: "glm-5.1", name: "GLM 5.1" },
+  ],
   "babel-town": [
     { id: "glm-5.2", name: "GLM 5.2" },
   ],

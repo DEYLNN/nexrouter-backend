@@ -350,6 +350,14 @@ export const PROVIDERS = {
     format: "openai",
     headers: {}
   },
+  cavoti: {
+    baseUrl: "https://cavoti.com/v1/chat/completions",
+    format: "openai"
+  },
+  cv: {
+    baseUrl: "https://cavoti.com/v1/chat/completions",
+    format: "openai"
+  },
   github: {
     baseUrl: "https://api.githubcopilot.com/chat/completions",
     responsesUrl: "https://api.githubcopilot.com/responses",

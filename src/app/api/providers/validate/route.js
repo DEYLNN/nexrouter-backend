@@ -407,6 +407,8 @@ export async function POST(request) {
         case "um":
         case "nabz-clan":
         case "nzc":
+        case "cavoti":
+        case "cv":
         case "conduit":
         case "co":
         case "babel-town":
@@ -665,6 +667,24 @@ export async function POST(request) {
                 model: "minimax-m3",
                 messages: [{ role: "user", content: "test" }],
                 max_tokens: 1,
+                stream: false,
+              },
+            },
+            cavoti: {
+              url: "https://cavoti.com/v1/chat/completions",
+              method: "POST",
+              body: {
+                model: "gpt-5.5",
+                messages: [{ role: "user", content: "hi" }],
+                stream: false,
+              },
+            },
+            cv: {
+              url: "https://cavoti.com/v1/chat/completions",
+              method: "POST",
+              body: {
+                model: "gpt-5.5",
+                messages: [{ role: "user", content: "hi" }],
                 stream: false,
               },
             },

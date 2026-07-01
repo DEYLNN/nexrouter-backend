@@ -926,18 +926,71 @@ async function testApiKeyConnection(connection, effectiveProxy = null) {
         return { valid, error: valid ? null : "Invalid API key" };
       }
       case "unimodel":
-      case "um":
-      case "nabz-clan":
-      case "nzc":
-      case "cavoti":
-      case "cv":
-      case "conduit":
-      case "co": {
+      case "um": {
         const res = await fetchWithConnectionProxy("https://www.unimodel.ai/v1/chat/completions", {
           method: "POST",
           headers: { Authorization: `Bearer ${connection.apiKey}`, "Content-Type": "application/json" },
           body: JSON.stringify({
             model: "deepseek-v4-flash",
+            messages: [{ role: "user", content: "test" }],
+            max_tokens: 1,
+            stream: false,
+          }),
+        }, effectiveProxy);
+        const valid = res.status !== 401 && res.status !== 403;
+        return { valid, error: valid ? null : "Invalid API key" };
+      }
+      case "nabz-clan":
+      case "nzc": {
+        const res = await fetchWithConnectionProxy("https://lumyx-ai.site/api/v1/chat/completions", {
+          method: "POST",
+          headers: { Authorization: `Bearer ${connection.apiKey}`, "Content-Type": "application/json" },
+          body: JSON.stringify({
+            model: "minimax-m3",
+            messages: [{ role: "user", content: "test" }],
+            max_tokens: 1,
+            stream: false,
+          }),
+        }, effectiveProxy);
+        const valid = res.status !== 401 && res.status !== 403;
+        return { valid, error: valid ? null : "Invalid API key" };
+      }
+      case "questflow":
+      case "qf": {
+        const res = await fetchWithConnectionProxy("https://app.questflow.ai/openapi/v1/chat/completions", {
+          method: "POST",
+          headers: { Authorization: `Bearer ${connection.apiKey}`, "Content-Type": "application/json" },
+          body: JSON.stringify({
+            model: "gpt-4o-mini",
+            messages: [{ role: "user", content: "test" }],
+            max_tokens: 1,
+            stream: false,
+          }),
+        }, effectiveProxy);
+        const valid = res.status !== 401 && res.status !== 403;
+        return { valid, error: valid ? null : "Invalid API key" };
+      }
+      case "cavoti":
+      case "cv": {
+        const res = await fetchWithConnectionProxy("https://cavoti.com/v1/responses", {
+          method: "POST",
+          headers: { Authorization: `Bearer ${connection.apiKey}`, "Content-Type": "application/json" },
+          body: JSON.stringify({
+            model: "gpt-5.5",
+            input: "hi",
+            stream: false,
+          }),
+        }, effectiveProxy);
+        const valid = res.status !== 401 && res.status !== 403;
+        return { valid, error: valid ? null : "Invalid API key" };
+      }
+      case "conduit":
+      case "co": {
+        const res = await fetchWithConnectionProxy("https://conduit.ozdoev.net/api/v1/chat/completions", {
+          method: "POST",
+          headers: { Authorization: `Bearer ${connection.apiKey}`, "Content-Type": "application/json" },
+          body: JSON.stringify({
+            model: "anthropic/claude-sonnet-4-6",
             messages: [{ role: "user", content: "test" }],
             max_tokens: 1,
             stream: false,

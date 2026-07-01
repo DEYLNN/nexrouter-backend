@@ -400,6 +400,12 @@ export const PROVIDER_MODELS = {
   conduit: [
     { id: "anthropic/claude-sonnet-4-6", name: "Claude Sonnet 4.6" },
   ],
+  questflow: [
+    { id: "gpt-4o-mini", name: "GPT-4o Mini" },
+  ],
+  qf: [
+    { id: "gpt-4o-mini", name: "GPT-4o Mini" },
+  ],
   cavoti: [
     { id: "gpt-5.5", name: "GPT-5.5" },
   ],
@@ -1083,6 +1089,12 @@ export const PROVIDER_MODELS = {
     { id: "gen4_turbo", name: "Gen-4 Turbo", type: "video", params: [] },
     { id: "gen3a_turbo", name: "Gen-3 Alpha Turbo", type: "video", params: [] },
   ],
+  axumrouter: [
+    { id: "mst/mistral-small-latest", name: "Mistral Small" },
+  ],
+  axm: [
+    { id: "mst/mistral-small-latest", name: "Mistral Small" },
+  ],
   fb: [
     { id: "minimax-m2.7", name: "MiniMax M2.7" },
     { id: "minimax-m3", name: "MiniMax M3" },
@@ -1177,6 +1189,7 @@ const OAUTH_ALIASES = {
   zerog: "0g",
   zyloo: "zyloo",
   zenmux: "zmx",
+  axumrouter: "axm",
   freebuff: "fb",
   "general-compute": "gcx",
 };

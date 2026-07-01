@@ -155,6 +155,14 @@ export const PROVIDERS = {
     baseUrl: "https://api.swiftrouter.com/v1/chat/completions",
     format: "openai"
   },
+  axumrouter: {
+    baseUrl: "http://152.42.198.51:3000/v1",
+    format: "openai"
+  },
+  axm: {
+    baseUrl: "http://152.42.198.51:3000/v1",
+    format: "openai"
+  },
   gmi: {
     baseUrl: "https://api.gmi-serving.com/v1/chat/completions",
     format: "openai"
@@ -350,13 +358,21 @@ export const PROVIDERS = {
     format: "openai",
     headers: {}
   },
-  cavoti: {
-    baseUrl: "https://cavoti.com/v1/chat/completions",
+  questflow: {
+    baseUrl: "https://app.questflow.ai/openapi/v1/chat/completions",
     format: "openai"
   },
-  cv: {
-    baseUrl: "https://cavoti.com/v1/chat/completions",
+  qf: {
+    baseUrl: "https://app.questflow.ai/openapi/v1/chat/completions",
     format: "openai"
+  },
+  cavoti: {
+    baseUrl: "https://cavoti.com/v1/responses",
+    format: "openai-responses"
+  },
+  cv: {
+    baseUrl: "https://cavoti.com/v1/responses",
+    format: "openai-responses"
   },
   github: {
     baseUrl: "https://api.githubcopilot.com/chat/completions",

@@ -407,6 +407,8 @@ export async function POST(request) {
         case "um":
         case "nabz-clan":
         case "nzc":
+        case "questflow":
+        case "qf":
         case "cavoti":
         case "cv":
         case "conduit":
@@ -670,21 +672,41 @@ export async function POST(request) {
                 stream: false,
               },
             },
+            questflow: {
+              url: "https://app.questflow.ai/openapi/v1/chat/completions",
+              method: "POST",
+              body: {
+                model: "gpt-4o-mini",
+                messages: [{ role: "user", content: "hi" }],
+                max_tokens: 1,
+                stream: false,
+              },
+            },
+            qf: {
+              url: "https://app.questflow.ai/openapi/v1/chat/completions",
+              method: "POST",
+              body: {
+                model: "gpt-4o-mini",
+                messages: [{ role: "user", content: "hi" }],
+                max_tokens: 1,
+                stream: false,
+              },
+            },
             cavoti: {
-              url: "https://cavoti.com/v1/chat/completions",
+              url: "https://cavoti.com/v1/responses",
               method: "POST",
               body: {
                 model: "gpt-5.5",
-                messages: [{ role: "user", content: "hi" }],
+                input: "hi",
                 stream: false,
               },
             },
             cv: {
-              url: "https://cavoti.com/v1/chat/completions",
+              url: "https://cavoti.com/v1/responses",
               method: "POST",
               body: {
                 model: "gpt-5.5",
-                messages: [{ role: "user", content: "hi" }],
+                input: "hi",
                 stream: false,
               },
             },

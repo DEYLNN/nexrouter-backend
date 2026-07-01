@@ -1090,10 +1090,10 @@ export const PROVIDER_MODELS = {
     { id: "gen3a_turbo", name: "Gen-3 Alpha Turbo", type: "video", params: [] },
   ],
   axumrouter: [
-    { id: "mst/mistral-small-latest", name: "Mistral Small" },
+    { id: "mistral/mistral-small-latest", name: "Mistral Small" },
   ],
   axm: [
-    { id: "mst/mistral-small-latest", name: "Mistral Small" },
+    { id: "mistral/mistral-small-latest", name: "Mistral Small" },
   ],
   fb: [
     { id: "minimax-m2.7", name: "MiniMax M2.7" },

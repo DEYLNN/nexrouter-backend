@@ -156,11 +156,11 @@ export const PROVIDERS = {
     format: "openai"
   },
   axumrouter: {
-    baseUrl: "http://152.42.198.51:3000/v1",
+    baseUrl: "http://152.42.198.51:3000/v1/chat/completions",
     format: "openai"
   },
   axm: {
-    baseUrl: "http://152.42.198.51:3000/v1",
+    baseUrl: "http://152.42.198.51:3000/v1/chat/completions",
     format: "openai"
   },
   gmi: {
@@ -650,6 +650,10 @@ export const PROVIDERS = {
   },
   "xiaomi-mimo-plan-sgp": {
     baseUrl: "https://token-plan-sgp.xiaomimimo.com/v1/chat/completions",
+    format: "openai"
+  },
+  agn: {
+    baseUrl: "https://apihub.agnes-ai.com/v1/chat/completions",
     format: "openai"
   },
 };
